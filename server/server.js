@@ -12,81 +12,77 @@ app.use(express.urlencoded({ extended: true }));
 
 const db = new sqlite3.Database("./data/database.db");
 
-let trueskill = [];
-let leaderboard = [];
-let commandStats = [];
-let profiles = [];
-
-db.serialize(() => {
-    const stmt = db.prepare("SELECT * FROM trueskill");
-
-    stmt.all((err, rows) => {
-        if (err) {
-            console.log(err);
-        } else {
-            trueskill = rows;
-        }
-    });
-    stmt.finalize();
-
-    const stmt2 = db.prepare("SELECT * FROM level");
-
-    stmt2.all((err, rows) => {
-        if (err) {
-            console.log(err);
-        } else {
-            leaderboard = rows;
-        }
-    });
-
-    stmt2.finalize();
-
-    const stmt3 = db.prepare("SELECT * FROM commands");
-
-    stmt3.all((err, rows) => {
-        if (err) {
-            console.log(err);
-        } else {
-            commandStats = rows;
-        }
-    });
-
-    stmt3.finalize();
-
-    const stmt4 = db.prepare("SELECT * FROM profile");
-
-    stmt4.all((err, rows) => {
-        if (err) {
-            console.log(err);
-        } else {
-            profiles = rows;
-        }
-    });
-
-    stmt4.finalize();
-});
-
-db.close();
-
 app.get("/", (req, res) => {
-    res.send(`Hi! Server is listening on port ${port}`);
+    res.send(`Hi! Listening on port ${port}. Available endpoints: /trueskill, /leaderboard, /commands, /profiles`);
 });
 
 app.get("/trueskill", (req, res) => {
-    res.send(trueskill);
+    db.serialize(() => {
+        const stmt = db.prepare("SELECT * FROM trueskill");
+
+        stmt.all((err, rows) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(rows);
+            }
+        });
+        stmt.finalize();
+    });
 });
 
 app.get("/leaderboard", (req, res) => {
-    res.send(leaderboard);
+    db.serialize(() => {
+        const stmt = db.prepare("SELECT * FROM level");
+
+        stmt.all((err, rows) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(rows);
+            }
+        });
+
+        stmt.finalize();
+    });
 });
 
 app.get("/commands", (req, res) => {
-    res.send(commandStats);
+    db.serialize(() => {
+        const stmt = db.prepare("SELECT * FROM commands");
+
+        stmt.all((err, rows) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(rows);
+            }
+        });
+
+        stmt.finalize();
+    });
 });
 
 app.get("/profiles", (req, res) => {
-    res.send(profiles);
+    db.serialize(() => {
+        const stmt = db.prepare("SELECT * FROM profile");
+
+        stmt.all((err, rows) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(rows);
+            }
+        });
+
+        stmt.finalize();
+    });
 });
 
-// listen on the port
+// Listen on the port
 app.listen(port);
+
+// Close the database connection when the process is exited.
+process.on("exit", () => {
+    db.close();
+});
