@@ -1,5 +1,5 @@
 <template>
-    <div v-for="u in user" :key="u">{{ u }}</div>
+    <div>WIP</div>
 </template>
 
 <script setup lang="ts">
@@ -11,7 +11,5 @@ const user = ref({});
 onMounted(async () => {
     const res = await fetch("http://localhost:8080/profiles");
     user.value = await res.json();
-
-    console.log(user.value);
 });
 </script>
