@@ -11,7 +11,9 @@
             <div>Winrate</div>
         </div>
         <div class="user" v-for="(u, i) in user" :key="u">
-            <div>#{{ i + 1 }}</div>
+            <div>
+                <i>#{{ i + 1 }}</i>
+            </div>
             <div>
                 <img :src="getRandomUserAvatar()" alt="User Avatar" class="avatar-preview" /> {{ getRandomUserName() }}
             </div>

@@ -1,7 +1,6 @@
 <template>
     <div class="grid">
         <div class="table-header">
-            <div>Index</div>
             <div>User</div>
             <div>ID</div>
             <div>Tag</div>
@@ -13,14 +12,13 @@
         </div>
         <div
             class="user"
-            v-for="(u, i) in user"
+            v-for="u in user"
             :key="u"
             :style="{
                 // @ts-ignore
                 borderLeftColor: '#' + u['colour'].toString(16).padStart(6, '0')
             }"
         >
-            <div>#{{ i + 1 }}</div>
             <div>
                 <img :src="getRandomUserAvatar()" alt="User Avatar" class="avatar-preview" /> {{ getRandomUserName() }}
             </div>
@@ -60,7 +58,7 @@ onMounted(async () => {
 <style scoped>
 .user,
 .table-header {
-    grid-template-columns: 1fr 1.2fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.2fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr;
     word-break: break-all;
 }
 

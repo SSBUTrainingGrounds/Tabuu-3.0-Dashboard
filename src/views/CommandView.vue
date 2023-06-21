@@ -7,7 +7,9 @@
             <div>Last Used</div>
         </div>
         <div class="command" v-for="(c, i) in command" :key="c">
-            <div>#{{ i + 1 }}</div>
+            <div>
+                <i>#{{ i + 1 }}</i>
+            </div>
             <div>%{{ c["command"] }}</div>
             <div>{{ c["uses"] }}</div>
             <div>{{ c["last_used"] !== 0 ? new Date(c["last_used"] * 1000).toLocaleString() : "N/A" }}</div>
