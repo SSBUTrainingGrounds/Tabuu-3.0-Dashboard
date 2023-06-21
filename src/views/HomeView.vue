@@ -1,9 +1,9 @@
 <template>
     <div>
-        <h1><img src="../assets/avatar.png" alt="Tabuu 3.0 Avatar" width="150" />Tabuu 3.0 Dashboard</h1>
+        <h1><img class="avatar" src="../assets/avatar.png" alt="Tabuu 3.0 Avatar" width="150" />Tabuu 3.0 Dashboard</h1>
 
-        <p>Welcome to the Tabuu 3.0 Dashboard! This is a work in progress.</p>
-        <p>Please choose a page from the navigation bar above to get started.</p>
+        <p class="description">Welcome to the Tabuu 3.0 Dashboard! This is a work in progress.</p>
+        <p class="description">Please choose a page from the navigation bar above to get started.</p>
     </div>
 </template>
 
@@ -15,12 +15,12 @@ h1 {
     text-align: center;
 }
 
-img {
+.avatar {
     display: block;
     margin: 0 auto;
 }
 
-p {
+.description {
     color: var(--white);
     text-align: center;
 }

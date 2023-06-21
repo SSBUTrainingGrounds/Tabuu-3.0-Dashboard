@@ -12,4 +12,12 @@ body {
     line-height: 1.5;
     background-color: var(--gray);
     color: var(--white);
+    overflow: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
 }

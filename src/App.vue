@@ -4,18 +4,27 @@ import { RouterLink, RouterView } from "vue-router";
 
 <template>
     <header>
-        <div class="wrapper">
-            <nav class="header-nav">
-                <RouterLink to="/"><i class="fa fa-home"></i>Home</RouterLink>
-                <RouterLink to="/trueskill"><i class="fa fa-check"></i>TrueSkill</RouterLink>
-                <RouterLink to="/leaderboard"><i class="fa fa-envelope"></i>Leaderboard</RouterLink>
-                <RouterLink to="/commands"><i class="fa fa-signal"></i>Command Stats</RouterLink>
-                <RouterLink to="/profiles"><i class="fa fa-user"></i>Profiles</RouterLink>
+        <div class="wrapper-header">
+            <nav class="nav">
+                <RouterLink to="/"><i class="fa fa-home"></i> Home</RouterLink>
+                <RouterLink to="/trueskill"><i class="fa fa-check"></i> TrueSkill</RouterLink>
+                <RouterLink to="/leaderboard"><i class="fa fa-envelope"></i> Leaderboard</RouterLink>
+                <RouterLink to="/commands"><i class="fa fa-signal"></i> Command Stats</RouterLink>
+                <RouterLink to="/profiles"><i class="fa fa-user"></i> Profiles</RouterLink>
             </nav>
         </div>
     </header>
 
     <RouterView />
+
+    <footer>
+        <div class="wrapper-footer">
+            <nav class="nav">
+                <a href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0"><i class="fa fa-github"></i> Bot GitHub</a>
+                <a href="https://github.com/atomflunder/bot-frontend"><i class="fa fa-github"></i> Dashboard GitHub</a>
+            </nav>
+        </div>
+    </footer>
 </template>
 
 <style>
@@ -27,29 +36,69 @@ header {
     padding: 1rem;
 }
 
-.wrapper {
+footer {
+    background-color: var(--black);
+    color: var(--white);
+    bottom: 0;
+    width: 100%;
+    position: absolute;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+header,
+footer,
+.grid {
+    overflow: hidden hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+header::-webkit-scrollbar,
+footer::-webkit-scrollbar,
+.grid::-webkit-scrollbar {
+    display: none;
+}
+
+.wrapper-header {
     max-width: 1200px;
     margin: 0 auto;
 }
 
-.header-nav {
+.wrapper-footer {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.nav {
     display: flex;
     justify-content: space-between;
 }
 
-.header-nav a {
+.nav a {
     color: var(--green);
     text-decoration: none;
     font-weight: bold;
     font-size: large;
+    margin: 0 0.2rem 0 0.2rem;
 }
 
-.header-nav a:hover {
+.nav a:hover {
     color: var(--light-green);
 }
 
-.header-nav a.active {
+.nav a.active {
     color: var(--light-green);
+}
+
+@media (max-width: 500px) {
+    .nav a {
+        font-size: small;
+    }
+
+    .grid {
+        font-size: x-small;
+    }
 }
 
 .grid {
