@@ -4,7 +4,6 @@
             <div>Rank</div>
             <div>ID</div>
             <div>TabuuSkill</div>
-            <div>Rating</div>
             <div>Deviation</div>
             <div>Wins</div>
             <div>Losses</div>
@@ -14,7 +13,6 @@
             <div>#{{ i + 1 }}</div>
             <div>{{ u["user_id"] }}</div>
             <div>{{ getTabuuSkill(u["rating"], u["deviation"]).toFixed(2) }}</div>
-            <div>{{ (u["rating"] * 100).toFixed(2) }}</div>
             <div>{{ (u["deviation"] * 100).toFixed(2) }}</div>
             <div>{{ u["wins"] }}</div>
             <div>{{ u["losses"] }}</div>
@@ -54,7 +52,7 @@ onMounted(async () => {
 .user,
 .header {
     display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1fr 1fr;
     grid-gap: 1rem;
     padding: 1rem;
     border-radius: 0.5rem;

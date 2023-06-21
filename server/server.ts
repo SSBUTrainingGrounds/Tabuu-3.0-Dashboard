@@ -1,16 +1,13 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const sqlite3 = require("sqlite3").verbose();
+import { Database } from "sqlite3";
+import express from "express";
 
 const app = express();
 const port = 8080;
 
-app.use(bodyParser.json());
-app.use(cors());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const db = new sqlite3.Database("./data/database.db");
+const db = new Database("./data/database.db");
 
 app.get("/", (req, res) => {
     res.send(`Hi! Listening on port ${port}. Available endpoints: /trueskill, /leaderboard, /commands, /profiles`);
