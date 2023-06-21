@@ -5,12 +5,12 @@ import { RouterLink, RouterView } from "vue-router";
 <template>
     <header>
         <div class="wrapper">
-            <nav>
-                <RouterLink to="/">Home</RouterLink>
-                <RouterLink to="/trueskill">TrueSkill</RouterLink>
-                <RouterLink to="/leaderboard">Leaderboard</RouterLink>
-                <RouterLink to="/commands">Command Stats</RouterLink>
-                <RouterLink to="/profiles">Profiles</RouterLink>
+            <nav class="header-nav">
+                <RouterLink to="/"><i class="fa fa-home"></i>Home</RouterLink>
+                <RouterLink to="/trueskill"><i class="fa fa-check"></i>TrueSkill</RouterLink>
+                <RouterLink to="/leaderboard"><i class="fa fa-envelope"></i>Leaderboard</RouterLink>
+                <RouterLink to="/commands"><i class="fa fa-signal"></i>Command Stats</RouterLink>
+                <RouterLink to="/profiles"><i class="fa fa-user"></i>Profiles</RouterLink>
             </nav>
         </div>
     </header>
@@ -32,22 +32,23 @@ header {
     margin: 0 auto;
 }
 
-nav {
+.header-nav {
     display: flex;
     justify-content: space-between;
 }
 
-nav a {
+.header-nav a {
     color: var(--green);
     text-decoration: none;
     font-weight: bold;
+    font-size: large;
 }
 
-nav a:hover {
+.header-nav a:hover {
     color: var(--light-green);
 }
 
-nav a.active {
+.header-nav a.active {
     color: var(--light-green);
 }
 

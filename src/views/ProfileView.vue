@@ -63,4 +63,9 @@ onMounted(async () => {
     grid-template-columns: 1fr 1.2fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr;
     word-break: break-all;
 }
+
+.user {
+    border-left: 0.5rem solid;
+    border-radius: 0.2rem;
+}
 </style>
