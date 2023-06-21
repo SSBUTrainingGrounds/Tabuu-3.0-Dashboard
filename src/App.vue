@@ -18,7 +18,7 @@ import { RouterLink, RouterView } from "vue-router";
     <RouterView />
 </template>
 
-<style scoped>
+<style>
 @import "./assets/styles.css";
 
 header {
@@ -49,5 +49,48 @@ nav a:hover {
 
 nav a.active {
     color: var(--light-green);
+}
+
+.grid {
+    display: grid;
+    grid-gap: 0.2rem;
+    max-width: 1200px;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.avatar-preview {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.table-header {
+    font-weight: bold;
+}
+
+.user,
+.table-header,
+.command {
+    display: grid;
+    grid-gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.user:nth-child(odd),
+.command:nth-child(odd) {
+    background-color: var(--black);
+}
+
+.user:nth-child(even),
+.command:nth-child(even) {
+    background-color: var(--dark-gray);
+}
+
+.user:hover,
+.command:hover {
+    background-color: var(--green);
 }
 </style>

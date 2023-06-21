@@ -1,6 +1,6 @@
 <template>
     <div class="grid">
-        <div class="header">
+        <div class="table-header">
             <div>Rank</div>
             <div>Command Name</div>
             <div>Uses</div>
@@ -30,33 +30,8 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@import "../assets/styles.css";
-.grid {
-    display: grid;
-    grid-gap: 0.2rem;
-    max-width: 1200px;
-    justify-content: center;
-    margin: 0 auto;
-}
-
 .command,
-.header {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-gap: 1rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-}
-
-.command:nth-child(odd) {
-    background-color: var(--black);
-}
-
-.command:nth-child(even) {
-    background-color: var(--dark-gray);
-}
-
-.user:hover {
-    background-color: var(--green);
+.table-header {
+    grid-template-columns: 1fr 1.2fr 1.5fr 1fr;
 }
 </style>

@@ -1,7 +1,8 @@
 <template>
     <div class="grid">
-        <div class="header">
+        <div class="table-header">
             <div>Rank</div>
+            <div>User</div>
             <div>ID</div>
             <div>TabuuSkill</div>
             <div>Deviation</div>
@@ -11,6 +12,9 @@
         </div>
         <div class="user" v-for="(u, i) in user" :key="u">
             <div>#{{ i + 1 }}</div>
+            <div>
+                <img :src="getRandomUserAvatar()" alt="User Avatar" class="avatar-preview" /> {{ getRandomUserName() }}
+            </div>
             <div>{{ u["user_id"] }}</div>
             <div>{{ getTabuuSkill(u["rating"], u["deviation"]).toFixed(2) }}</div>
             <div>{{ (u["deviation"] * 100).toFixed(2) }}</div>
@@ -24,6 +28,7 @@
 <script setup lang="ts">
 // Get the user info from the express server
 import { ref, onMounted } from "vue";
+import { getRandomUserAvatar, getRandomUserName } from "../helpers/mockUsers";
 
 const user = ref({});
 
@@ -40,33 +45,8 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@import "../assets/styles.css";
-.grid {
-    display: grid;
-    grid-gap: 0.2rem;
-    max-width: 1200px;
-    justify-content: center;
-    margin: 0 auto;
-}
-
 .user,
-.header {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    grid-gap: 1rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-}
-
-.user:nth-child(odd) {
-    background-color: var(--black);
-}
-
-.user:nth-child(even) {
-    background-color: var(--dark-gray);
-}
-
-.user:hover {
-    background-color: var(--green);
+.table-header {
+    grid-template-columns: 1fr 1.2fr 1.5fr 1fr 1fr 1fr 1fr 1fr;
 }
 </style>
