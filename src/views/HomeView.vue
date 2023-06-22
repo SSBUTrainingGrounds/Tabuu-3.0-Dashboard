@@ -1,27 +1,32 @@
 <template>
-    <div>
-        <h1><img class="avatar" src="../assets/avatar.png" alt="Tabuu 3.0 Avatar" width="150" />Tabuu 3.0 Dashboard</h1>
+    <div class="home-div">
+        <img class="avatar" src="../assets/avatar.png" alt="Tabuu 3.0 Avatar" width="150" />
+        <div class="description">
+            <h1>Tabuu 3.0 Dashboard</h1>
 
-        <p class="description">Welcome to the Tabuu 3.0 Dashboard! This is a work in progress.</p>
-        <p class="description">Please choose a page from the navigation bar above to get started.</p>
+            <p>Welcome to the Tabuu 3.0 Dashboard! This is a work in progress.</p>
+            <p>Please choose a page from the navigation bar above to get started.</p>
+        </div>
     </div>
 </template>
 
 <style scoped>
 @import "../assets/styles.css";
 
-h1 {
+.home-div {
     color: var(--white);
     text-align: center;
+}
+
+.description,
+.avatar {
+    display: inline-block;
+    margin: 0 auto;
+    vertical-align: top;
 }
 
 .avatar {
-    display: block;
-    margin: 0 auto;
-}
-
-.description {
-    color: var(--white);
-    text-align: center;
+    height: 150px;
+    width: 150px;
 }
 </style>
