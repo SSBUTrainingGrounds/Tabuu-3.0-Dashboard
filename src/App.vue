@@ -11,6 +11,7 @@ import { RouterLink, RouterView } from "vue-router";
                 <RouterLink to="/leaderboard"><i class="fa fa-envelope"></i> Leaderboard</RouterLink>
                 <RouterLink to="/commands"><i class="fa fa-signal"></i> Command Stats</RouterLink>
                 <RouterLink to="/profiles"><i class="fa fa-user"></i> Profiles</RouterLink>
+                <RouterLink to="/dashboard"><i class="fa fa-cog"></i> Dashboard</RouterLink>
             </nav>
         </div>
     </header>
@@ -92,7 +93,7 @@ footer::-webkit-scrollbar,
     color: var(--light-green);
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
     .nav a {
         font-size: small;
     }
