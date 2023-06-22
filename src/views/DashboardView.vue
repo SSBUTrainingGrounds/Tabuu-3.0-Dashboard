@@ -1,12 +1,19 @@
 <template>
     <div v-if="!loggedIn" class="wrapper">
         <a
-            href="https://discord.com/api/oauth2/authorize?client_id=775675159402905642&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fdashboard&response_type=token&scope=identify"
+            href="https://discord.com/api/oauth2/authorize?client_id=775675159402905642&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fdashboard&response_type=token&scope=identify%20guilds%20guilds.members.read"
             class="log-button"
             ><i class="fab fa-discord"></i> Login With Discord
         </a>
 
         <h2>Please login with Discord to use the dashboard</h2>
+    </div>
+
+    <div class="wrapper" v-else-if="!isAdmin">
+        <a href="http://localhost:5173/dashboard" class="log-button"><i class="fab fa-discord"></i> Log Out</a>
+
+        <h2>You are not authorized to view this page</h2>
+        <p>If you believe this is a mistake, please contact the server administrators.</p>
     </div>
 
     <div v-else class="wrapper">
@@ -27,9 +34,10 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, type Ref } from "vue";
 
 let loggedIn = ref(false);
+let isAdmin = ref(false);
 
 let user = ref({
     id: "",
@@ -46,6 +54,8 @@ let user = ref({
     premium_type: 0,
     public_flags: 0
 });
+
+let guilds: Ref<Object[]> = ref([]);
 
 onBeforeMount(() => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -67,6 +77,30 @@ onBeforeMount(() => {
                 } else {
                     user.value = data;
                     loggedIn.value = true;
+                }
+            });
+
+        fetch("https://discord.com/api/users/@me/guilds", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.message) {
+                    console.log(data.message);
+                } else {
+                    guilds.value = data;
+
+                    for (let i = 0; i < guilds.value.length; i++) {
+                        // @ts-ignore
+                        if (guilds.value[i].id === "739299507795132486" && guilds.value[i].permissions === 2147483647) {
+                            isAdmin.value = true;
+                            return;
+                        }
+                    }
+
+                    isAdmin.value = false;
                 }
             });
     } else {
