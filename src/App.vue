@@ -20,8 +20,9 @@ import { RouterLink, RouterView } from "vue-router";
     <footer>
         <div class="wrapper-footer">
             <nav class="nav">
-                <a href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0"><i class="fa fa-github"></i> Bot GitHub</a>
-                <a href="https://github.com/atomflunder/bot-frontend"><i class="fa fa-github"></i> Dashboard GitHub</a>
+                <a href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0"><i class="fab fa-github"></i> Bot GitHub</a>
+                <a href="https://discord.gg/ssbutg"><i class="fab fa-discord"></i> Join Our Discord</a>
+                <a href="https://github.com/atomflunder/bot-frontend"><i class="fab fa-github"></i> Dashboard GitHub</a>
             </nav>
         </div>
     </footer>
