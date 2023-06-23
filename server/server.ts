@@ -76,6 +76,24 @@ app.get("/profiles", (req, res) => {
     });
 });
 
+app.post("/macro", (req, res) => {
+    const { name, macro, uses, author } = req.body;
+
+    db.serialize(() => {
+        const stmt = db.prepare("INSERT INTO macros (name, payload, uses, author) VALUES (?, ?, ?, ?)");
+
+        stmt.run(name, macro, uses, author, (err) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send("Success!");
+            }
+        });
+
+        stmt.finalize();
+    });
+});
+
 // Listen on the port
 app.listen(port);
 

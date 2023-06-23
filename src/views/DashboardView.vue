@@ -30,6 +30,15 @@
                 <h3 class>({{ user.id }})</h3>
             </div>
         </div>
+
+        <div class="macro">
+            <h2>Macros</h2>
+            <div class="macro-input">
+                <input type="text" placeholder="Macro Name" id="macro-name" v-model="name" />
+                <input type="text" placeholder="Macro Value" id="macro-value" v-model="payload" />
+                <button @click="sendMacro()">Send Macro</button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -107,6 +116,27 @@ onBeforeMount(() => {
         loggedIn.value = false;
     }
 });
+
+let name = ref("");
+let payload = ref("");
+
+function sendMacro() {
+    fetch("http://localhost:8080/macro", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name.value,
+            macro: payload.value,
+            uses: 0,
+            author: user.value.id
+        })
+    });
+
+    name.value = "";
+    payload.value = "";
+}
 </script>
 
 <style scoped>
