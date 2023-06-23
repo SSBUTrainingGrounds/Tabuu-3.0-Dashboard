@@ -35,18 +35,13 @@
             </div>
         </div>
 
-        <div class="macro">
-            <h2>Macros</h2>
-            <div class="macro-input">
-                <input type="text" placeholder="Macro Name" id="macro-name" v-model="name" />
-                <input type="text" placeholder="Macro Value" id="macro-value" v-model="payload" />
-                <button @click="sendMacro()">Send Macro</button>
-            </div>
-        </div>
+        <MacroComponent @sendMacro="sendMacro" />
     </div>
 </template>
 
 <script setup lang="ts">
+import MacroComponent from "@/components/MacroComponent.vue";
+
 import { onBeforeMount, ref, type Ref } from "vue";
 
 let discordToken = ref(localStorage.getItem("discordToken") || "");
@@ -136,25 +131,19 @@ onBeforeMount(() => {
     }
 });
 
-let name = ref("");
-let payload = ref("");
-
-function sendMacro() {
+function sendMacro(name: string, payload: string) {
     fetch("http://localhost:8080/macro", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            name: name.value,
-            macro: payload.value,
+            name: name,
+            macro: payload,
             uses: 0,
             author: user.value.id
         })
     });
-
-    name.value = "";
-    payload.value = "";
 }
 </script>
 
