@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!loggedIn" class="wrapper">
+    <div v-if="!discordToken" class="wrapper">
         <a
             href="https://discord.com/api/oauth2/authorize?client_id=775675159402905642&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fdashboard&response_type=token&scope=identify%20guilds%20guilds.members.read"
             class="log-button"
@@ -10,14 +10,18 @@
     </div>
 
     <div class="wrapper" v-else-if="!isAdmin">
-        <a href="http://localhost:5173/dashboard" class="log-button"><i class="fab fa-discord"></i> Log Out</a>
+        <a href="http://localhost:5173/dashboard" class="log-button" @click="logOut"
+            ><i class="fab fa-discord"></i> Log Out</a
+        >
 
         <h2>You are not authorized to view this page</h2>
         <p>If you believe this is a mistake, please contact the server administrators.</p>
     </div>
 
     <div v-else class="wrapper">
-        <a href="http://localhost:5173/dashboard" class="log-button"><i class="fab fa-discord"></i> Log Out</a>
+        <a href="http://localhost:5173/dashboard" class="log-button" @click="logOut"
+            ><i class="fab fa-discord"></i> Log Out</a
+        >
 
         <div class="user-display">
             <img
@@ -45,7 +49,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref, type Ref } from "vue";
 
-let loggedIn = ref(false);
+let discordToken = ref(localStorage.getItem("discordToken") || "");
 let isAdmin = ref(false);
 
 let user = ref({
@@ -66,32 +70,49 @@ let user = ref({
 
 let guilds: Ref<Object[]> = ref([]);
 
+function logIn(token: string) {
+    discordToken.value = token;
+    localStorage.setItem("discordToken", discordToken.value);
+}
+
+function logOut() {
+    localStorage.removeItem("discordToken");
+    discordToken.value = "";
+}
+
 onBeforeMount(() => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
 
     const token = fragment.get("access_token");
 
     if (token) {
+        logIn(token);
+        // Remove the token from the URL.
+        window.location.hash = "";
+    }
+
+    if (discordToken.value) {
         fetch("https://discord.com/api/users/@me", {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${discordToken.value}`
             }
         })
             .then((res) => res.json())
             .then((data) => {
                 // The message property is only present if there is an error, like an invalid token.
                 if (data.message) {
-                    loggedIn.value = false;
+                    logOut();
                     console.log(data.message);
                 } else {
                     user.value = data;
-                    loggedIn.value = true;
+                    logIn(discordToken.value);
                 }
             });
 
+        // Find out if the user is an admin on the server.
         fetch("https://discord.com/api/users/@me/guilds", {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${discordToken.value}`
             }
         })
             .then((res) => res.json())
@@ -112,8 +133,6 @@ onBeforeMount(() => {
                     isAdmin.value = false;
                 }
             });
-    } else {
-        loggedIn.value = false;
     }
 });
 
