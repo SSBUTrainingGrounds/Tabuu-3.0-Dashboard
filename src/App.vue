@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from "vue-router";
 </script>
 
 <template>
-    <header>
+    <header class="header">
         <div class="wrapper-header">
             <nav class="nav">
                 <RouterLink to="/"><i class="fa fa-home"></i> Home</RouterLink>
@@ -11,19 +11,21 @@ import { RouterLink, RouterView } from "vue-router";
                 <RouterLink to="/leaderboard"><i class="fa fa-envelope"></i> Leaderboard</RouterLink>
                 <RouterLink to="/commands"><i class="fa fa-signal"></i> Command Stats</RouterLink>
                 <RouterLink to="/profiles"><i class="fa fa-user"></i> Profiles</RouterLink>
-                <RouterLink to="/dashboard"><i class="fa fa-cog"></i> Dashboard</RouterLink>
+                <RouterLink to="/macro"><i class="fa fa-cog"></i> Macros</RouterLink>
             </nav>
         </div>
     </header>
 
-    <RouterView />
+    <div class="view"><RouterView /></div>
 
-    <footer>
+    <footer class="footer">
         <div class="wrapper-footer">
             <nav class="nav">
                 <a href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0"><i class="fab fa-github"></i> Bot GitHub</a>
                 <a href="https://discord.gg/ssbutg"><i class="fab fa-discord"></i> Join Our Discord</a>
-                <a href="https://github.com/atomflunder/dashboard-frontend"><i class="fab fa-github"></i> Dashboard GitHub</a>
+                <a href="https://github.com/atomflunder/dashboard-frontend"
+                    ><i class="fab fa-github"></i> Dashboard GitHub</a
+                >
             </nav>
         </div>
     </footer>
@@ -32,32 +34,43 @@ import { RouterLink, RouterView } from "vue-router";
 <style>
 @import "./assets/styles.css";
 
-header {
+.header {
     background-color: var(--black);
     color: var(--white);
     padding: 1rem;
 }
 
-footer {
+.footer {
     background-color: var(--black);
     color: var(--white);
     bottom: 0;
-    width: 100%;
-    position: absolute;
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
 
-header,
-footer,
+.view {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.header,
+.footer {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    right: 0;
+}
+
+.header,
+.footer,
 .grid {
     overflow: hidden hidden;
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-header::-webkit-scrollbar,
-footer::-webkit-scrollbar,
+.header::-webkit-scrollbar,
+.footer::-webkit-scrollbar,
 .grid::-webkit-scrollbar {
     display: none;
 }

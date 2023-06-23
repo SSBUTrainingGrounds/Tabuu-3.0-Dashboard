@@ -5,26 +5,16 @@
             class="log-button"
             ><i class="fab fa-discord"></i> Login With Discord
         </a>
-
-        <h2>Please login with Discord to use the dashboard</h2>
-    </div>
-
-    <div class="wrapper" v-else-if="!isAdmin">
-        <a href="http://localhost:5173/dashboard" class="log-button" @click="logOut"
-            ><i class="fab fa-discord"></i> Log Out</a
-        >
-
-        <h2>You are not authorized to view this page</h2>
-        <p>If you believe this is a mistake, please contact the server administrators.</p>
     </div>
 
     <div v-else class="wrapper">
-        <a href="http://localhost:5173/dashboard" class="log-button" @click="logOut"
+        <a href="http://localhost:5173/macro" class="log-button" @click="logOut"
             ><i class="fab fa-discord"></i> Log Out</a
         >
 
         <div class="user-display">
             <img
+                v-if="user.id && user.avatar"
                 :src="`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`"
                 class="avatar"
                 alt="Avatar"
@@ -35,7 +25,14 @@
             </div>
         </div>
 
-        <MacroComponent @sendMacro="sendMacro" />
+        <div v-if="isAdmin">
+            <MacroComponent @sendMacro="sendMacro" @deleteMacro="deleteMacro" />
+        </div>
+
+        <div v-else>
+            <h2>You are not authorized to view this page</h2>
+            <p>If you believe this is a mistake, please contact the server administrators.</p>
+        </div>
     </div>
 </template>
 
@@ -132,7 +129,7 @@ onBeforeMount(() => {
 });
 
 function sendMacro(name: string, payload: string) {
-    fetch("http://localhost:8080/macro", {
+    fetch("http://localhost:8080/macro_new", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -142,6 +139,18 @@ function sendMacro(name: string, payload: string) {
             macro: payload,
             uses: 0,
             author: user.value.id
+        })
+    });
+}
+
+function deleteMacro(name: string) {
+    fetch("http://localhost:8080/macro_delete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name
         })
     });
 }

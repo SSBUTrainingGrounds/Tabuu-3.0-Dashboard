@@ -33,9 +33,9 @@ const router = createRouter({
             component: () => import("../views/ProfileView.vue")
         },
         {
-            path: "/dashboard",
-            name: "dashboard",
-            component: () => import("../views/DashboardView.vue")
+            path: "/macro",
+            name: "macro",
+            component: () => import("../views/MacroView.vue")
         }
     ]
 });
