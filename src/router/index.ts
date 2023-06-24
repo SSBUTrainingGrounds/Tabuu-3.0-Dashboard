@@ -35,7 +35,8 @@ const router = createRouter({
         {
             path: "/macro",
             name: "macro",
-            component: () => import("../views/MacroView.vue")
+            component: () => import("../views/MacroView.vue"),
+            props: true
         }
     ]
 });

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-</script>
-
 <template>
     <header class="header">
         <div class="wrapper-header">
@@ -12,11 +8,33 @@ import { RouterLink, RouterView } from "vue-router";
                 <RouterLink to="/commands"><i class="fa fa-signal"></i> Command Stats</RouterLink>
                 <RouterLink to="/profiles"><i class="fa fa-user"></i> Profiles</RouterLink>
                 <RouterLink to="/macro"><i class="fa fa-cog"></i> Macros</RouterLink>
+
+                <a
+                    href="https://discord.com/api/oauth2/authorize?client_id=775675159402905642&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F&response_type=token&scope=guilds%20identify%20guilds.members.read"
+                    class="log-button"
+                    v-if="!discordToken"
+                    ><i class="fab fa-discord"></i> Login With Discord
+                </a>
+
+                <a href="http://localhost:5173/" class="log-button" v-if="discordToken" @click="logOut"
+                    ><i class="fab fa-discord"></i> Log Out</a
+                >
+
+                <div class="user-display" v-if="discordToken">
+                    <img
+                        v-if="user.id && user.avatar"
+                        :src="`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`"
+                        class="avatar"
+                        alt="Avatar"
+                    />
+                    <div class="user-login-info">Logged in as @{{ user.username }}!</div>
+                    <div class="user-login-id">({{ user.id }})</div>
+                </div>
             </nav>
         </div>
     </header>
 
-    <div class="view"><RouterView /></div>
+    <div class="view"><RouterView :isAdmin="isAdmin" :user="user" /></div>
 
     <footer class="footer">
         <div class="wrapper-footer">
@@ -30,6 +48,99 @@ import { RouterLink, RouterView } from "vue-router";
         </div>
     </footer>
 </template>
+
+<script setup lang="ts">
+import { onBeforeMount, ref, type Ref } from "vue";
+import { RouterLink, RouterView } from "vue-router";
+
+onBeforeMount(() => {
+    const fragment = new URLSearchParams(window.location.hash.slice(1));
+
+    const token = fragment.get("access_token");
+
+    if (token) {
+        logIn(token);
+    }
+
+    if (discordToken.value) {
+        fetch("https://discord.com/api/users/@me", {
+            headers: {
+                Authorization: `Bearer ${discordToken.value}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                // The message property is only present if there is an error, like an invalid token.
+                if (data.message) {
+                    discordToken.value = "";
+                    console.log(data.message);
+                } else {
+                    user.value = data;
+                    logIn(discordToken.value);
+                }
+            });
+
+        // Find out if the user is an admin on the server.
+        fetch("https://discord.com/api/users/@me/guilds", {
+            headers: {
+                Authorization: `Bearer ${discordToken.value}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.message) {
+                    console.log(data.message);
+                } else {
+                    guilds.value = data;
+
+                    for (let i = 0; i < guilds.value.length; i++) {
+                        // @ts-ignore
+                        if (guilds.value[i].id === "739299507795132486" && guilds.value[i].permissions === 2147483647) {
+                            isAdmin.value = true;
+                            return;
+                        }
+                    }
+
+                    isAdmin.value = false;
+                }
+            });
+    }
+});
+
+let discordToken = ref(localStorage.getItem("discordToken") || "");
+let isAdmin = ref(false);
+
+let user = ref({
+    id: "",
+    username: "",
+    discriminator: "",
+    avatar: "",
+    bot: false,
+    system: false,
+    mfa_enabled: false,
+    locale: "",
+    verified: false,
+    email: "",
+    flags: 0,
+    premium_type: 0,
+    public_flags: 0
+});
+
+let guilds: Ref<Object[]> = ref([]);
+
+function logIn(token: string) {
+    discordToken.value = token;
+    localStorage.setItem("discordToken", discordToken.value);
+
+    // Remove the token from the URL.
+    window.location.hash = "";
+}
+
+function logOut() {
+    discordToken.value = "";
+    localStorage.removeItem("discordToken");
+}
+</script>
 
 <style>
 @import "./assets/styles.css";
@@ -83,6 +194,32 @@ import { RouterLink, RouterView } from "vue-router";
 .wrapper-footer {
     max-width: 800px;
     margin: 0 auto;
+}
+
+.user-display {
+    display: grid;
+    position: relative;
+    font-weight: bold;
+}
+
+.avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    grid-row: 1 / 3;
+}
+
+.user-login-info {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: x-small;
+}
+
+.user-login-id {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: xx-small;
 }
 
 .nav {
