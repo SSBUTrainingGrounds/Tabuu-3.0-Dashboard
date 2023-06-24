@@ -1,7 +1,7 @@
 <template>
     <div class="macro">
         <div class="macro-input" v-if="isAdmin">
-            <h2>Create New Macro</h2>
+            <h2 class="new-header">Create New Macro</h2>
             <input type="text" class="macro-input-name" placeholder="Macro Name" id="macro-name" v-model="name" />
             <input type="text" class="macro-input-value" placeholder="Macro Value" id="macro-value" v-model="payload" />
             <button class="macro-button" @click="sendMacro">Send Macro</button>
@@ -103,10 +103,15 @@ onMounted(async () => {
 <style scoped>
 @import "../assets/styles.css";
 
+.new-header {
+    grid-column: 1 / 6;
+}
+
 .macro-grid,
 .macro-input {
     display: grid;
     gap: 0.2rem 0.5rem;
+    min-width: 600px;
     width: 1200px;
     max-width: 90%;
     margin: 5px auto;
@@ -145,6 +150,12 @@ onMounted(async () => {
     color: var(--white);
 }
 
+.macro-name {
+    justify-content: center;
+    text-align: center;
+    font-weight: bold;
+}
+
 .macro-input-name {
     grid-column: 1;
 }
@@ -164,6 +175,7 @@ onMounted(async () => {
     font-weight: bold;
     transition: opacity 0.2s ease-in-out;
     grid-column: 5;
+    align-self: start;
 }
 
 .macro-button:hover {

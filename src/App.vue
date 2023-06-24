@@ -120,18 +120,17 @@ function logOut() {
     overflow: hidden hidden;
     -ms-overflow-style: none;
     scrollbar-width: none;
+
+    display: grid;
+    grid-gap: 0.2rem;
+    max-width: 1200px;
+    min-width: 600px;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .grid::-webkit-scrollbar {
     display: none;
-}
-
-.grid {
-    display: grid;
-    grid-gap: 0.2rem;
-    max-width: 1200px;
-    justify-content: center;
-    margin: 0 auto;
 }
 
 .avatar-preview {
