@@ -11,7 +11,7 @@
             <div>Note</div>
         </div>
         <div
-            class="user"
+            class="content"
             v-for="u in user"
             :key="u"
             :style="{
@@ -56,13 +56,13 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.user,
+.content,
 .table-header {
     grid-template-columns: 1.2fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr;
     word-break: break-all;
 }
 
-.user {
+.content {
     border-left: 0.5rem solid;
     border-radius: 0.2rem;
 }

@@ -1,32 +1,31 @@
 <template>
-    <div class="macro">
-        <div class="macro-input" v-if="isAdmin">
-            <h2 class="new-header">Create New Macro</h2>
-            <input type="text" class="macro-input-name" placeholder="Macro Name" id="macro-name" v-model="name" />
-            <input type="text" class="macro-input-value" placeholder="Macro Value" id="macro-value" v-model="payload" />
-            <button class="macro-button" @click="sendMacro">Send Macro</button>
-        </div>
+    <div class="macro-input" v-if="isAdmin">
+        <h2 class="new-header">Create New Macro</h2>
+        <input type="text" class="macro-input-name" placeholder="Macro Name" id="macro-name" v-model="name" />
+        <input type="text" class="macro-input-value" placeholder="Macro Value" id="macro-value" v-model="payload" />
+        <button class="macro-button" @click="sendMacro">Send Macro</button>
+    </div>
 
-        <div class="macro-grid" :style="{ gridTemplateColumns: isAdmin ? '1fr 1fr 1fr 1fr 1fr' : '1fr 1fr 1fr 1fr' }">
-            <h2 class="macro-column-1">Name</h2>
-            <h2 class="macro-column-2">Value</h2>
-            <h2 class="macro-column-3">Author</h2>
-            <h2 class="macro-column-4">Uses</h2>
-            <h2 class="macro-column-5" v-if="isAdmin">Delete</h2>
+    <div class="grid">
+        <div class="table-header" :style="{ gridTemplateColumns: isAdmin ? '1fr 1fr 1fr 1fr 1fr' : '1fr 1fr 1fr 1fr' }">
+            <div>Name</div>
+            <div>Payload</div>
+            <div>Author</div>
+            <div>Uses</div>
         </div>
 
         <div
             v-for="(macro, i) in allMacros"
             :key="i"
-            class="macro-grid"
+            class="content"
             :style="{ gridTemplateColumns: isAdmin ? '1fr 1fr 1fr 1fr 1fr' : '1fr 1fr 1fr 1fr' }"
         >
-            <div class="macro-name macro-column-1">%{{ macro.name }}</div>
-            <div class="macro-value macro-column-2">{{ macro.payload }}</div>
-            <div class="macro-author macro-column-3">{{ macro.author }}</div>
-            <div class="macro-uses macro-column-4">{{ macro.uses }}</div>
+            <div>%{{ macro.name }}</div>
+            <div>{{ macro.payload }}</div>
+            <div>{{ macro.author }}</div>
+            <div>{{ macro.uses }}</div>
             <button
-                class="macro-button macro-column-5"
+                class="delete-button"
                 v-if="isAdmin"
                 @click="
                     {
@@ -36,7 +35,7 @@
                     }
                 "
             >
-                Delete
+                X
             </button>
         </div>
     </div>
@@ -45,7 +44,7 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from "vue";
 
-const props = defineProps(["user", "isAdmin"]);
+const props = defineProps(["userID", "isAdmin"]);
 
 let name = ref("");
 let payload = ref("");
@@ -75,9 +74,19 @@ function sendMacro() {
             name: name.value,
             macro: payload.value,
             uses: 0,
-            author: props.user.value.id
+            author: props.userID
         })
     });
+
+    allMacros.value.push({
+        name: name.value,
+        payload: payload.value,
+        author: props.userID,
+        uses: 0
+    });
+
+    alert(`Macro %${name.value} created!`);
+
     name.value = "";
     payload.value = "";
 }
@@ -107,7 +116,6 @@ onMounted(async () => {
     grid-column: 1 / 6;
 }
 
-.macro-grid,
 .macro-input {
     display: grid;
     gap: 0.2rem 0.5rem;
@@ -116,30 +124,11 @@ onMounted(async () => {
     max-width: 90%;
     margin: 5px auto;
     word-break: break-all;
+    background-color: var(--dark-gray);
+    border-radius: 1rem;
+    padding: 20px;
 }
 
-.macro-column-1 {
-    grid-column: 1;
-}
-
-.macro-column-2 {
-    grid-column: 2;
-}
-
-.macro-column-3 {
-    grid-column: 3;
-}
-
-.macro-column-4 {
-    grid-column: 4;
-}
-
-.macro-column-5 {
-    grid-column: 5;
-}
-
-.macro-name,
-.macro-value,
 .macro-input-name,
 .macro-input-value {
     padding: 0.5rem;
@@ -148,12 +137,6 @@ onMounted(async () => {
     font-size: 1rem;
     background-color: var(--light-gray);
     color: var(--white);
-}
-
-.macro-name {
-    justify-content: center;
-    text-align: center;
-    font-weight: bold;
 }
 
 .macro-input-name {
@@ -180,5 +163,23 @@ onMounted(async () => {
 
 .macro-button:hover {
     opacity: 0.8;
+}
+
+.delete-button {
+    background-color: var(--dark-gray);
+    border: solid 1px var(--red);
+    border-radius: 50%;
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--red);
+    height: 2.5rem;
+    width: 2.5rem;
+    margin: auto;
+}
+
+.delete-button:hover {
+    background-color: var(--red);
+    color: var(--light-red);
+    border: solid 1px var(--light-red);
 }
 </style>

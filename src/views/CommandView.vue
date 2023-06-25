@@ -6,7 +6,7 @@
             <div>Uses</div>
             <div>Last Used</div>
         </div>
-        <div class="command" v-for="(c, i) in command" :key="c">
+        <div class="content" v-for="(c, i) in command" :key="c">
             <div>
                 <i>#{{ i + 1 }}</i>
             </div>
@@ -32,7 +32,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.command,
+.content,
 .table-header {
     grid-template-columns: 1fr 1.2fr 1.5fr 1fr;
 }

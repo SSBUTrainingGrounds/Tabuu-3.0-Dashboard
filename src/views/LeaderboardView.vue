@@ -8,7 +8,7 @@
             <div>XP</div>
             <div>Messages</div>
         </div>
-        <div class="user" v-for="(u, i) in user" :key="u">
+        <div class="content" v-for="(u, i) in user" :key="u">
             <div>
                 <i>#{{ i + 1 }}</i>
             </div>
@@ -39,7 +39,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.user,
+.content,
 .table-header {
     grid-template-columns: 1fr 1.2fr 1.5fr 1fr 1fr 1fr;
 }

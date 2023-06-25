@@ -1,7 +1,7 @@
 <template>
     <HeaderComponent :discordToken="discordToken" :user="user" :guilds="guilds" @logOut="logOut" />
 
-    <div class="view"><RouterView :isAdmin="isAdmin" :user="user" /></div>
+    <div class="view"><RouterView :isAdmin="isAdmin" :userID="user.id" /></div>
 
     <FooterComponent />
 </template>
@@ -117,20 +117,12 @@ function logOut() {
 }
 
 .grid {
-    overflow: hidden hidden;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-
     display: grid;
     grid-gap: 0.2rem;
     max-width: 1200px;
     min-width: 600px;
     justify-content: center;
     margin: 0 auto;
-}
-
-.grid::-webkit-scrollbar {
-    display: none;
 }
 
 .avatar-preview {
@@ -144,27 +136,23 @@ function logOut() {
     font-weight: bold;
 }
 
-.user,
-.table-header,
-.command {
+.content,
+.table-header {
     display: grid;
     grid-gap: 1rem;
     padding: 1rem;
     border-radius: 0.5rem;
 }
 
-.user:nth-child(odd),
-.command:nth-child(odd) {
+.content:nth-child(odd) {
     background-color: var(--black);
 }
 
-.user:nth-child(even),
-.command:nth-child(even) {
+.content:nth-child(even) {
     background-color: var(--dark-gray);
 }
 
-.user:hover,
-.command:hover {
+.content:hover {
     background-color: var(--green);
 }
 </style>
