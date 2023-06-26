@@ -1,5 +1,6 @@
 import { Database } from "sqlite3";
 import express from "express";
+import { adminCheck } from "../src/helpers/adminCheck";
 
 const app = express();
 const port = 8080;
@@ -94,8 +95,15 @@ app.get("/macro_get", (req, res) => {
     });
 });
 
-app.post("/macro_new", (req, res) => {
-    const { name, macro, uses, author } = req.body;
+app.post("/macro_new", async (req, res, next) => {
+    const { name, macro, uses, author, discordToken } = req.body;
+
+    const isAdmin = await adminCheck(discordToken).catch(next);
+
+    if (!isAdmin) {
+        res.status(401).send("Error: You are not an admin of the server. Please login with the dashboard first.");
+        return;
+    }
 
     db.serialize(() => {
         const stmt = db.prepare("INSERT INTO macros (name, payload, uses, author) VALUES (?, ?, ?, ?)");
@@ -104,7 +112,7 @@ app.post("/macro_new", (req, res) => {
             if (err) {
                 console.log(err);
             } else {
-                res.send("Success!");
+                res.status(200).send("Success!");
             }
         });
 
@@ -112,8 +120,15 @@ app.post("/macro_new", (req, res) => {
     });
 });
 
-app.post("/macro_delete", (req, res) => {
-    const { name } = req.body;
+app.post("/macro_delete", async (req, res, next) => {
+    const { name, discordToken } = req.body;
+
+    const isAdmin = await adminCheck(discordToken).catch(next);
+
+    if (!isAdmin) {
+        res.status(401).send("Error: You are not an admin of the server. Please login with the dashboard first.");
+        return;
+    }
 
     db.serialize(() => {
         const stmt = db.prepare("DELETE FROM macros WHERE name = ?");
@@ -122,7 +137,7 @@ app.post("/macro_delete", (req, res) => {
             if (err) {
                 console.log(err);
             } else {
-                res.send("Success!");
+                res.status(200).send("Success!");
             }
         });
 

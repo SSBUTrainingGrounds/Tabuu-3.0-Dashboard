@@ -12,6 +12,7 @@ import { RouterView } from "vue-router";
 
 import HeaderComponent from "./components/HeaderComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
+import { adminCheck } from "./helpers/adminCheck";
 
 onBeforeMount(() => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -40,29 +41,12 @@ onBeforeMount(() => {
                 }
             });
 
-        // Find out if the user is an admin on the server.
-        fetch("https://discord.com/api/users/@me/guilds", {
-            headers: {
-                Authorization: `Bearer ${discordToken.value}`
-            }
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.message) {
-                    console.log(data.message);
-                } else {
-                    guilds.value = data;
-
-                    for (let i = 0; i < guilds.value.length; i++) {
-                        // @ts-ignore
-                        if (guilds.value[i].id === "739299507795132486" && guilds.value[i].permissions === 2147483647) {
-                            isAdmin.value = true;
-                            return;
-                        }
-                    }
-
-                    isAdmin.value = false;
-                }
+        adminCheck(discordToken.value)
+            .then((res) => {
+                isAdmin.value = res;
+            })
+            .catch((err) => {
+                console.log(err);
             });
     }
 });

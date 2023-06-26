@@ -24,19 +24,7 @@
             <div>{{ macro.payload }}</div>
             <div>{{ macro.author }}</div>
             <div>{{ macro.uses }}</div>
-            <button
-                class="delete-button"
-                v-if="isAdmin"
-                @click="
-                    {
-                        deleteMacro(macro.name);
-
-                        allMacros.splice(i, 1);
-                    }
-                "
-            >
-                X
-            </button>
+            <button class="delete-button" v-if="isAdmin" @click="deleteMacro(macro.name, i)">X</button>
         </div>
     </div>
 </template>
@@ -74,32 +62,46 @@ function sendMacro() {
             name: name.value,
             macro: payload.value,
             uses: 0,
-            author: props.userID
+            author: props.userID,
+            discordToken: localStorage.getItem("discordToken")
         })
+    }).then((res) => {
+        if (res.status !== 200) {
+            alert(res.statusText);
+            return;
+        } else {
+            allMacros.value.push({
+                name: name.value,
+                payload: payload.value,
+                author: props.userID,
+                uses: 0
+            });
+
+            alert(`Macro %${name.value} created!`);
+
+            name.value = "";
+            payload.value = "";
+        }
     });
-
-    allMacros.value.push({
-        name: name.value,
-        payload: payload.value,
-        author: props.userID,
-        uses: 0
-    });
-
-    alert(`Macro %${name.value} created!`);
-
-    name.value = "";
-    payload.value = "";
 }
 
-function deleteMacro(name: string) {
+function deleteMacro(name: string, i: number) {
     fetch("http://localhost:8080/macro_delete", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            name: name
+            name: name,
+            discordToken: localStorage.getItem("discordToken")
         })
+    }).then((res) => {
+        if (res.status !== 200) {
+            alert(res.statusText);
+            return;
+        } else {
+            allMacros.value.splice(i, 1);
+        }
     });
 }
 
