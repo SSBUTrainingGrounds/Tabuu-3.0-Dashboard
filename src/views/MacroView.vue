@@ -1,12 +1,12 @@
 <template>
-    <div class="macro-input" v-if="isAdmin">
-        <h2 class="new-header">Create New Macro</h2>
-        <input type="text" class="macro-input-name" placeholder="Macro Name" id="macro-name" v-model="name" />
-        <input type="text" class="macro-input-value" placeholder="Macro Value" id="macro-value" v-model="payload" />
-        <button class="macro-button" @click="sendMacro">Send Macro</button>
-    </div>
-
     <div class="grid">
+        <div class="macro-input content" v-if="isAdmin">
+            <h2 class="new-header">Create New Macro</h2>
+            <input type="text" class="macro-input-name" placeholder="Macro Name" id="macro-name" v-model="name" />
+            <input type="text" class="macro-input-value" placeholder="Macro Value" id="macro-value" v-model="payload" />
+            <button class="macro-button" @click="sendMacro">+</button>
+        </div>
+
         <div class="table-header" :style="{ gridTemplateColumns: isAdmin ? '1fr 1fr 1fr 1fr 1fr' : '1fr 1fr 1fr 1fr' }">
             <div>Name</div>
             <div>Payload</div>
@@ -119,25 +119,18 @@ onMounted(async () => {
 @import "../assets/styles.css";
 
 .new-header {
-    grid-column: 1 / 6;
+    grid-column: 1 / 5;
 }
 
 .macro-input {
     display: grid;
-    gap: 0.2rem 0.5rem;
-    min-width: 600px;
-    width: 1200px;
-    max-width: 90%;
-    margin: 5px auto;
-    word-break: break-all;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     background-color: var(--dark-gray);
     border-radius: 1rem;
-    padding: 20px;
 }
 
 .macro-input-name,
 .macro-input-value {
-    padding: 0.5rem;
     border-radius: 0.5rem;
     border: 1px solid #ccc;
     font-size: 1rem;
@@ -146,41 +139,45 @@ onMounted(async () => {
 }
 
 .macro-input-name {
-    grid-column: 1;
+    grid-column: 1 / 2;
 }
 
 .macro-input-value {
-    grid-column: 2 / 4;
+    grid-column: 2 / 5;
 }
 
-.macro-button {
-    background-color: var(--light-gray);
-    color: var(--white);
-    padding: 0.8rem 1rem;
-    margin: 1rem auto;
-    border-radius: 5px;
+.macro-button,
+.delete-button {
+    all: unset;
+    cursor: pointer;
+    margin: auto;
     text-decoration: none;
     font-size: 1rem;
     font-weight: bold;
     transition: opacity 0.2s ease-in-out;
     grid-column: 5;
     align-self: start;
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 50%;
+    text-align: center;
+    background-color: var(--dark-gray);
+}
+
+.macro-button {
+    border: 1px solid var(--green);
+    color: var(--green);
 }
 
 .macro-button:hover {
-    opacity: 0.8;
+    background-color: var(--green);
+    color: var(--light-green);
+    border: solid 1px var(--light-green);
 }
 
 .delete-button {
-    background-color: var(--dark-gray);
     border: solid 1px var(--red);
-    border-radius: 50%;
-    font-size: 1rem;
-    font-weight: bold;
     color: var(--red);
-    height: 2.5rem;
-    width: 2.5rem;
-    margin: auto;
 }
 
 .delete-button:hover {

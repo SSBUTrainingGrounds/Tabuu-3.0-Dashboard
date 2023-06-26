@@ -104,6 +104,7 @@ function logOut() {
     display: grid;
     grid-gap: 0.2rem;
     max-width: 1200px;
+    max-width: 95%;
     min-width: 600px;
     justify-content: center;
     margin: 0 auto;
