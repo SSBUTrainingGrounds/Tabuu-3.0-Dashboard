@@ -86,6 +86,10 @@ function sendMacro() {
 }
 
 function deleteMacro(name: string, i: number) {
+    if (!confirm(`Are you sure you want to delete %${name}?`)) {
+        return;
+    }
+
     fetch("http://localhost:8080/macro_delete", {
         method: "POST",
         headers: {
