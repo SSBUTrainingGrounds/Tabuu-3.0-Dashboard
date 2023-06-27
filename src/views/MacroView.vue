@@ -22,7 +22,7 @@
         >
             <div>%{{ macro.name }}</div>
             <div>{{ macro.payload }}</div>
-            <div>{{ macro.author }}</div>
+            <div>{{ getUserName(props.users, macro.author) }}</div>
             <div>{{ macro.uses }}</div>
             <button class="delete-button" v-if="isAdmin" @click="deleteMacro(macro.name, i)">X</button>
         </div>
@@ -31,8 +31,9 @@
 
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from "vue";
+import { getUserName } from "@/helpers/userDetails";
 
-const props = defineProps(["userID", "isAdmin"]);
+const props = defineProps(["userID", "isAdmin", "users"]);
 
 let name = ref("");
 let payload = ref("");

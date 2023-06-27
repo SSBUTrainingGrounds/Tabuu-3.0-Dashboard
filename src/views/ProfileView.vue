@@ -20,7 +20,8 @@
             }"
         >
             <div>
-                <img :src="getRandomUserAvatar()" alt="User Avatar" class="avatar-preview" /> {{ getRandomUserName() }}
+                <img :src="getUserAvatar(props.users, u['user_id'])" alt="User Avatar" class="avatar-preview" />
+                {{ getUserName(props.users, u["user_id"]) }}
             </div>
             <div>{{ u["user_id"] }}</div>
             <div>{{ u["tag"] }}</div>
@@ -36,9 +37,11 @@
 <script setup lang="ts">
 // Get the user info from the express server
 import { ref, onMounted } from "vue";
-import { getRandomUserAvatar, getRandomUserName } from "../helpers/mockUsers";
+import { getUserAvatar, getUserName } from "@/helpers/userDetails";
 
 const user = ref({});
+
+const props = defineProps(["users"]);
 
 function getCharacters(characters: string): string {
     if (characters === "") return "None";

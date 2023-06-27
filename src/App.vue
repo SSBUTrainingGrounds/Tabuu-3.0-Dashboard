@@ -1,7 +1,7 @@
 <template>
     <HeaderComponent :discordToken="discordToken" :user="user" :guilds="guilds" @logOut="logOut" />
 
-    <div class="view"><RouterView :isAdmin="isAdmin" :userID="user.id" /></div>
+    <div class="view"><RouterView :isAdmin="isAdmin" :userID="user.id" :users="allGuildUsers" /></div>
 
     <FooterComponent />
 </template>
@@ -14,7 +14,7 @@ import HeaderComponent from "./components/HeaderComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 import { adminCheck } from "./helpers/adminCheck";
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
 
     const token = fragment.get("access_token");
@@ -41,7 +41,7 @@ onBeforeMount(() => {
                 }
             });
 
-        adminCheck(discordToken.value)
+        adminCheck(discordToken.value, import.meta.env.GUILD_ID)
             .then((res) => {
                 isAdmin.value = res;
             })
@@ -49,6 +49,15 @@ onBeforeMount(() => {
                 console.log(err);
             });
     }
+
+    await fetch("http://localhost:8080/users")
+        .then((res) => res.json())
+        .then((data) => {
+            data.forEach((user: Object) => {
+                // @ts-ignore
+                allGuildUsers.value.set(user.user.id, user);
+            });
+        });
 });
 
 let discordToken = ref(localStorage.getItem("discordToken") || "");
@@ -71,6 +80,8 @@ let user = ref({
 });
 
 let guilds: Ref<Object[]> = ref([]);
+
+let allGuildUsers: Ref<Map<string, Object>> = ref(new Map());
 
 function logIn(token: string) {
     discordToken.value = token;
@@ -103,8 +114,8 @@ function logOut() {
 .grid {
     display: grid;
     grid-gap: 0.2rem;
+    width: 95%;
     max-width: 1200px;
-    max-width: 95%;
     min-width: 600px;
     justify-content: center;
     margin: 0 auto;

@@ -15,7 +15,8 @@
                 <i>#{{ i + 1 }}</i>
             </div>
             <div>
-                <img :src="getRandomUserAvatar()" alt="User Avatar" class="avatar-preview" /> {{ getRandomUserName() }}
+                <img :src="getUserAvatar(props.users, u['user_id'])" alt="User Avatar" class="avatar-preview" />
+                {{ getUserName(props.users, u["user_id"]) }}
             </div>
             <div>{{ u["user_id"] }}</div>
             <div>{{ getTabuuSkill(u["rating"], u["deviation"]).toFixed(2) }}</div>
@@ -29,8 +30,10 @@
 
 <script setup lang="ts">
 // Get the user info from the express server
+import { getUserName, getUserAvatar } from "@/helpers/userDetails";
 import { ref, onMounted } from "vue";
-import { getRandomUserAvatar, getRandomUserName } from "../helpers/mockUsers";
+
+const props = defineProps(["users"]);
 
 const user = ref({});
 
@@ -41,6 +44,7 @@ function getTabuuSkill(rating: number, deviation: number) {
 onMounted(async () => {
     const res = await fetch("http://localhost:8080/trueskill");
     user.value = await res.json();
+
     // @ts-ignore
     user.value.sort((a, b) => getTabuuSkill(b["rating"], b["deviation"]) - getTabuuSkill(a["rating"], a["deviation"]));
 });

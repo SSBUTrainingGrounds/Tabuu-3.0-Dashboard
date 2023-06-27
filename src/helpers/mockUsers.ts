@@ -47,24 +47,13 @@ export function getRandomUserName(): string {
  * @returns {string} A random user avatar.
  */
 export function getRandomUserAvatar(): string {
-    // These are all of the default discord avatars, plus some more randomly chosen ones.
     const avatarList = [
         "https://cdn.discordapp.com/embed/avatars/0.png",
         "https://cdn.discordapp.com/embed/avatars/1.png",
         "https://cdn.discordapp.com/embed/avatars/2.png",
         "https://cdn.discordapp.com/embed/avatars/3.png",
         "https://cdn.discordapp.com/embed/avatars/4.png",
-        "https://cdn.discordapp.com/embed/avatars/5.png",
-        "https://i.imgur.com/uLTJjRL.png",
-        "https://i.imgur.com/dDWewCl.png",
-        "https://i.imgur.com/UyeuGkh.jpg",
-        "https://i.imgur.com/nDpAO2T.jpg",
-        "https://i.imgur.com/UrgaMOj.jpg",
-        "https://i.imgur.com/xdi6tSM.jpg",
-        "https://i.imgur.com/JHZSqZX.png",
-        "https://i.imgur.com/MZNcrO8.jpg",
-        "https://i.imgur.com/VHBAi7a.png",
-        "https://i.imgur.com/i9qs1aB.jpg"
+        "https://cdn.discordapp.com/embed/avatars/5.png"
     ];
 
     return avatarList[Math.floor(Math.random() * avatarList.length)];

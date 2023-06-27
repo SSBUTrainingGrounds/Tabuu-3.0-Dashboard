@@ -13,7 +13,8 @@
                 <i>#{{ i + 1 }}</i>
             </div>
             <div>
-                <img :src="getRandomUserAvatar()" alt="User Avatar" class="avatar-preview" /> {{ getRandomUserName() }}
+                <img :src="getUserAvatar(props.users, u['id'])" alt="User Avatar" class="avatar-preview" />
+                {{ getUserName(props.users, u["id"]) }}
             </div>
             <div>{{ u["id"] }}</div>
             <div>{{ u["level"] }}</div>
@@ -26,9 +27,11 @@
 <script setup lang="ts">
 // Get the user info from the express server
 import { ref, onMounted } from "vue";
-import { getRandomUserAvatar, getRandomUserName } from "../helpers/mockUsers";
+import { getUserAvatar, getUserName } from "@/helpers/userDetails";
 
 const user = ref({});
+
+const props = defineProps(["users"]);
 
 onMounted(async () => {
     const res = await fetch("http://localhost:8080/leaderboard");

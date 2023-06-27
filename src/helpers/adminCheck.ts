@@ -1,5 +1,7 @@
-export async function adminCheck(discordToken: string): Promise<boolean> {
+export async function adminCheck(discordToken: string, guildID: string): Promise<boolean> {
     // TODO: Cache this result.
+
+    const adminPermissions = 2147483647;
 
     let guilds: any[] = [];
 
@@ -20,7 +22,7 @@ export async function adminCheck(discordToken: string): Promise<boolean> {
     for (let i = 0; i < guilds.length; i++) {
         const currentGuild = guilds[i];
 
-        if (currentGuild.id === "739299507795132486" && currentGuild.permissions === 2147483647) {
+        if (currentGuild.id === guildID && currentGuild.permissions === adminPermissions) {
             return true;
         }
     }
