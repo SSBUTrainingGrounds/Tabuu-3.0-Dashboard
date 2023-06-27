@@ -41,7 +41,7 @@ onBeforeMount(async () => {
                 }
             });
 
-        adminCheck(discordToken.value, import.meta.env.GUILD_ID)
+        adminCheck(discordToken.value, import.meta.env.VITE_GUILD_ID)
             .then((res) => {
                 isAdmin.value = res;
             })

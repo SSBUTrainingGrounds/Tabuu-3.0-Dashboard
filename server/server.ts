@@ -104,7 +104,7 @@ app.get("/macro_get", (req, res) => {
 app.post("/macro_new", async (req, res, next) => {
     const { name, macro, uses, author, discordToken } = req.body;
 
-    const isAdmin = await adminCheck(discordToken, process.env.GUILD_ID!).catch(next);
+    const isAdmin = await adminCheck(discordToken, process.env.VITE_GUILD_ID!).catch(next);
 
     if (!isAdmin) {
         res.status(401).send("Error: You are not an admin of the server. Please login with the dashboard first.");
@@ -129,7 +129,7 @@ app.post("/macro_new", async (req, res, next) => {
 app.post("/macro_delete", async (req, res, next) => {
     const { name, discordToken } = req.body;
 
-    const isAdmin = await adminCheck(discordToken, process.env.GUILD_ID!).catch(next);
+    const isAdmin = await adminCheck(discordToken, process.env.VITE_GUILD_ID!).catch(next);
 
     if (!isAdmin) {
         res.status(401).send("Error: You are not an admin of the server. Please login with the dashboard first.");
@@ -152,7 +152,7 @@ app.post("/macro_delete", async (req, res, next) => {
 });
 
 app.get("/users", async (req, res) => {
-    await getUsers(process.env.GUILD_ID!, process.env.DISCORD_TOKEN!).then((users) => {
+    await getUsers(process.env.VITE_GUILD_ID!, process.env.DISCORD_TOKEN!).then((users) => {
         res.send(users);
     });
 });
