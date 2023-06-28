@@ -39,7 +39,7 @@
 import { ref, onMounted } from "vue";
 import { getUserAvatar, getUserName } from "@/helpers/userDetails";
 
-const user = ref({});
+const user = ref([]);
 
 const props = defineProps(["users"]);
 

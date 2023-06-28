@@ -35,7 +35,7 @@ import { ref, onMounted } from "vue";
 
 const props = defineProps(["users"]);
 
-const user = ref({});
+const user = ref([]);
 
 function getTabuuSkill(rating: number, deviation: number) {
     return (rating - 3 * deviation) * 100 + 1000;
@@ -45,7 +45,6 @@ onMounted(async () => {
     const res = await fetch("http://localhost:8080/trueskill");
     user.value = await res.json();
 
-    // @ts-ignore
     user.value.sort((a, b) => getTabuuSkill(b["rating"], b["deviation"]) - getTabuuSkill(a["rating"], a["deviation"]));
 });
 </script>

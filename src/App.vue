@@ -14,7 +14,7 @@ import HeaderComponent from "./components/HeaderComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 
 import { adminCheck } from "./helpers/adminCheck";
-import type { GuildUser } from "./helpers/types";
+import type { GuildUser, LoggedInUser, RawGuildUser } from "./helpers/types";
 
 onBeforeMount(async () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -55,7 +55,7 @@ onBeforeMount(async () => {
     await fetch("http://localhost:8080/users")
         .then((res) => res.json())
         .then((data) => {
-            data.forEach((user: any) => {
+            data.forEach((user: RawGuildUser) => {
                 allGuildUsers.value.set(user.user.id, {
                     name: user.user.username,
                     avatar: user.user.avatar
@@ -67,7 +67,7 @@ onBeforeMount(async () => {
 let discordToken = ref(localStorage.getItem("discordToken") || "");
 let isAdmin = ref(false);
 
-let loggedInUser = ref({
+let loggedInUser: Ref<LoggedInUser> = ref({
     id: "",
     username: "",
     discriminator: "",

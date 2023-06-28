@@ -1,22 +1,20 @@
 import { getRandomUserAvatar } from "./mockUsers";
+import type { GuildUser } from "./types";
 
-export function getUserName(users: Map<string, Object>, id: string): string {
+export function getUserName(users: Map<string, GuildUser>, id: string): string {
     const user = users.get(id);
 
     if (user) {
-        // @ts-ignore
         return user.name;
     } else {
         return "Unknown User";
     }
 }
 
-export function getUserAvatar(users: Map<string, Object>, id: string): string {
+export function getUserAvatar(users: Map<string, GuildUser>, id: string): string {
     const user = users.get(id);
 
-    // @ts-ignore
     if (user && user.avatar) {
-        // @ts-ignore
         return "https://cdn.discordapp.com/avatars/" + id + "/" + user.avatar + ".png";
     } else {
         return getRandomUserAvatar();

@@ -21,12 +21,11 @@
 // Get the user info from the express server
 import { ref, onMounted } from "vue";
 
-const command = ref({});
+const command = ref([]);
 
 onMounted(async () => {
     const res = await fetch("http://localhost:8080/commands");
     command.value = await res.json();
-    // @ts-ignore
     command.value.sort((a, b) => b["uses"] - a["uses"]);
 });
 </script>

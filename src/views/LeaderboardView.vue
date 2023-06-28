@@ -29,14 +29,13 @@
 import { ref, onMounted } from "vue";
 import { getUserAvatar, getUserName } from "@/helpers/userDetails";
 
-const user = ref({});
+const user = ref([]);
 
 const props = defineProps(["users"]);
 
 onMounted(async () => {
     const res = await fetch("http://localhost:8080/leaderboard");
     user.value = await res.json();
-    // @ts-ignore
     user.value.sort((a, b) => b["xp"] - a["xp"]);
 });
 </script>
