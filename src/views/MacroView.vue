@@ -32,18 +32,12 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from "vue";
 import { getUserName } from "@/helpers/userDetails";
+import type { Macro } from "@/helpers/types";
 
 const props = defineProps(["userID", "isAdmin", "users"]);
 
 let name = ref("");
 let payload = ref("");
-
-interface Macro {
-    name: string;
-    payload: string;
-    author: string;
-    uses: number;
-}
 
 let allMacros: Ref<Macro[]> = ref([]);
 

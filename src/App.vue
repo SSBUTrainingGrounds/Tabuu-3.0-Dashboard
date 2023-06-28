@@ -1,7 +1,7 @@
 <template>
-    <HeaderComponent :discordToken="discordToken" :user="user" :guilds="guilds" @logOut="logOut" />
+    <HeaderComponent :discordToken="discordToken" :user="loggedInUser" :guilds="guilds" @logOut="logOut" />
 
-    <div class="view"><RouterView :isAdmin="isAdmin" :userID="user.id" :users="allGuildUsers" /></div>
+    <div class="view"><RouterView :isAdmin="isAdmin" :userID="loggedInUser.id" :users="allGuildUsers" /></div>
 
     <FooterComponent />
 </template>
@@ -12,7 +12,9 @@ import { RouterView } from "vue-router";
 
 import HeaderComponent from "./components/HeaderComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
+
 import { adminCheck } from "./helpers/adminCheck";
+import type { GuildUser } from "./helpers/types";
 
 onBeforeMount(async () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -36,7 +38,7 @@ onBeforeMount(async () => {
                     discordToken.value = "";
                     console.log(data.message);
                 } else {
-                    user.value = data;
+                    loggedInUser.value = data;
                     logIn(discordToken.value);
                 }
             });
@@ -53,9 +55,11 @@ onBeforeMount(async () => {
     await fetch("http://localhost:8080/users")
         .then((res) => res.json())
         .then((data) => {
-            data.forEach((user: Object) => {
-                // @ts-ignore
-                allGuildUsers.value.set(user.user.id, user);
+            data.forEach((user: any) => {
+                allGuildUsers.value.set(user.user.id, {
+                    name: user.user.username,
+                    avatar: user.user.avatar
+                });
             });
         });
 });
@@ -63,7 +67,7 @@ onBeforeMount(async () => {
 let discordToken = ref(localStorage.getItem("discordToken") || "");
 let isAdmin = ref(false);
 
-let user = ref({
+let loggedInUser = ref({
     id: "",
     username: "",
     discriminator: "",
@@ -81,7 +85,7 @@ let user = ref({
 
 let guilds: Ref<Object[]> = ref([]);
 
-let allGuildUsers: Ref<Map<string, Object>> = ref(new Map());
+let allGuildUsers: Ref<Map<string, GuildUser>> = ref(new Map());
 
 function logIn(token: string) {
     discordToken.value = token;
