@@ -10,7 +10,7 @@ const port = 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const db = new Database("./data/database.db");
+const db = new Database(process.env.DATABASE_LOCATION!);
 
 app.get("/", (req, res) => {
     res.send(
