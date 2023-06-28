@@ -53,7 +53,11 @@ function getCharacters(characters: string): string {
 }
 
 onMounted(async () => {
-    const res = await fetch("http://localhost:8080/profiles");
+    let url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/profiles";
+
+    const res = await fetch(url);
     user.value = await res.json();
 });
 </script>

@@ -52,7 +52,11 @@ onBeforeMount(async () => {
             });
     }
 
-    await fetch("http://localhost:8080/users")
+    let url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/users";
+
+    await fetch(url)
         .then((res) => res.json())
         .then((data) => {
             data.forEach((user: RawGuildUser) => {

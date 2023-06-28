@@ -24,7 +24,11 @@ import { ref, onMounted } from "vue";
 const command = ref([]);
 
 onMounted(async () => {
-    const res = await fetch("http://localhost:8080/commands");
+    let url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/commands";
+
+    const res = await fetch(url);
     command.value = await res.json();
     command.value.sort((a, b) => b["uses"] - a["uses"]);
 });

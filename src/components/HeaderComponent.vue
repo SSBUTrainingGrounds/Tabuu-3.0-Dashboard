@@ -10,13 +10,19 @@
                 <RouterLink class="green-link" to="/macro"><i class="fa fa-cog"></i> Macros</RouterLink>
 
                 <a
-                    href="https://discord.com/api/oauth2/authorize?client_id=775675159402905642&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F&response_type=token&scope=guilds%20identify%20guilds.members.read"
+                    :href="
+                        'https://discord.com/api/oauth2/authorize?client_id=785303736582012969&redirect_uri=http%3A%2F%2F' +
+                        url +
+                        '%3A' +
+                        port +
+                        '%2F&response_type=token&scope=guilds%20guilds.members.read%20identify'
+                    "
                     class="login-button"
                     v-if="!discordToken"
                     ><i class="fab fa-discord"></i> Login With Discord
                 </a>
 
-                <a href="http://localhost:5173/" class="logout-button" v-if="discordToken" @click="$emit('logOut')"
+                <a href="/" class="logout-button" v-if="discordToken" @click="$emit('logOut')"
                     ><i class="fab fa-discord"></i> Log Out</a
                 >
 
@@ -39,6 +45,9 @@
 defineProps(["discordToken", "user", "guilds"]);
 
 defineEmits(["logOut"]);
+
+const url = window.location.hostname;
+const port = "5173";
 </script>
 
 <style scoped>

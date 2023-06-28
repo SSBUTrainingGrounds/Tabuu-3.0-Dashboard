@@ -34,7 +34,11 @@ const user = ref([]);
 const props = defineProps(["users"]);
 
 onMounted(async () => {
-    const res = await fetch("http://localhost:8080/leaderboard");
+    let url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/leaderboard";
+
+    const res = await fetch(url);
     user.value = await res.json();
     user.value.sort((a, b) => b["xp"] - a["xp"]);
 });

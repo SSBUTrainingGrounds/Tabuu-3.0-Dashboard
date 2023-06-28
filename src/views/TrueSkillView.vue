@@ -42,7 +42,11 @@ function getTabuuSkill(rating: number, deviation: number) {
 }
 
 onMounted(async () => {
-    const res = await fetch("http://localhost:8080/trueskill");
+    let url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/trueskill";
+
+    const res = await fetch(url);
     user.value = await res.json();
 
     user.value.sort((a, b) => getTabuuSkill(b["rating"], b["deviation"]) - getTabuuSkill(a["rating"], a["deviation"]));

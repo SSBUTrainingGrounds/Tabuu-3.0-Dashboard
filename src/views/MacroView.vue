@@ -48,7 +48,12 @@ function sendMacro() {
             return;
         }
     }
-    fetch("http://localhost:8080/macro_new", {
+
+    let url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/macro_new";
+
+    fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -85,7 +90,11 @@ function deleteMacro(name: string, i: number) {
         return;
     }
 
-    fetch("http://localhost:8080/macro_delete", {
+    let url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/macro_delete";
+
+    fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -105,7 +114,11 @@ function deleteMacro(name: string, i: number) {
 }
 
 onMounted(async () => {
-    const res = await fetch("http://localhost:8080/macro_get");
+    let url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/macro_get";
+
+    const res = await fetch(url);
     allMacros.value = await res.json();
 
     allMacros.value.sort((a, b) => {
