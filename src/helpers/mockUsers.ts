@@ -3,9 +3,7 @@
  * @returns {string} A random user name.
  */
 export function getRandomUserName(): string {
-    // It would be better to use a real user name and avatar, but this is a quick and easy way to get a random user.
-    // So we don't have to call the discord API over and over again.
-
+    // Mainly used for testing to avoid spamming the discord API.
     const usernameList = [
         "Aardvark",
         "Albatross",

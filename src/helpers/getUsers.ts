@@ -1,9 +1,16 @@
 import "dotenv/config";
+import type { RawGuildUser } from "./types";
 
-export async function getUsers(guildID: string, botToken: string): Promise<Object[]> {
+/**
+ * Fetches all users from a guild.
+ * @param guildID - The ID of the guild to fetch users from.
+ * @param botToken - The bot token to use for authentication.
+ * @returns {Promise<RawGuildUser[]>} An array of users.
+ */
+export async function getUsers(guildID: string, botToken: string): Promise<RawGuildUser[]> {
     // TODO: Improve performance.
 
-    const users: Object[] = [];
+    const users: RawGuildUser[] = [];
 
     let after = "0";
     let keepGoing = true;
@@ -17,6 +24,7 @@ export async function getUsers(guildID: string, botToken: string): Promise<Objec
             .then((res) => res.json())
             .then((data) => {
                 if (data.message) {
+                    // These are most likely either rate limits, or wrong token/guild ID.
                     console.log(data.message);
                     keepGoing = false;
                 } else {

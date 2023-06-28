@@ -1,3 +1,9 @@
+/**
+ * Returns true if the user is an admin of the guild.
+ * @param discordToken - The user's discord token.
+ * @param guildID - The ID of the guild to check.
+ * @returns {Promise<boolean>} Whether the user is an admin of the guild.
+ */
 export async function adminCheck(discordToken: string, guildID: string): Promise<boolean> {
     // TODO: Cache this result.
 
