@@ -107,6 +107,10 @@ function deleteMacro(name: string, i: number) {
 onMounted(async () => {
     const res = await fetch("http://localhost:8080/macro_get");
     allMacros.value = await res.json();
+
+    allMacros.value.sort((a, b) => {
+        return b.uses - a.uses;
+    });
 });
 </script>
 
