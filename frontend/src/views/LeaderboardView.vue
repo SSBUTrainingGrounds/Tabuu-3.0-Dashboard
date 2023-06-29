@@ -5,7 +5,8 @@
             <div>User</div>
             <div>ID</div>
             <div>Level</div>
-            <div>XP</div>
+            <div>Level Progress</div>
+            <div>Total XP</div>
             <div>Messages</div>
         </div>
         <div class="content" v-for="(u, i) in user" :key="u">
@@ -18,6 +19,17 @@
             </div>
             <div>{{ u["id"] }}</div>
             <div>{{ u["level"] }}</div>
+            <div>
+                <div
+                    class="pie-progress"
+                    :style="{
+                        backgroundImage: `conic-gradient(var(--light-green) ${
+                            getLevelProgress(u['level'], u['xp']) * 100
+                        }%, var(--gray) 0%)`
+                    }"
+                ></div>
+                {{ (getLevelProgress(u["level"], u["xp"]) * 100).toFixed(2) }}%
+            </div>
             <div>{{ u["xp"] }}</div>
             <div>{{ u["messages"] }}</div>
         </div>
@@ -28,6 +40,7 @@
 // Get the user info from the express server
 import { ref, onMounted } from "vue";
 import { getUserAvatar, getUserName } from "@/helpers/userDetails";
+import { getLevelProgress } from "@/helpers/level";
 
 const user = ref([]);
 
@@ -45,8 +58,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+@import "@/assets/styles.css";
+
 .content,
 .table-header {
-    grid-template-columns: 1fr 1.2fr 1.5fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1.2fr 1.5fr 1fr 1fr 1fr 1fr;
+}
+
+.pie-progress {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
 }
 </style>
