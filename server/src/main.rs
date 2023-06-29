@@ -1,7 +1,9 @@
 mod types;
 mod utils;
 
+use dotenv::dotenv;
 use rusqlite::Connection;
+use std::env;
 use utils::get_users;
 
 #[macro_use]
@@ -14,7 +16,13 @@ fn index() -> &'static str {
 
 #[get("/trueskill")]
 fn trueskill() -> String {
-    let conn = Connection::open("./database.db").unwrap();
+    dotenv().ok();
+
+    let conn = Connection::open(
+        env::var("DATABASE_LOCATION")
+            .expect("You have not set the DATABASE_LOCATION environment variable"),
+    )
+    .unwrap();
 
     let mut stmt = conn.prepare("SELECT * FROM trueskill").unwrap();
 
@@ -41,7 +49,13 @@ fn trueskill() -> String {
 
 #[get("/leaderboard")]
 fn leaderboard() -> String {
-    let conn = Connection::open("./database.db").unwrap();
+    dotenv().ok();
+
+    let conn = Connection::open(
+        env::var("DATABASE_LOCATION")
+            .expect("You have not set the DATABASE_LOCATION environment variable"),
+    )
+    .unwrap();
 
     let mut stmt = conn.prepare("SELECT * FROM level").unwrap();
 
@@ -65,7 +79,13 @@ fn leaderboard() -> String {
 
 #[get("/commands")]
 fn commands() -> String {
-    let conn = Connection::open("./database.db").unwrap();
+    dotenv().ok();
+
+    let conn = Connection::open(
+        env::var("DATABASE_LOCATION")
+            .expect("You have not set the DATABASE_LOCATION environment variable"),
+    )
+    .unwrap();
 
     let mut stmt = conn.prepare("SELECT * FROM commands").unwrap();
 
@@ -88,7 +108,13 @@ fn commands() -> String {
 
 #[get("/profiles")]
 fn profiles() -> String {
-    let conn = Connection::open("./database.db").unwrap();
+    dotenv().ok();
+
+    let conn = Connection::open(
+        env::var("DATABASE_LOCATION")
+            .expect("You have not set the DATABASE_LOCATION environment variable"),
+    )
+    .unwrap();
 
     let mut stmt = conn.prepare("SELECT * FROM profile").unwrap();
 
@@ -116,7 +142,13 @@ fn profiles() -> String {
 
 #[get("/macro_get")]
 fn macro_get() -> String {
-    let conn = Connection::open("./database.db").unwrap();
+    dotenv().ok();
+
+    let conn = Connection::open(
+        env::var("DATABASE_LOCATION")
+            .expect("You have not set the DATABASE_LOCATION environment variable"),
+    )
+    .unwrap();
 
     let mut stmt = conn.prepare("SELECT * FROM macros").unwrap();
 
@@ -162,7 +194,14 @@ fn macro_delete() {
 
 #[get("/users")]
 async fn users() -> String {
-    let users: Vec<types::RawGuildUser> = get_users("bot-token", "guild-id").await;
+    dotenv().ok();
+
+    let users: Vec<types::RawGuildUser> = get_users(
+        &env::var("DISCORD_TOKEN")
+            .expect("You have not set the DISCORD_TOKEN environment variable"),
+        &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
+    )
+    .await;
 
     serde_json::to_string(&users).unwrap()
 }

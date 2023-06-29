@@ -6,21 +6,27 @@ Install dependencies
 npm install
 ```
 
-Set up `.env` file
+Set up `.env` file in the server folder
 
 ```bash
 # The ID of the guild for the leaderboard
-VITE_GUILD_ID = "1234567890"
+GUILD_ID = "1234567890"
 # The Token of the bot, used for requests
 DISCORD_TOKEN = "Example.Token"
 # The location of the database
 DATABASE_LOCATION = "./path/to/database.db"
 ```
 
-Start express server
+Set up `.env` file in the client folder
+
+```bash
+VITE_GUILD_ID = "775528948683374632"
+```
+
+Start rocket.rs server, in the server folder
 
 ```
-npm start
+cargo run --release
 ```
 
 Start frontend
