@@ -1,35 +1,53 @@
 # dashboard-frontend
 
+## Prerequisites
+
+-   [Node.js](https://nodejs.org/en/)
+-   [Rust](https://www.rust-lang.org/tools/install)
+
+## Installation
+
 Install dependencies
 
 ```bash
 npm install
 ```
 
-Set up `.env` file in the server folder
+Set up the `./server/Rocket.toml` file
+
+```toml
+[default]
+port = 8080
+
+[default.databases.sqlite_database]
+url = 'C:/Users/willi/Documents/Python/Tabuu-3.0 - dev version/db/database.db'
+```
+
+Set up the `./server/.env` file
 
 ```bash
-# The ID of the guild for the leaderboard
+# The ID of the guild to check for admin permissions
 GUILD_ID = "1234567890"
 # The Token of the bot, used for requests
 DISCORD_TOKEN = "Example.Token"
-# The location of the database
-DATABASE_LOCATION = "./path/to/database.db"
 ```
 
-Set up `.env` file in the client folder
+Set up `.env` file in the parent folder
 
 ```bash
-VITE_GUILD_ID = "775528948683374632"
+# The ID of the guild to check for admin permissions
+VITE_GUILD_ID = "1234567890"
 ```
 
-Start rocket.rs server, in the server folder
+## Usage
+
+Start rocket.rs server, _from the server folder_
 
 ```
 cargo run --release
 ```
 
-Start frontend
+Start frontend, _from the parent folder_
 
 ```
 npm run dev -- --open
