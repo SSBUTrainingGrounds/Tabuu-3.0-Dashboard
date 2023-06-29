@@ -1,4 +1,6 @@
-# dashboard-frontend
+# bot-dashboard
+
+Work in progress for a discord bot dashboard.
 
 ## Prerequisites
 
@@ -32,7 +34,7 @@ GUILD_ID = "1234567890"
 DISCORD_TOKEN = "Example.Token"
 ```
 
-Set up `.env` file in the parent folder
+Set up the `./frontend/.env` file
 
 ```bash
 # The ID of the guild to check for admin permissions
@@ -47,7 +49,7 @@ Start rocket.rs server, _from the server folder_
 cargo run --release
 ```
 
-Start frontend, _from the parent folder_
+Start frontend, _from the frontend folder_
 
 ```
 npm run dev -- --open

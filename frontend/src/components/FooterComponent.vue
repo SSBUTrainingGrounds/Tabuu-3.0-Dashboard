@@ -4,7 +4,7 @@
             <nav class="nav">
                 <a href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0"><i class="fab fa-github"></i> Bot GitHub</a>
                 <a href="https://discord.gg/ssbutg"><i class="fab fa-discord"></i> Join Our Discord</a>
-                <a href="https://github.com/atomflunder/dashboard-frontend"
+                <a href="https://github.com/atomflunder/bot-dashboard"
                     ><i class="fab fa-github"></i> Dashboard GitHub</a
                 >
             </nav>
