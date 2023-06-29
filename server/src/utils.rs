@@ -2,6 +2,8 @@ extern crate reqwest;
 use reqwest::header;
 use serde_json::Value;
 
+use crate::types::RawGuildUser;
+
 pub fn admin_check(discord_token: &str, guild_id: &str) -> bool {
     // TODO: Remove all of those unwraps.
 
@@ -46,4 +48,68 @@ pub fn admin_check(discord_token: &str, guild_id: &str) -> bool {
     }
 
     false
+}
+
+pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser> {
+    let mut users: Vec<RawGuildUser> = vec![];
+
+    let mut after: String = "0".to_string();
+    let mut keep_going = true;
+
+    let mut headers = header::HeaderMap::new();
+    headers.insert(
+        header::AUTHORIZATION,
+        header::HeaderValue::from_str(&("Bot ".to_owned() + discord_token))
+            .unwrap_or(header::HeaderValue::from_str("").unwrap()),
+    );
+
+    // Need to use the async client here, because of the multiple requests.
+    // For the others, the blocking client is fine.
+    let client = reqwest::Client::builder()
+        .default_headers(headers)
+        .build()
+        .unwrap();
+
+    while keep_going {
+        let res = client
+            .get(
+                &("https://discord.com/api/guilds/".to_owned()
+                    + guild_id
+                    + "/members?limit=1000&after="
+                    + after.as_ref()),
+            )
+            .send()
+            .await;
+        #[allow(unused_assignments)]
+        let mut body = String::new();
+
+        match res {
+            Ok(res) => {
+                body = res.text().await.unwrap_or("".to_string());
+
+                let json: Value = serde_json::from_str(&body).unwrap();
+
+                let last = json.as_array().unwrap_or(&vec![]).len() - 1;
+
+                after = json.as_array().unwrap()[last]["user"]["id"]
+                    .as_str()
+                    .unwrap_or("0")
+                    .to_string();
+
+                for user in json.as_array().unwrap_or(&vec![]) {
+                    let user: RawGuildUser = serde_json::from_value(user.clone()).unwrap();
+                    users.push(user);
+                }
+
+                if json.as_array().unwrap_or(&vec![]).len() < 1000 {
+                    keep_going = false;
+                }
+            }
+            Err(_) => {
+                keep_going = false;
+            }
+        }
+    }
+
+    users
 }

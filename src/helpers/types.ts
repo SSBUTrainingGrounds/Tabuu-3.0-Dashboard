@@ -36,39 +36,3 @@ export interface LoggedInUser {
     premium_type: number;
     public_flags: number;
 }
-
-/**
- * Extra global user data returned by the Discord API, when a Guild User is fetched.
- */
-export interface RawUser {
-    accent_color: number | null;
-    avatar: string | null;
-    avatar_decoration: string | null;
-    banner: string | null;
-    banner_color: string | null;
-    bot: boolean;
-    discriminator: string;
-    display_name: string | null;
-    flags: number;
-    global_name: string | null;
-    id: string;
-    public_flags: number;
-    username: string;
-}
-
-/**
- * The data returned by the Discord API when a user is fetched by the bot.
- */
-export interface RawGuildUser {
-    avatar: string | null;
-    communication_disabled_until: number | null;
-    deaf: boolean;
-    flags: number;
-    joined_at: string;
-    mute: boolean;
-    nick: string | null;
-    pending: boolean;
-    premium_since: string | null;
-    roles: string[];
-    user: RawUser;
-}

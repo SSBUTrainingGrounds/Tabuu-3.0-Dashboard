@@ -1,14 +1,15 @@
-mod json_types;
+mod types;
 mod utils;
 
 use rusqlite::Connection;
+use utils::get_users;
 
 #[macro_use]
 extern crate rocket;
 
 #[get("/")]
 fn index() -> &'static str {
-    "Hi! Listening on port 8080. Available endpoints: /trueskill, /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete"
+    "Hi! Listening on port 8080. Available endpoints: /trueskill, /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users"
 }
 
 #[get("/trueskill")]
@@ -18,7 +19,8 @@ fn trueskill() -> String {
     let mut stmt = conn.prepare("SELECT * FROM trueskill").unwrap();
 
     let user_iter = stmt.query_map([], |row| {
-        Ok(json_types::TrueSkill {
+        Ok(types::TrueSkill {
+            // TODO: The user_ids may need to be converted to strings for JavaScript.
             user_id: row.get(0)?,
             rating: row.get(1)?,
             deviation: row.get(2)?,
@@ -44,7 +46,7 @@ fn leaderboard() -> String {
     let mut stmt = conn.prepare("SELECT * FROM level").unwrap();
 
     let user_iter = stmt.query_map([], |row| {
-        Ok(json_types::Leaderboard {
+        Ok(types::Leaderboard {
             id: row.get(0)?,
             level: row.get(1)?,
             xp: row.get(2)?,
@@ -68,7 +70,7 @@ fn commands() -> String {
     let mut stmt = conn.prepare("SELECT * FROM commands").unwrap();
 
     let user_iter = stmt.query_map([], |row| {
-        Ok(json_types::Commands {
+        Ok(types::Commands {
             command: row.get(0)?,
             uses: row.get(1)?,
             last_used: row.get(2)?,
@@ -91,7 +93,7 @@ fn profiles() -> String {
     let mut stmt = conn.prepare("SELECT * FROM profile").unwrap();
 
     let user_iter = stmt.query_map([], |row| {
-        Ok(json_types::Profiles {
+        Ok(types::Profiles {
             user_id: row.get(0)?,
             tag: row.get(1)?,
             region: row.get(2)?,
@@ -119,7 +121,7 @@ fn macro_get() -> String {
     let mut stmt = conn.prepare("SELECT * FROM macros").unwrap();
 
     let user_iter = stmt.query_map([], |row| {
-        Ok(json_types::Macros {
+        Ok(types::Macros {
             name: row.get(0)?,
             payload: row.get(1)?,
             uses: row.get(2)?,
@@ -158,6 +160,13 @@ fn macro_delete() {
     // ...
 }
 
+#[get("/users")]
+async fn users() -> String {
+    let users: Vec<types::RawGuildUser> = get_users("bot-token", "guild-id").await;
+
+    serde_json::to_string(&users).unwrap()
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build().mount(
@@ -170,7 +179,8 @@ fn rocket() -> _ {
             profiles,
             macro_get,
             macro_new,
-            macro_delete
+            macro_delete,
+            users
         ],
     )
 }
