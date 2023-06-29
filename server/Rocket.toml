@@ -1,5 +1,0 @@
-[default]
-port = 8080
-
-[default.databases.sqlite_database]
-url = ''
