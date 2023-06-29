@@ -1,6 +1,6 @@
 # bot-dashboard
 
-Work in progress for a discord bot dashboard.
+Simple dashboard for our discord bot.
 
 ## Prerequisites
 
@@ -9,7 +9,7 @@ Work in progress for a discord bot dashboard.
 
 ## Installation
 
-Install dependencies
+Install dependencies in the `./frontend` folder
 
 ```bash
 npm install
@@ -19,10 +19,12 @@ Set up the `./server/Rocket.toml` file
 
 ```toml
 [default]
+# The port needs to be 8080
 port = 8080
 
 [default.databases.sqlite_database]
-url = './database.db'
+# The path to your sqlite database
+url = './path/to/database.db'
 ```
 
 Set up the `./server/.env` file
@@ -43,14 +45,28 @@ VITE_GUILD_ID = "1234567890"
 
 ## Usage
 
-Start rocket.rs server, _from the server folder_
+Start the backend server, _from the server folder_
 
 ```
 cargo run --release
 ```
 
-Start frontend, _from the frontend folder_
+Start the frontend, _from the frontend folder_
 
 ```
 npm run dev -- --open
 ```
+
+## Packages used
+
+### Frontend
+
+-   [Vue](https://vuejs.org/)
+-   [Vite](https://vitejs.dev/)
+-   [TypeScript](https://www.typescriptlang.org/)
+
+### Backend
+
+-   [Rocket](https://docs.rs/rocket/0.4.11/rocket/)
+-   [Reqwest](https://docs.rs/reqwest/latest/reqwest/)
+-   [Rusqlite](https://docs.rs/rusqlite/latest/rusqlite/)
