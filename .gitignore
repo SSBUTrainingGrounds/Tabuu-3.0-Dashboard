@@ -32,3 +32,6 @@ coverage
 
 # Environment variables
 .env
+
+# Rust target directory
+*/target
