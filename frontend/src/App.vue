@@ -14,7 +14,7 @@ import HeaderComponent from "./components/HeaderComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 
 import { adminCheck } from "./helpers/adminCheck";
-import type { GuildUser, LoggedInUser, RawGuildUser } from "./helpers/types";
+import type { GuildUser, LoggedInUser } from "./helpers/types";
 
 onBeforeMount(async () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -59,7 +59,7 @@ onBeforeMount(async () => {
     await fetch(url)
         .then((res) => res.json())
         .then((data) => {
-            data.forEach((user: RawGuildUser) => {
+            data.forEach((user: any) => {
                 allGuildUsers.value.set(user.user.id, {
                     name: user.user.username,
                     avatar: user.user.avatar
