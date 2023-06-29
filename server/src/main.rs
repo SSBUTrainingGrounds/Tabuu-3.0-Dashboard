@@ -24,11 +24,10 @@ fn trueskill() -> String {
     )
     .unwrap();
 
-    let mut stmt = conn.prepare("SELECT * FROM trueskill").unwrap();
+    let mut stmt = conn.prepare("SELECT CAST(user_id AS TEXT) as user_id, rating, deviation, wins, losses, matches FROM trueskill").unwrap();
 
     let user_iter = stmt.query_map([], |row| {
         Ok(types::TrueSkill {
-            // TODO: The user_ids may need to be converted to strings for JavaScript.
             user_id: row.get(0)?,
             rating: row.get(1)?,
             deviation: row.get(2)?,
@@ -57,7 +56,9 @@ fn leaderboard() -> String {
     )
     .unwrap();
 
-    let mut stmt = conn.prepare("SELECT * FROM level").unwrap();
+    let mut stmt = conn
+        .prepare("SELECT CAST(id AS TEXT) as id, level, xp, messages FROM level")
+        .unwrap();
 
     let user_iter = stmt.query_map([], |row| {
         Ok(types::Leaderboard {
@@ -116,7 +117,7 @@ fn profiles() -> String {
     )
     .unwrap();
 
-    let mut stmt = conn.prepare("SELECT * FROM profile").unwrap();
+    let mut stmt = conn.prepare("SELECT CAST(user_id AS TEXT) AS user_id, tag, region, mains, secondaries, pockets, note, colour FROM profile").unwrap();
 
     let user_iter = stmt.query_map([], |row| {
         Ok(types::Profiles {
@@ -150,7 +151,9 @@ fn macro_get() -> String {
     )
     .unwrap();
 
-    let mut stmt = conn.prepare("SELECT * FROM macros").unwrap();
+    let mut stmt = conn
+        .prepare("SELECT name, payload, uses, CAST(author AS TEXT) as author FROM macros")
+        .unwrap();
 
     let user_iter = stmt.query_map([], |row| {
         Ok(types::Macros {

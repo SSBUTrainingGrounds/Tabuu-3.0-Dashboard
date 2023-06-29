@@ -2,7 +2,7 @@ use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TrueSkill {
-    pub user_id: usize,
+    pub user_id: String,
     pub rating: f64,
     pub deviation: f64,
     pub wins: usize,
@@ -12,7 +12,7 @@ pub struct TrueSkill {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Leaderboard {
-    pub id: usize,
+    pub id: String,
     pub level: usize,
     pub xp: usize,
     pub messages: usize,
@@ -27,7 +27,7 @@ pub struct Commands {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Profiles {
-    pub user_id: usize,
+    pub user_id: String,
     pub tag: String,
     pub region: String,
     pub mains: String,
@@ -42,7 +42,7 @@ pub struct Macros {
     pub name: String,
     pub payload: String,
     pub uses: usize,
-    pub author: usize,
+    pub author: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
