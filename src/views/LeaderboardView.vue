@@ -41,8 +41,6 @@ onMounted(async () => {
     const res = await fetch(url);
     user.value = await res.json();
     user.value.sort((a, b) => b["xp"] - a["xp"]);
-
-    console.log(user.value);
 });
 </script>
 

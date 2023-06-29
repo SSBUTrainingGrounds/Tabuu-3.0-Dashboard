@@ -1,6 +1,21 @@
 use rocket::serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct MacroNew {
+    pub name: String,
+    pub payload: String,
+    pub uses: usize,
+    pub author: String,
+    pub discord_token: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct MacroDelete {
+    pub discord_token: String,
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TrueSkill {
     pub user_id: String,
     pub rating: f64,
@@ -10,7 +25,7 @@ pub struct TrueSkill {
     pub matches: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Leaderboard {
     pub id: String,
     pub level: usize,
@@ -18,14 +33,14 @@ pub struct Leaderboard {
     pub messages: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Commands {
     pub command: String,
     pub uses: usize,
     pub last_used: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Profiles {
     pub user_id: String,
     pub tag: String,
@@ -37,7 +52,7 @@ pub struct Profiles {
     pub colour: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Macros {
     pub name: String,
     pub payload: String,
@@ -45,7 +60,7 @@ pub struct Macros {
     pub author: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RawUser {
     pub accent_color: Option<usize>,
     pub avatar: Option<String>,
@@ -62,7 +77,7 @@ pub struct RawUser {
     pub username: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RawGuildUser {
     pub avatar: Option<String>,
     pub communication_disabled_until: Option<String>,

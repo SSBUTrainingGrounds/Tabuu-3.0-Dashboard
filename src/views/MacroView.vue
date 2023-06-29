@@ -60,10 +60,10 @@ function sendMacro() {
         },
         body: JSON.stringify({
             name: name.value,
-            macro: payload.value,
+            payload: payload.value,
             uses: 0,
             author: props.userID,
-            discordToken: localStorage.getItem("discordToken")
+            discord_token: localStorage.getItem("discordToken")
         })
     }).then((res) => {
         if (res.status !== 200) {
@@ -101,7 +101,7 @@ function deleteMacro(name: string, i: number) {
         },
         body: JSON.stringify({
             name: name,
-            discordToken: localStorage.getItem("discordToken")
+            discord_token: localStorage.getItem("discordToken")
         })
     }).then((res) => {
         if (res.status !== 200) {

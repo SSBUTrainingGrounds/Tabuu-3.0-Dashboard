@@ -35,3 +35,6 @@ coverage
 
 # Rust target directory
 */target
+
+# Rocket config
+Rocket.toml
