@@ -1,9 +1,11 @@
 #![allow(clippy::let_unit_value)] // False positive
 
+mod level;
 mod types;
 mod utils;
 
 use dotenv::dotenv;
+use level::get_level_progress;
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use std::env;
@@ -92,11 +94,17 @@ async fn leaderboard(conn: DbConn) -> String {
                 }
             };
         let user_iter = match stmt.query_map([], |row| {
-            Ok(types::Leaderboard {
-                id: row.get(0)?,
-                level: row.get(1)?,
-                xp: row.get(2)?,
-                messages: row.get(3)?,
+            Ok({
+                let level = row.get(1)?;
+                let xp = row.get(2)?;
+
+                types::Leaderboard {
+                    id: row.get(0)?,
+                    level,
+                    xp,
+                    messages: row.get(3)?,
+                    xp_progress: get_level_progress(level, xp),
+                }
             })
         }) {
             Ok(user_iter) => user_iter,
@@ -113,6 +121,7 @@ async fn leaderboard(conn: DbConn) -> String {
                     level: 0,
                     xp: 0,
                     messages: 0,
+                    xp_progress: 0.0,
                 },
             });
         }

@@ -35,6 +35,7 @@ pub struct Leaderboard {
     pub level: usize,
     pub xp: usize,
     pub messages: usize,
+    pub xp_progress: f64,
 }
 
 /// A struct for the GET endpoint /commands

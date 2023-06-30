@@ -23,12 +23,10 @@
                 <div
                     class="pie-progress"
                     :style="{
-                        backgroundImage: `conic-gradient(var(--light-green) ${
-                            getLevelProgress(u['level'], u['xp']) * 100
-                        }%, var(--gray) 0%)`
+                        backgroundImage: `conic-gradient(var(--light-green) ${u['xp_progress'] * 100}%, var(--gray) 0%)`
                     }"
                 ></div>
-                {{ (getLevelProgress(u["level"], u["xp"]) * 100).toFixed(2) }}%
+                {{ ((u["xp_progress"] * 100) as number).toFixed(2) }}%
             </div>
             <div>{{ u["xp"] }}</div>
             <div>{{ u["messages"] }}</div>
@@ -40,7 +38,6 @@
 // Get the user info from the express server
 import { ref, onMounted } from "vue";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
-import { getLevelProgress } from "@/helpers/level";
 
 const user = ref([]);
 
