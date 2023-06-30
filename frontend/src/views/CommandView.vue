@@ -18,7 +18,6 @@
 </template>
 
 <script setup lang="ts">
-// Get the user info from the express server
 import { ref, onMounted } from "vue";
 
 const command = ref([]);

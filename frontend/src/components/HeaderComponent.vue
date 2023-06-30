@@ -3,8 +3,10 @@
         <div class="wrapper-header">
             <nav class="nav">
                 <RouterLink class="green-link" to="/"><i class="fa fa-home"></i> Home</RouterLink>
-                <RouterLink class="green-link" to="/trueskill"><i class="fa fa-check"></i> TrueSkill</RouterLink>
-                <RouterLink class="green-link" to="/leaderboard"><i class="fa fa-envelope"></i> Leaderboard</RouterLink>
+                <RouterLink class="green-link" to="/ranked/leaderboard"
+                    ><i class="fa fa-check"></i> Ranked Matchmaking</RouterLink
+                >
+                <RouterLink class="green-link" to="/level"><i class="fa fa-envelope"></i> Level</RouterLink>
                 <RouterLink class="green-link" to="/profiles"><i class="fa fa-user"></i> Profiles</RouterLink>
                 <RouterLink class="green-link" to="/commands"><i class="fa fa-signal"></i> Command Stats</RouterLink>
                 <RouterLink class="green-link" to="/macro"><i class="fa fa-cog"></i> Macros</RouterLink>

@@ -1,5 +1,7 @@
 <template>
     <div class="grid">
+        <RankedComponent />
+
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
@@ -19,7 +21,7 @@
                 {{ getUserName(props.users, u["user_id"]) }}
             </div>
             <div>{{ u["user_id"] }}</div>
-            <div>{{ getTabuuSkill(u["rating"], u["deviation"]).toFixed(2) }}</div>
+            <div>{{ (u["display_rating"] as number).toFixed(2) }}</div>
             <div>{{ (u["deviation"] * 100).toFixed(2) }}</div>
             <div>{{ u["wins"] }}</div>
             <div>{{ u["losses"] }}</div>
@@ -29,17 +31,13 @@
 </template>
 
 <script setup lang="ts">
-// Get the user info from the express server
+import RankedComponent from "@/components/RankedComponent.vue";
 import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
 import { ref, onMounted } from "vue";
 
 const props = defineProps(["users"]);
 
 const user = ref([]);
-
-function getTabuuSkill(rating: number, deviation: number) {
-    return (rating - 3 * deviation) * 100 + 1000;
-}
 
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
@@ -49,7 +47,7 @@ onMounted(async () => {
     const res = await fetch(url);
     user.value = await res.json();
 
-    user.value.sort((a, b) => getTabuuSkill(b["rating"], b["deviation"]) - getTabuuSkill(a["rating"], a["deviation"]));
+    user.value.sort((a, b) => b["display_rating"] - a["display_rating"]);
 });
 </script>
 

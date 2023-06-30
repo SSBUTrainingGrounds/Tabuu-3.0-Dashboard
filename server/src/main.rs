@@ -1,11 +1,13 @@
 #![allow(clippy::let_unit_value)] // False positive
 
 mod level;
+mod rating;
 mod requests;
 mod types;
 
 use dotenv::dotenv;
 use level::get_level_progress;
+use rating::get_display_rating;
 use requests::{fetch_single_user, get_json_string, get_users};
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
@@ -21,7 +23,7 @@ struct DbConn(rusqlite::Connection);
 #[get("/")]
 fn index() -> &'static str {
     "Hi! Available endpoints: 
-    /trueskill, /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users /user/<user_id>"
+    /trueskill, /matches /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users, /user/<user_id>"
 }
 
 #[get("/trueskill")]
@@ -40,14 +42,21 @@ async fn trueskill(conn: DbConn) -> String {
                 }
             };
             let user_iter = match stmt.query_map([], |row| {
-                Ok(types::TrueSkill {
-                    user_id: row.get(0)?,
-                    rating: row.get(1)?,
-                    deviation: row.get(2)?,
-                    wins: row.get(3)?,
-                    losses: row.get(4)?,
-                    matches: row.get(5)?,
-                })
+                Ok( {
+                    let rating = row.get(1)?;
+                    let deviation = row.get(2)?;
+
+                    types::TrueSkill {
+                        user_id: row.get(0)?,
+                        rating,
+                        deviation,
+                        display_rating: get_display_rating(rating, deviation),
+                        wins: row.get(3)?,
+                        losses: row.get(4)?,
+                        matches: row.get(5)?,
+                    }
+                }
+                    )
             }) {
                 Ok(user_iter) => user_iter,
                 Err(e) => {
@@ -65,6 +74,7 @@ async fn trueskill(conn: DbConn) -> String {
                             user_id: String::from(""),
                             rating: 0.0,
                             deviation: 0.0,
+                            display_rating: 0.0,
                             wins: 0,
                             losses: 0,
                             matches: String::from(""),
@@ -77,6 +87,104 @@ async fn trueskill(conn: DbConn) -> String {
         }
 
     ).await
+}
+
+#[get("/matches")]
+async fn matches(conn: DbConn) -> String {
+    conn.run(move |c| {
+        let mut matches = vec![];
+
+        let mut stmt = match c.prepare(
+            "SELECT CAST(match_id AS TEXT) AS match_id, CAST(winner_id AS TEXT) AS winner_id,
+                CAST(loser_id AS TEXT) AS loser_id, timestamp, old_winner_rating, 
+                old_winner_deviation, old_loser_rating, old_loser_deviation, new_winner_rating, 
+                new_winner_deviation, new_loser_rating, new_loser_deviation FROM matches",
+        ) {
+            Ok(stmt) => stmt,
+            Err(e) => {
+                println!("Error: {}", e);
+                return get_json_string(&matches);
+            }
+        };
+        let user_iter = match stmt.query_map([], |row| {
+            Ok({
+                let old_winner_rating = row.get(4)?;
+                let old_winner_deviation = row.get(5)?;
+                let old_loser_rating = row.get(6)?;
+                let old_loser_deviation = row.get(7)?;
+                let new_winner_rating = row.get(8)?;
+                let new_winner_deviation = row.get(9)?;
+                let new_loser_rating = row.get(10)?;
+                let new_loser_deviation = row.get(11)?;
+
+                let old_winner_display_rating =
+                    get_display_rating(old_winner_rating, old_winner_deviation);
+                let old_loser_display_rating =
+                    get_display_rating(old_loser_rating, old_loser_deviation);
+                let new_winner_display_rating =
+                    get_display_rating(new_winner_rating, new_winner_deviation);
+                let new_loser_display_rating =
+                    get_display_rating(new_loser_rating, new_loser_deviation);
+
+                types::Matches {
+                    match_id: row.get(0)?,
+                    winner_id: row.get(1)?,
+                    loser_id: row.get(2)?,
+                    timestamp: row.get(3)?,
+                    old_winner_rating,
+                    old_winner_deviation,
+                    old_loser_rating,
+                    old_loser_deviation,
+                    new_winner_rating,
+                    new_winner_deviation,
+                    new_loser_rating,
+                    new_loser_deviation,
+                    old_winner_display_rating,
+                    old_loser_display_rating,
+                    new_winner_display_rating,
+                    new_loser_display_rating,
+                    winner_display_rating_change: new_winner_display_rating
+                        - old_winner_display_rating,
+                    loser_display_rating_change: new_loser_display_rating
+                        - old_loser_display_rating,
+                }
+            })
+        }) {
+            Ok(user_iter) => user_iter,
+            Err(e) => {
+                println!("Error: {}", e);
+                return get_json_string(&matches);
+            }
+        };
+        for user in user_iter {
+            matches.push(match user {
+                Ok(u) => u,
+                Err(_) => types::Matches {
+                    match_id: String::from(""),
+                    winner_id: String::from(""),
+                    loser_id: String::from(""),
+                    timestamp: 0,
+                    old_winner_rating: 0.0,
+                    old_winner_deviation: 0.0,
+                    old_loser_rating: 0.0,
+                    old_loser_deviation: 0.0,
+                    new_winner_rating: 0.0,
+                    new_winner_deviation: 0.0,
+                    new_loser_rating: 0.0,
+                    new_loser_deviation: 0.0,
+                    old_winner_display_rating: 0.0,
+                    old_loser_display_rating: 0.0,
+                    new_winner_display_rating: 0.0,
+                    new_loser_display_rating: 0.0,
+                    winner_display_rating_change: 0.0,
+                    loser_display_rating_change: 0.0,
+                },
+            });
+        }
+
+        get_json_string(&matches)
+    })
+    .await
 }
 
 #[get("/leaderboard")]
@@ -376,6 +484,7 @@ fn rocket() -> _ {
         routes![
             index,
             trueskill,
+            matches,
             leaderboard,
             commands,
             profiles,

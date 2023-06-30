@@ -23,6 +23,7 @@ pub struct TrueSkill {
     pub user_id: String,
     pub rating: f64,
     pub deviation: f64,
+    pub display_rating: f64,
     pub wins: usize,
     pub losses: usize,
     pub matches: String,
@@ -122,4 +123,27 @@ pub struct FetchedUser {
     pub flags: Option<usize>,
     pub premium_type: Option<usize>,
     pub public_flags: Option<usize>,
+}
+
+/// A struct for the GET endpoint /matches
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Matches {
+    pub match_id: String,
+    pub winner_id: String,
+    pub loser_id: String,
+    pub timestamp: usize,
+    pub old_winner_rating: f64,
+    pub old_winner_deviation: f64,
+    pub old_loser_rating: f64,
+    pub old_loser_deviation: f64,
+    pub new_winner_rating: f64,
+    pub new_winner_deviation: f64,
+    pub new_loser_rating: f64,
+    pub new_loser_deviation: f64,
+    pub old_winner_display_rating: f64,
+    pub old_loser_display_rating: f64,
+    pub new_winner_display_rating: f64,
+    pub new_loser_display_rating: f64,
+    pub winner_display_rating_change: f64,
+    pub loser_display_rating_change: f64,
 }

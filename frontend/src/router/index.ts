@@ -10,17 +10,22 @@ const router = createRouter({
             component: HomeView
         },
         {
-            path: "/trueskill",
-            name: "trueskill",
+            path: "/ranked/leaderboard",
+            name: "ranked_leaderboard",
             // route level code-splitting
             // this generates a separate chunk (About.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import("../views/TrueSkillView.vue")
+            component: () => import("../views/RankedLeaderboardView.vue")
         },
         {
-            path: "/leaderboard",
-            name: "leaderboard",
-            component: () => import("../views/LeaderboardView.vue")
+            path: "/ranked/matches",
+            name: "ranked_matches",
+            component: () => import("../views/RankedMatchesView.vue")
+        },
+        {
+            path: "/level",
+            name: "level",
+            component: () => import("../views/LevelView.vue")
         },
         {
             path: "/commands",
