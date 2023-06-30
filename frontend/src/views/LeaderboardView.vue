@@ -9,7 +9,7 @@
             <div>Total XP</div>
             <div>Messages</div>
         </div>
-        <div class="content" v-for="(u, i) in user" :key="u" @click="fetchUser(users, u['user_id'])">
+        <div class="content" v-for="(u, i) in user" :key="u" @click="fetchUser(users, u['id'])">
             <div>
                 <i>#{{ i + 1 }}</i>
             </div>

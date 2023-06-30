@@ -7,7 +7,8 @@ use dotenv::dotenv;
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use std::env;
-use utils::{get_users, fetch_single_user};
+use types::TrueSkill;
+use utils::{fetch_single_user, get_json_string, get_users};
 
 #[macro_use]
 extern crate rocket;
@@ -22,12 +23,18 @@ fn index() -> &'static str {
 
 #[get("/trueskill")]
 async fn trueskill(conn: DbConn) -> String {
-    conn.run(move |c| 
+    conn.run(move |c|
         {
             let mut trueskill = vec![];
 
-            let mut stmt = c.prepare("SELECT CAST(user_id AS TEXT) AS user_id, rating, deviation, wins, losses, matches FROM trueskill").unwrap();
-            let user_iter = stmt.query_map([], |row| {
+            let mut stmt = match c.prepare("SELECT CAST(user_id AS TEXT) AS user_id, rating, deviation, wins, losses, matches FROM trueskill") {
+                Ok(stmt) => stmt,
+                Err(e) => {
+                    println!("Error: {}", e);
+                    return get_json_string(&trueskill);
+                }
+            };
+            let user_iter = match stmt.query_map([], |row| {
                 Ok(types::TrueSkill {
                     user_id: row.get(0)?,
                     rating: row.get(1)?,
@@ -36,76 +43,136 @@ async fn trueskill(conn: DbConn) -> String {
                     losses: row.get(4)?,
                     matches: row.get(5)?,
                 })
-            });
-            for user in user_iter.unwrap() {
-                trueskill.push(user.unwrap());
+            }) {
+                Ok(user_iter) => user_iter,
+                Err(e) => {
+                    println!("Error: {}", e);
+                    return get_json_string(&trueskill);
+                }
+            };
+
+
+            for user in user_iter {
+                trueskill.push(match user {
+                    Ok(u) => u,
+                    Err(_) => {
+                        TrueSkill {
+                            user_id: String::from(""),
+                            rating: 0.0,
+                            deviation: 0.0,
+                            wins: 0,
+                            losses: 0,
+                            matches: String::from(""),
+                        }
+                    }
+                });
             }
 
-            serde_json::to_string(&trueskill).unwrap()
+            get_json_string(&trueskill)
         }
 
-    
     ).await
 }
 
 #[get("/leaderboard")]
 async fn leaderboard(conn: DbConn) -> String {
-    conn.run(move |c| 
-        {
-            let mut leaderboard = vec![];
+    conn.run(move |c| {
+        let mut leaderboard = vec![];
 
-            let mut stmt = c.prepare("SELECT CAST(id AS TEXT) as id, level, xp, messages FROM level").unwrap();
-            let user_iter = stmt.query_map([], |row| {
-                Ok(types::Leaderboard {
-                    id: row.get(0)?,
-                    level: row.get(1)?,
-                    xp: row.get(2)?,
-                    messages: row.get(3)?,
-                })
-            });
-            for user in user_iter.unwrap() {
-                leaderboard.push(user.unwrap());
+        let mut stmt =
+            match c.prepare("SELECT CAST(id AS TEXT) as id, level, xp, messages FROM level") {
+                Ok(stmt) => stmt,
+                Err(e) => {
+                    println!("Error: {}", e);
+                    return get_json_string(&leaderboard);
+                }
+            };
+        let user_iter = match stmt.query_map([], |row| {
+            Ok(types::Leaderboard {
+                id: row.get(0)?,
+                level: row.get(1)?,
+                xp: row.get(2)?,
+                messages: row.get(3)?,
+            })
+        }) {
+            Ok(user_iter) => user_iter,
+            Err(e) => {
+                println!("Error: {}", e);
+                return get_json_string(&leaderboard);
             }
-
-            serde_json::to_string(&leaderboard).unwrap()
+        };
+        for user in user_iter {
+            leaderboard.push(match user {
+                Ok(u) => u,
+                Err(_) => types::Leaderboard {
+                    id: String::from(""),
+                    level: 0,
+                    xp: 0,
+                    messages: 0,
+                },
+            });
         }
 
-    
-    ).await
+        get_json_string(&leaderboard)
+    })
+    .await
 }
 
 #[get("/commands")]
 async fn commands(conn: DbConn) -> String {
-    conn.run(move |c| 
-        {
-            let mut commands = vec![];
+    conn.run(move |c| {
+        let mut commands = vec![];
 
-            let mut stmt = c.prepare("SELECT * FROM commands").unwrap();
-            let user_iter = stmt.query_map([], |row| {
-                Ok(types::Commands {
-                    command: row.get(0)?,
-                    uses: row.get(1)?,
-                    last_used: row.get(2)?,
-                })
-            });
-            for user in user_iter.unwrap() {
-                commands.push(user.unwrap());
+        let mut stmt = match c.prepare("SELECT * FROM commands") {
+            Ok(stmt) => stmt,
+            Err(e) => {
+                println!("Error: {}", e);
+                return get_json_string(&commands);
             }
-
-            serde_json::to_string(&commands).unwrap()
-
+        };
+        let user_iter = match stmt.query_map([], |row| {
+            Ok(types::Commands {
+                command: row.get(0)?,
+                uses: row.get(1)?,
+                last_used: row.get(2)?,
+            })
+        }) {
+            Ok(user_iter) => user_iter,
+            Err(e) => {
+                println!("Error: {}", e);
+                return get_json_string(&commands);
+            }
+        };
+        for user in user_iter {
+            commands.push(match user {
+                Ok(u) => u,
+                Err(_) => types::Commands {
+                    command: String::from(""),
+                    uses: 0,
+                    last_used: 0,
+                },
+            });
         }
-    ).await
+
+        get_json_string(&commands)
+    })
+    .await
 }
 
 #[get("/profiles")]
 async fn profiles(conn: DbConn) -> String {
-    conn.run(move |c| 
+    conn.run(move |c|
         {
             let mut profiles = vec![];
 
-            let mut stmt = c.prepare("SELECT CAST(user_id AS TEXT) AS user_id, tag, region, mains, secondaries, pockets, note, colour FROM profile").unwrap();
-            let user_iter = stmt.query_map([], |row| {
+            let mut stmt = match c.prepare("SELECT CAST(user_id AS TEXT) AS user_id, tag, region, mains, secondaries, pockets, note, colour FROM profile") {
+                Ok(stmt) => stmt,
+                Err(e) => {
+                    println!("Error: {}", e);
+                    return get_json_string(&profiles);
+                }
+            };
+            let user_iter = match stmt.query_map([], |row| {
                 Ok(types::Profiles {
                     user_id: row.get(0)?,
                     tag: row.get(1)?,
@@ -116,44 +183,81 @@ async fn profiles(conn: DbConn) -> String {
                     note: row.get(6)?,
                     colour: row.get(7)?,
                 })
-            });
-            for user in user_iter.unwrap() {
-                profiles.push(user.unwrap());
+            }) {
+                Ok(user_iter) => user_iter,
+                Err(e) => {
+                    println!("Error: {}", e);
+                    return get_json_string(&profiles);
+                }
+            };
+            for user in user_iter {
+                profiles.push(match user {
+                    Ok(u) => u,
+                    Err(_) => {
+                        types::Profiles {
+                            user_id: String::from(""),
+                            tag: String::from(""),
+                            region: String::from(""),
+                            mains: String::from(""),
+                            secondaries: String::from(""),
+                            pockets: String::from(""),
+                            note: String::from(""),
+                            colour: 0,
+                        }
+                    }
+                });
             }
 
-            serde_json::to_string(&profiles).unwrap()
+            get_json_string(&profiles)
 
         }
     ).await
-
-    
 }
 
 #[get("/macro_get")]
 async fn macro_get(conn: DbConn) -> String {
-    conn.run(move |c| 
+    conn.run(move |c| {
+        let mut macros = vec![];
+
+        let mut stmt = match c
+            .prepare("SELECT name, payload, uses, CAST(author AS TEXT) as author FROM macros")
         {
-            let mut macros = vec![];
-
-            let mut stmt = c.prepare("SELECT name, payload, uses, CAST(author AS TEXT) as author FROM macros").unwrap();
-            let user_iter = stmt.query_map([], |row| {
-                Ok(types::Macros {
-                    name: row.get(0)?,
-                    payload: row.get(1)?,
-                    uses: row.get(2)?,
-                    author: row.get(3)?,
-                })
-            });
-
-            for user in user_iter.unwrap() {
-                macros.push(user.unwrap());
+            Ok(stmt) => stmt,
+            Err(e) => {
+                println!("Error: {}", e);
+                return get_json_string(&macros);
             }
+        };
+        let macro_iter = match stmt.query_map([], |row| {
+            Ok(types::Macros {
+                name: row.get(0)?,
+                payload: row.get(1)?,
+                uses: row.get(2)?,
+                author: row.get(3)?,
+            })
+        }) {
+            Ok(macro_iter) => macro_iter,
+            Err(e) => {
+                println!("Error: {}", e);
+                return get_json_string(&macros);
+            }
+        };
 
-            serde_json::to_string(&macros).unwrap()
-
+        for m in macro_iter {
+            macros.push(match m {
+                Ok(u) => u,
+                Err(_) => types::Macros {
+                    name: String::from(""),
+                    payload: String::from(""),
+                    uses: 0,
+                    author: String::from(""),
+                },
+            });
         }
 
-    ).await
+        get_json_string(&macros)
+    })
+    .await
 }
 
 #[post("/macro_new", data = "<input>", format = "application/json")]
@@ -161,20 +265,36 @@ async fn macro_new(conn: DbConn, input: Json<types::MacroNew>) {
     let admin = utils::admin_check(
         &input.discord_token,
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
-    ).await;
+    )
+    .await;
 
     if !admin {
         return;
     }
 
-
-    conn.run(move |c| 
+    conn.run(move |c| {
+        let mut stmt = match c
+            .prepare("INSERT INTO macros (name, payload, uses, author) VALUES (?1, ?2, ?3, ?4)")
         {
-            let mut stmt = c.prepare("INSERT INTO macros (name, payload, uses, author) VALUES (?1, ?2, ?3, ?4)").unwrap();
-            stmt.execute([&input.name, &input.payload, &input.uses.to_string(), &input.author]).unwrap();
-        }
-    ).await;
-    
+            Ok(stmt) => stmt,
+            Err(e) => {
+                println!("Error: {}", e);
+                return;
+            }
+        };
+        match stmt.execute([
+            &input.name,
+            &input.payload,
+            &input.uses.to_string(),
+            &input.author,
+        ]) {
+            Ok(_) => (),
+            Err(e) => {
+                println!("Error: {}", e);
+            }
+        };
+    })
+    .await;
 }
 
 #[post("/macro_delete", data = "<input>", format = "application/json")]
@@ -182,19 +302,29 @@ async fn macro_delete(conn: DbConn, input: Json<types::MacroDelete>) {
     let admin = utils::admin_check(
         &input.discord_token,
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
-    ).await;
+    )
+    .await;
 
     if !admin {
         return;
     }
 
-
-    conn.run(move |c| 
-        {
-            let mut stmt = c.prepare("DELETE FROM macros WHERE name = ?1").unwrap();
-            stmt.execute([&input.name]).unwrap();
-        }
-    ).await;
+    conn.run(move |c| {
+        let mut stmt = match c.prepare("DELETE FROM macros WHERE name = ?1") {
+            Ok(stmt) => stmt,
+            Err(e) => {
+                println!("Error: {}", e);
+                return;
+            }
+        };
+        match stmt.execute([&input.name]) {
+            Ok(_) => (),
+            Err(e) => {
+                println!("Error: {}", e);
+            }
+        };
+    })
+    .await;
 }
 
 #[get("/users")]
@@ -208,18 +338,21 @@ async fn users() -> String {
     )
     .await;
 
-    serde_json::to_string(&users).unwrap()
+    get_json_string(users)
 }
 
 #[get("/user/<user_id>")]
 async fn get_user(user_id: &str) -> String {
     dotenv().ok();
 
-    let user = fetch_single_user(&env::var("DISCORD_TOKEN")
-    .expect("You have not set the DISCORD_TOKEN environment variable"), user_id).await;
+    let user = fetch_single_user(
+        &env::var("DISCORD_TOKEN")
+            .expect("You have not set the DISCORD_TOKEN environment variable"),
+        user_id,
+    )
+    .await;
 
-    serde_json::to_string(&user).unwrap()
-
+    get_json_string(user)
 }
 
 #[launch]
