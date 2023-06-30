@@ -20,8 +20,7 @@ struct DbConn(rusqlite::Connection);
 
 #[get("/")]
 fn index() -> &'static str {
-    "Hi! Listening on port 8080.
-    Available endpoints: 
+    "Hi! Available endpoints: 
     /trueskill, /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users /user/<user_id>"
 }
 

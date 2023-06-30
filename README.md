@@ -19,7 +19,9 @@ Set up the `./server/Rocket.toml` file
 
 ```toml
 [default]
+# The address the server will listen on
 address = '127.0.0.1'
+# The port the server will listen on
 port = 8080
 
 [default.databases.sqlite_database]
@@ -41,7 +43,10 @@ Set up the `./frontend/.env` file
 ```bash
 # The ID of the guild to check for admin permissions
 VITE_GUILD_ID = "1234567890"
-VITE_API_URL = "http://localhost"
+# The address the frontend will send requests to, set this to the same address as the backend above
+VITE_API_URL = "http://127.0.0.1"
+# The port the frontend will send requests to, set this to the same port as the backend above
+VITE_API_PORT = "8080"
 ```
 
 ## Usage
@@ -57,8 +62,6 @@ Start the frontend, _from the frontend folder_
 ```
 npm run dev -- --open
 ```
-
-Open the dashboard at [localhost:5173](http://localhost:5173/), the rocket server is running on port 8080.
 
 ## Packages used
 

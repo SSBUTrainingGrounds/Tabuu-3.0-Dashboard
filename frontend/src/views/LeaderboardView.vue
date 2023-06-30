@@ -45,7 +45,7 @@ const props = defineProps(["users"]);
 
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
-    url.port = "8080";
+    url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/leaderboard";
 
     const res = await fetch(url);

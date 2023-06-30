@@ -50,7 +50,7 @@ function sendMacro() {
     }
 
     let url = new URL(import.meta.env.VITE_API_URL);
-    url.port = "8080";
+    url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/macro_new";
 
     fetch(url, {
@@ -91,7 +91,7 @@ function deleteMacro(name: string, i: number) {
     }
 
     let url = new URL(import.meta.env.VITE_API_URL);
-    url.port = "8080";
+    url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/macro_delete";
 
     fetch(url, {
@@ -115,7 +115,7 @@ function deleteMacro(name: string, i: number) {
 
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
-    url.port = "8080";
+    url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/macro_get";
 
     const res = await fetch(url);
