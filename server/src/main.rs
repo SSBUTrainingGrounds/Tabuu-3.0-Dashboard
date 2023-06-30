@@ -1,16 +1,16 @@
 #![allow(clippy::let_unit_value)] // False positive
 
 mod level;
+mod requests;
 mod types;
-mod utils;
 
 use dotenv::dotenv;
 use level::get_level_progress;
+use requests::{fetch_single_user, get_json_string, get_users};
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use std::env;
 use types::TrueSkill;
-use utils::{fetch_single_user, get_json_string, get_users};
 
 #[macro_use]
 extern crate rocket;
@@ -277,7 +277,7 @@ async fn macro_get(conn: DbConn) -> String {
 
 #[post("/macro_new", data = "<input>", format = "application/json")]
 async fn macro_new(conn: DbConn, input: Json<types::MacroNew>) {
-    let admin = utils::admin_check(
+    let admin = requests::admin_check(
         &input.discord_token,
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
     )
@@ -314,7 +314,7 @@ async fn macro_new(conn: DbConn, input: Json<types::MacroNew>) {
 
 #[post("/macro_delete", data = "<input>", format = "application/json")]
 async fn macro_delete(conn: DbConn, input: Json<types::MacroDelete>) {
-    let admin = utils::admin_check(
+    let admin = requests::admin_check(
         &input.discord_token,
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
     )
