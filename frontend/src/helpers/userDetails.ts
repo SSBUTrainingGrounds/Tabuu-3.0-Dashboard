@@ -32,3 +32,27 @@ export function getUserAvatar(users: Map<string, GuildUser>, id: string): string
         return getRandomUserAvatar();
     }
 }
+
+/**
+ * Fetches a user manually, if it isn't already cached.
+ * @param users The cache of users.
+ * @param id The ID of the user to fetch.
+ */
+export async function fetchUser(users: Map<string, GuildUser>, id: string) {
+    if (users.has(id)) {
+        return;
+    }
+
+    const url = new URL(window.location.href);
+    url.port = "8080";
+    url.pathname = "/user/" + id;
+
+    await fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+            users.set(id, {
+                name: data.username,
+                avatar: data.avatar
+            });
+        });
+}

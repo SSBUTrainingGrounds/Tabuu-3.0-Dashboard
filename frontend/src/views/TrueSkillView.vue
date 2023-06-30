@@ -10,7 +10,7 @@
             <div>Losses</div>
             <div>Winrate</div>
         </div>
-        <div class="content" v-for="(u, i) in user" :key="u">
+        <div class="content" v-for="(u, i) in user" :key="u" @click="fetchUser(users, u['user_id'])">
             <div>
                 <i>#{{ i + 1 }}</i>
             </div>
@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 // Get the user info from the express server
-import { getUserName, getUserAvatar } from "@/helpers/userDetails";
+import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
 import { ref, onMounted } from "vue";
 
 const props = defineProps(["users"]);

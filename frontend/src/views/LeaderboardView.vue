@@ -9,7 +9,7 @@
             <div>Total XP</div>
             <div>Messages</div>
         </div>
-        <div class="content" v-for="(u, i) in user" :key="u">
+        <div class="content" v-for="(u, i) in user" :key="u" @click="fetchUser(users, u['user_id'])">
             <div>
                 <i>#{{ i + 1 }}</i>
             </div>
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 // Get the user info from the express server
 import { ref, onMounted } from "vue";
-import { getUserAvatar, getUserName } from "@/helpers/userDetails";
+import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { getLevelProgress } from "@/helpers/level";
 
 const user = ref([]);

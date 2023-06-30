@@ -2,7 +2,7 @@ extern crate reqwest;
 use reqwest::header;
 use serde_json::Value;
 
-use crate::types::RawGuildUser;
+use crate::types::{FetchedUser, RawGuildUser};
 
 pub async fn admin_check(discord_token: &str, guild_id: &str) -> bool {
     // TODO: Remove all of those unwraps.
@@ -64,8 +64,6 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
             .unwrap_or(header::HeaderValue::from_str("").unwrap()),
     );
 
-    // Need to use the async client here, because of the multiple requests.
-    // For the others, the blocking client is fine.
     let client = reqwest::Client::builder()
         .default_headers(headers)
         .build()
@@ -113,4 +111,40 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
     }
 
     users
+}
+
+pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<FetchedUser> {
+    let mut headers = header::HeaderMap::new();
+    headers.insert(
+        header::AUTHORIZATION,
+        header::HeaderValue::from_str(&("Bot ".to_owned() + discord_token))
+            .unwrap_or(header::HeaderValue::from_str("").unwrap()),
+    );
+
+    let client = reqwest::Client::builder()
+        .default_headers(headers)
+        .build()
+        .unwrap();
+
+    let res = client
+        .get(&("https://discord.com/api/users/".to_owned() + user_id))
+        .send()
+        .await;
+
+    #[allow(unused_assignments)]
+    let mut body = String::new();
+
+    match res {
+        Ok(res) => {
+            body = res.text().await.unwrap_or("".to_string());
+
+            let json: Value = serde_json::from_str(&body).unwrap();
+
+            let user: FetchedUser = serde_json::from_value(json).unwrap();
+
+            Some(user)
+        }
+
+        Err(_) => None,
+    }
 }

@@ -148,6 +148,10 @@ function logOut() {
     border-radius: 0.5rem;
 }
 
+.content {
+    cursor: pointer;
+}
+
 .content:nth-child(odd) {
     background-color: var(--black);
 }

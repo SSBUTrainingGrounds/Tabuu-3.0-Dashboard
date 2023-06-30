@@ -18,6 +18,7 @@
                 // @ts-ignore
                 borderLeftColor: '#' + u['colour'].toString(16).padStart(6, '0')
             }"
+            @click="fetchUser(users, u['user_id'])"
         >
             <div>
                 <img :src="getUserAvatar(props.users, u['user_id'])" alt="User Avatar" class="avatar-preview" />
@@ -37,7 +38,7 @@
 <script setup lang="ts">
 // Get the user info from the express server
 import { ref, onMounted } from "vue";
-import { getUserAvatar, getUserName } from "@/helpers/userDetails";
+import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 
 const user = ref([]);
 

@@ -9,7 +9,7 @@ Simple dashboard for our discord bot.
 
 ## Installation
 
-Install dependencies in the `./frontend` folder
+Install dependencies in the `./frontend/` folder
 
 ```bash
 npm install

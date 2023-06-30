@@ -91,3 +91,23 @@ pub struct RawGuildUser {
     pub roles: Vec<String>,
     pub user: RawUser,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct FetchedUser {
+    pub id: String,
+    pub username: String,
+    pub discriminator: String,
+    pub global_name: Option<String>,
+    pub avatar: Option<String>,
+    pub bot: Option<bool>,
+    pub system: Option<bool>,
+    pub mfa_enabled: Option<bool>,
+    pub banner: Option<String>,
+    pub accent_color: Option<usize>,
+    pub locale: Option<String>,
+    pub verified: Option<bool>,
+    pub email: Option<String>,
+    pub flags: Option<usize>,
+    pub premium_type: Option<usize>,
+    pub public_flags: Option<usize>,
+}

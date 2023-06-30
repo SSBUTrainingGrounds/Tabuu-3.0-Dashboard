@@ -7,7 +7,7 @@ use dotenv::dotenv;
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use std::env;
-use utils::get_users;
+use utils::{get_users, fetch_single_user};
 
 #[macro_use]
 extern crate rocket;
@@ -211,6 +211,17 @@ async fn users() -> String {
     serde_json::to_string(&users).unwrap()
 }
 
+#[get("/user/<user_id>")]
+async fn get_user(user_id: &str) -> String {
+    dotenv().ok();
+
+    let user = fetch_single_user(&env::var("DISCORD_TOKEN")
+    .expect("You have not set the DISCORD_TOKEN environment variable"), user_id).await;
+
+    serde_json::to_string(&user).unwrap()
+
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build().attach(DbConn::fairing()).mount(
@@ -224,7 +235,8 @@ fn rocket() -> _ {
             macro_get,
             macro_new,
             macro_delete,
-            users
+            users,
+            get_user
         ],
     )
 }
