@@ -49,7 +49,7 @@ function sendMacro() {
         }
     }
 
-    let url = new URL(window.location.href);
+    let url = new URL(import.meta.env.VITE_API_URL);
     url.port = "8080";
     url.pathname = "/macro_new";
 
@@ -90,7 +90,7 @@ function deleteMacro(name: string, i: number) {
         return;
     }
 
-    let url = new URL(window.location.href);
+    let url = new URL(import.meta.env.VITE_API_URL);
     url.port = "8080";
     url.pathname = "/macro_delete";
 
@@ -114,7 +114,7 @@ function deleteMacro(name: string, i: number) {
 }
 
 onMounted(async () => {
-    let url = new URL(window.location.href);
+    let url = new URL(import.meta.env.VITE_API_URL);
     url.port = "8080";
     url.pathname = "/macro_get";
 

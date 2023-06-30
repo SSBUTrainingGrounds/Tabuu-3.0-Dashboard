@@ -52,7 +52,7 @@ onBeforeMount(async () => {
             });
     }
 
-    let url = new URL(window.location.href);
+    let url = new URL(import.meta.env.VITE_API_URL);
     url.port = "8080";
     url.pathname = "/users";
 

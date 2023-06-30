@@ -43,7 +43,7 @@ export async function fetchUser(users: Map<string, GuildUser>, id: string) {
         return;
     }
 
-    const url = new URL(window.location.href);
+    const url = new URL(import.meta.env.VITE_API_URL);
     url.port = "8080";
     url.pathname = "/user/" + id;
 

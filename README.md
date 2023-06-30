@@ -19,7 +19,7 @@ Set up the `./server/Rocket.toml` file
 
 ```toml
 [default]
-# The port needs to be 8080
+address = '127.0.0.1'
 port = 8080
 
 [default.databases.sqlite_database]
@@ -41,6 +41,7 @@ Set up the `./frontend/.env` file
 ```bash
 # The ID of the guild to check for admin permissions
 VITE_GUILD_ID = "1234567890"
+VITE_API_URL = "http://localhost"
 ```
 
 ## Usage
