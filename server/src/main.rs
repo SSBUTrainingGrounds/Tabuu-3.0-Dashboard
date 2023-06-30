@@ -19,7 +19,8 @@ struct DbConn(rusqlite::Connection);
 #[get("/")]
 fn index() -> &'static str {
     "Hi! Listening on port 8080.
-    Available endpoints: /trueskill, /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users /user/<user_id>"
+    Available endpoints: 
+    /trueskill, /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users /user/<user_id>"
 }
 
 #[get("/trueskill")]
@@ -28,7 +29,9 @@ async fn trueskill(conn: DbConn) -> String {
         {
             let mut trueskill = vec![];
 
-            let mut stmt = match c.prepare("SELECT CAST(user_id AS TEXT) AS user_id, rating, deviation, wins, losses, matches FROM trueskill") {
+            let mut stmt = match c.prepare(
+                "SELECT CAST(user_id AS TEXT) AS user_id, rating, deviation, wins, losses, matches FROM trueskill"
+            ) {
                 Ok(stmt) => stmt,
                 Err(e) => {
                     println!("Error: {}", e);
@@ -166,7 +169,9 @@ async fn profiles(conn: DbConn) -> String {
         {
             let mut profiles = vec![];
 
-            let mut stmt = match c.prepare("SELECT CAST(user_id AS TEXT) AS user_id, tag, region, mains, secondaries, pockets, note, colour FROM profile") {
+            let mut stmt = match c.prepare(
+                "SELECT CAST(user_id AS TEXT) AS user_id, tag, region, mains, secondaries, pockets, note, colour FROM profile"
+            ) {
                 Ok(stmt) => stmt,
                 Err(e) => {
                     println!("Error: {}", e);

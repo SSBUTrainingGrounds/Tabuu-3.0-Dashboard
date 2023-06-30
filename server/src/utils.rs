@@ -6,6 +6,9 @@ use serde_json::Value;
 
 use crate::types::{FetchedUser, RawGuildUser, RawUser};
 
+/// Checks if the user is an admin of the guild.
+/// Returns false if the user is not an admin or if the request fails.
+/// Otherwise returns true.
 pub async fn admin_check(discord_token: &str, guild_id: &str) -> bool {
     let admin_permissions = 2147483647;
 
@@ -56,6 +59,10 @@ pub async fn admin_check(discord_token: &str, guild_id: &str) -> bool {
     false
 }
 
+/// Gets all the users in a guild.
+/// Returns an empty vector if the request fails.
+/// If a user cannot be parsed, it will insert an "empty" user.
+/// Otherwise returns a vector of users.
 pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser> {
     let mut users: Vec<RawGuildUser> = vec![];
 
@@ -152,6 +159,9 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
     users
 }
 
+/// Fetches a single user from the Discord API.
+/// Returns None if the request fails, or the user cannot be parsed.
+/// Otherwise returns the user.
 pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<FetchedUser> {
     let mut headers = header::HeaderMap::new();
     headers.insert(
@@ -196,6 +206,8 @@ pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<Fet
     }
 }
 
+/// Gets the JSON string of a serializable object.
+/// Returns an empty array string if the object cannot be serialized.
 pub fn get_json_string(return_type: impl Sized + Serialize) -> String {
     match serde_json::to_string(&return_type) {
         Ok(s) => s,

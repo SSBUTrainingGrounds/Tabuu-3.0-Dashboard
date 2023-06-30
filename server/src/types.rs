@@ -1,5 +1,6 @@
 use rocket::serde::{Deserialize, Serialize};
 
+/// A struct for the POST endpoint /macro_new
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MacroNew {
     pub name: String,
@@ -9,12 +10,14 @@ pub struct MacroNew {
     pub discord_token: String,
 }
 
+/// A struct for the POST endpoint /macro_delete
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MacroDelete {
     pub discord_token: String,
     pub name: String,
 }
 
+/// A struct for the GET endpoint /trueskill
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TrueSkill {
     pub user_id: String,
@@ -25,6 +28,7 @@ pub struct TrueSkill {
     pub matches: String,
 }
 
+/// A struct for the GET endpoint /leaderboard
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Leaderboard {
     pub id: String,
@@ -33,6 +37,7 @@ pub struct Leaderboard {
     pub messages: usize,
 }
 
+/// A struct for the GET endpoint /commands
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Commands {
     pub command: String,
@@ -40,6 +45,7 @@ pub struct Commands {
     pub last_used: usize,
 }
 
+/// A struct for the GET endpoint /profiles
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Profiles {
     pub user_id: String,
@@ -52,6 +58,7 @@ pub struct Profiles {
     pub colour: usize,
 }
 
+/// A struct for the GET endpoint /macro_get
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Macros {
     pub name: String,
@@ -60,6 +67,7 @@ pub struct Macros {
     pub author: String,
 }
 
+/// Extra user data for the `RawGuildUser` struct.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RawUser {
     pub accent_color: Option<usize>,
@@ -77,6 +85,7 @@ pub struct RawUser {
     pub username: String,
 }
 
+/// A struct for the GET endpoint /users
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RawGuildUser {
     pub avatar: Option<String>,
@@ -92,6 +101,8 @@ pub struct RawGuildUser {
     pub user: RawUser,
 }
 
+/// A struct for the GET endpoint /user/<user_id>
+/// Different to the `RawGuildUser`, this is what gets returned from the Discord API.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct FetchedUser {
     pub id: String,

@@ -57,6 +57,8 @@ Start the frontend, _from the frontend folder_
 npm run dev -- --open
 ```
 
+Open the dashboard at [localhost:5173](http://localhost:5173/), the rocket server is running on port 8080.
+
 ## Packages used
 
 ### Frontend
