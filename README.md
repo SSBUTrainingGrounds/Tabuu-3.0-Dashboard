@@ -16,9 +16,9 @@ These steps take place in the `./frontend/` directory
 Set up the `./frontend/.env` file
 
 ```bash
-# The address the frontend will send requests to, set this to the same address as the backend above
+# The address the frontend will send requests to
 VITE_API_URL = "http://127.0.0.1"
-# The port the frontend will send requests to, set this to the same port as the backend above
+# The port the frontend will send requests to
 VITE_API_PORT = "8080"
 ```
 
