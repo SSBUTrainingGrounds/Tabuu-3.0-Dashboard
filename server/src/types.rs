@@ -148,13 +148,13 @@ pub struct Matches {
     pub loser_display_rating_change: f64,
 }
 
-/// A struct for the GET endpoint /is_admin
+/// A struct for the POST endpoint /is_admin
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IsAdmin {
     pub is_admin: bool,
 }
 
-/// A struct for the data required for the GET endpoint /is_admin
+/// A struct for the data required for the POST endpoint /is_admin
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IsAdminData {
     pub discord_token: String,

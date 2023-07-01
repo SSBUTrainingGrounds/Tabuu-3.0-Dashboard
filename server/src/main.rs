@@ -24,7 +24,8 @@ struct DbConn(rusqlite::Connection);
 #[get("/")]
 fn index() -> &'static str {
     "Hi! Available endpoints: 
-    /trueskill, /matches /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users, /user/<user_id>, /is_admin"
+    GET: /trueskill, /matches, /leaderboard, /commands, /profiles, /macro_get, /users, /user/<user_id>
+    POST: /macro_new, /macro_delete, /is_admin"
 }
 
 #[get("/trueskill")]
