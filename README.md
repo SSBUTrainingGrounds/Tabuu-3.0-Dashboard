@@ -1,19 +1,44 @@
 # bot-dashboard
 
-Simple dashboard for our discord bot.
+Simple dashboard for the [Tabuu 3.0 Discord Bot](https://github.com/SSBUTrainingGrounds/Tabuu-3.0).
 
 ## Prerequisites
 
 -   [Node.js](https://nodejs.org/en/)
 -   [Rust](https://www.rust-lang.org/tools/install)
 
-## Installation
+## Installation & Usage
 
-Install dependencies in the `./frontend/` folder
+### Frontend
+
+These steps take place in the `./frontend/` directory
+
+Set up the `./frontend/.env` file
+
+```bash
+# The ID of the guild to check for admin permissions
+VITE_GUILD_ID = "1234567890"
+# The address the frontend will send requests to, set this to the same address as the backend above
+VITE_API_URL = "http://127.0.0.1"
+# The port the frontend will send requests to, set this to the same port as the backend above
+VITE_API_PORT = "8080"
+```
+
+Install dependencies
 
 ```bash
 npm install
 ```
+
+Start the frontend
+
+```
+npm run dev -- --open
+```
+
+### Backend
+
+These steps take place in the `./server/` directory
 
 Set up the `./server/Rocket.toml` file
 
@@ -38,41 +63,17 @@ GUILD_ID = "1234567890"
 DISCORD_TOKEN = "Example.Token"
 ```
 
-Set up the `./frontend/.env` file
-
-```bash
-# The ID of the guild to check for admin permissions
-VITE_GUILD_ID = "1234567890"
-# The address the frontend will send requests to, set this to the same address as the backend above
-VITE_API_URL = "http://127.0.0.1"
-# The port the frontend will send requests to, set this to the same port as the backend above
-VITE_API_PORT = "8080"
-```
-
-## Usage
-
-Start the backend server, _from the server folder_
+Start the backend server
 
 ```
 cargo run --release
 ```
 
-Start the frontend, _from the frontend folder_
-
-```
-npm run dev -- --open
-```
-
 ## Packages used
-
-### Frontend
 
 -   [Vue](https://vuejs.org/)
 -   [Vite](https://vitejs.dev/)
 -   [TypeScript](https://www.typescriptlang.org/)
-
-### Backend
-
 -   [Rocket](https://docs.rs/rocket/0.4.11/rocket/)
 -   [Reqwest](https://docs.rs/reqwest/latest/reqwest/)
 -   [Rusqlite](https://docs.rs/rusqlite/latest/rusqlite/)
