@@ -105,7 +105,7 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
                     Err(_) => return users,
                 };
 
-                let last = json.as_array().unwrap_or(&vec![]).len() - 1;
+                let last = json.as_array().unwrap_or(&vec![Value::Null]).len() - 1;
 
                 after = json.as_array().unwrap_or(&vec![])[last]["user"]["id"]
                     .as_str()

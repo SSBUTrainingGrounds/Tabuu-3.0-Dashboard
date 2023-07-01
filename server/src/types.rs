@@ -158,5 +158,4 @@ pub struct IsAdmin {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IsAdminData {
     pub discord_token: String,
-    pub guild_id: String,
 }

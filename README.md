@@ -16,8 +16,6 @@ These steps take place in the `./frontend/` directory
 Set up the `./frontend/.env` file
 
 ```bash
-# The ID of the guild to check for admin permissions
-VITE_GUILD_ID = "1234567890"
 # The address the frontend will send requests to, set this to the same address as the backend above
 VITE_API_URL = "http://127.0.0.1"
 # The port the frontend will send requests to, set this to the same port as the backend above
@@ -30,7 +28,7 @@ Install dependencies
 npm install
 ```
 
-Start the frontend
+**Start the frontend**
 
 ```
 npm run dev -- --open
@@ -63,7 +61,7 @@ GUILD_ID = "1234567890"
 DISCORD_TOKEN = "Example.Token"
 ```
 
-Start the backend server
+**Start the backend server**
 
 ```
 cargo run --release

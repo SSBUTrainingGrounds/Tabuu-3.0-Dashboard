@@ -52,8 +52,7 @@ onBeforeMount(async () => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                discord_token: discordToken.value,
-                guild_id: import.meta.env.VITE_GUILD_ID
+                discord_token: discordToken.value
             })
         });
 

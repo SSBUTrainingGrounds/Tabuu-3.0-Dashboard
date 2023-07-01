@@ -482,7 +482,13 @@ async fn get_user(user_id: &str) -> String {
 async fn is_admin(
     input: Json<types::IsAdminData>,
 ) -> Result<status::Accepted<String>, status::Unauthorized<String>> {
-    let result = requests::admin_check(&input.discord_token, &input.guild_id).await;
+    dotenv().ok();
+
+    let result = requests::admin_check(
+        &input.discord_token,
+        &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
+    )
+    .await;
 
     if result {
         Ok(status::Accepted(Some("True".to_string())))
