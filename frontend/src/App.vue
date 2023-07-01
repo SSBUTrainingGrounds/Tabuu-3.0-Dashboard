@@ -46,7 +46,7 @@ onBeforeMount(async () => {
         url.port = import.meta.env.VITE_API_PORT;
         url.pathname = "/is_admin";
 
-        const res = await fetch(url, {
+        await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -54,9 +54,9 @@ onBeforeMount(async () => {
             body: JSON.stringify({
                 discord_token: discordToken.value
             })
+        }).then((res) => {
+            isAdmin.value = res.status === 202 ? true : false;
         });
-
-        isAdmin.value = res.status === 202 ? true : false;
     }
 
     let url = new URL(import.meta.env.VITE_API_URL);
