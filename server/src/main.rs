@@ -6,13 +6,14 @@ mod requests;
 mod types;
 
 use dotenv::dotenv;
-use level::get_level_progress;
-use rating::get_display_rating;
-use requests::{fetch_single_user, get_json_string, get_users};
+use rocket::response::status;
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use std::env;
-use types::TrueSkill;
+
+use level::get_level_progress;
+use rating::get_display_rating;
+use requests::{fetch_single_user, get_json_string, get_users};
 
 #[macro_use]
 extern crate rocket;
@@ -23,7 +24,7 @@ struct DbConn(rusqlite::Connection);
 #[get("/")]
 fn index() -> &'static str {
     "Hi! Available endpoints: 
-    /trueskill, /matches /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users, /user/<user_id>"
+    /trueskill, /matches /leaderboard, /commands, /profiles, /macro_get, /macro_new, /macro_delete, /users, /user/<user_id>, /is_admin"
 }
 
 #[get("/trueskill")]
@@ -70,7 +71,7 @@ async fn trueskill(conn: DbConn) -> String {
                 trueskill.push(match user {
                     Ok(u) => u,
                     Err(_) => {
-                        TrueSkill {
+                        types::TrueSkill {
                             user_id: String::from(""),
                             rating: 0.0,
                             deviation: 0.0,
@@ -477,6 +478,19 @@ async fn get_user(user_id: &str) -> String {
     get_json_string(user)
 }
 
+#[post("/is_admin", data = "<input>", format = "application/json")]
+async fn is_admin(
+    input: Json<types::IsAdminData>,
+) -> Result<status::Accepted<String>, status::Unauthorized<String>> {
+    let result = requests::admin_check(&input.discord_token, &input.guild_id).await;
+
+    if result {
+        Ok(status::Accepted(Some("True".to_string())))
+    } else {
+        Err(status::Unauthorized(Some("False".to_string())))
+    }
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build().attach(DbConn::fairing()).mount(
@@ -492,7 +506,8 @@ fn rocket() -> _ {
             macro_new,
             macro_delete,
             users,
-            get_user
+            get_user,
+            is_admin
         ],
     )
 }

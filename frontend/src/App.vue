@@ -13,7 +13,6 @@ import { RouterView } from "vue-router";
 import HeaderComponent from "./components/HeaderComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 
-import { adminCheck } from "./helpers/adminCheck";
 import type { GuildUser, LoggedInUser } from "./helpers/types";
 
 onBeforeMount(async () => {
@@ -43,13 +42,22 @@ onBeforeMount(async () => {
                 }
             });
 
-        adminCheck(discordToken.value, import.meta.env.VITE_GUILD_ID)
-            .then((res) => {
-                isAdmin.value = res;
+        let url = new URL(import.meta.env.VITE_API_URL);
+        url.port = import.meta.env.VITE_API_PORT;
+        url.pathname = "/is_admin";
+
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                discord_token: discordToken.value,
+                guild_id: import.meta.env.VITE_GUILD_ID
             })
-            .catch((err) => {
-                console.log(err);
-            });
+        });
+
+        isAdmin.value = res.status === 202 ? true : false;
     }
 
     let url = new URL(import.meta.env.VITE_API_URL);

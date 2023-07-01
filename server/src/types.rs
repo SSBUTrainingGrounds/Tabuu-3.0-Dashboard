@@ -147,3 +147,16 @@ pub struct Matches {
     pub winner_display_rating_change: f64,
     pub loser_display_rating_change: f64,
 }
+
+/// A struct for the GET endpoint /is_admin
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IsAdmin {
+    pub is_admin: bool,
+}
+
+/// A struct for the data required for the GET endpoint /is_admin
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IsAdminData {
+    pub discord_token: String,
+    pub guild_id: String,
+}
