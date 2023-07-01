@@ -5,15 +5,15 @@ Simple dashboard for the [Tabuu 3.0 Discord Bot](https://github.com/SSBUTraining
 ## Prerequisites
 
 -   [Node.js](https://nodejs.org/en/)
--   [Rust](https://www.rust-lang.org/tools/install)
+-   [Rust](https://www.rust-lang.org/)
 
 ## Installation & Usage
 
 ### Frontend
 
-These steps take place in the `./frontend/` directory
+_These steps take place in the `./frontend/` directory_
 
-Set up the `./frontend/.env` file
+1. Set up the `./frontend/.env` file
 
 ```bash
 # The address the frontend will send requests to
@@ -22,13 +22,13 @@ VITE_API_URL = "http://127.0.0.1"
 VITE_API_PORT = "8080"
 ```
 
-Install dependencies
+2. Install dependencies
 
 ```bash
 npm install
 ```
 
-**Start the frontend**
+3. **Start the frontend**
 
 ```
 npm run dev -- --open
@@ -36,9 +36,9 @@ npm run dev -- --open
 
 ### Backend
 
-These steps take place in the `./server/` directory
+_These steps take place in the `./server/` directory_
 
-Set up the `./server/Rocket.toml` file
+1. Set up the `./server/Rocket.toml` file
 
 ```toml
 [default]
@@ -52,7 +52,7 @@ port = 8080
 url = './path/to/database.db'
 ```
 
-Set up the `./server/.env` file
+2. Set up the `./server/.env` file
 
 ```bash
 # The ID of the guild to check for admin permissions
@@ -61,7 +61,7 @@ GUILD_ID = "1234567890"
 DISCORD_TOKEN = "Example.Token"
 ```
 
-**Start the backend server**
+3. **Start the backend server**
 
 ```
 cargo run --release
