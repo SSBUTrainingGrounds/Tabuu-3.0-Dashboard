@@ -1,6 +1,7 @@
 # bot-dashboard
 
-Simple dashboard for the [Tabuu 3.0 Discord Bot](https://github.com/SSBUTrainingGrounds/Tabuu-3.0).
+Simple dashboard for the [Tabuu 3.0 Discord Bot](https://github.com/SSBUTrainingGrounds/Tabuu-3.0).  
+Written in [Vue](https://vuejs.org/) and the server is powered by [Rocket](https://rocket.rs/).
 
 ## Prerequisites
 
@@ -16,9 +17,9 @@ _These steps take place in the `./frontend/` directory_
 1. Set up the `./frontend/.env` file
 
 ```bash
-# The address the frontend will send requests to
+# The address to send requests to
 VITE_API_URL = "http://127.0.0.1"
-# The port the frontend will send requests to
+# The port to send requests to
 VITE_API_PORT = "8080"
 ```
 
@@ -48,14 +49,15 @@ address = '127.0.0.1'
 port = 8080
 
 [default.databases.sqlite_database]
-# The path to your sqlite database
+# The path to the sqlite database of the bot
 url = './path/to/database.db'
 ```
 
 2. Set up the `./server/.env` file
 
 ```bash
-# The ID of the guild to check for admin permissions
+# The ID of the discord server
+# Used to check for admin permissions
 GUILD_ID = "1234567890"
 # The Token of the bot, used for requests
 DISCORD_TOKEN = "Example.Token"
