@@ -1,40 +1,22 @@
-/// Gets you the XP needed until you level up.
-/// The `current_xp` parameter is your XP from **this level only, not the total amount of XP**.
-fn get_xp_till_next_level(level: usize, current_xp: usize) -> usize {
-    (5 * level.pow(2) + 50 * level + 100 - current_xp).max(0)
-}
-
 /// Gets you the total amount of XP needed to reach a certain level.
 fn get_xp_for_level(level: usize) -> usize {
     let mut xp = 0;
     for i in 0..level {
-        xp += get_xp_till_next_level(i, 0);
+        xp += 5 * i.pow(2) + 50 * i + 100;
     }
     xp
 }
 
-/// Gets you the progress towards the next level.
-/// The `total_xp` parameter is your **total XP, not the XP from this level only**.
+/// Gets you the progress towards the next level based on your current level and total XP earned.
 pub fn get_level_progress(level: usize, total_xp: usize) -> f64 {
-    let xp_progress = total_xp - get_xp_for_level(level);
-    let xp_needed = get_xp_for_level(level + 1) - get_xp_for_level(level);
+    let xp = get_xp_for_level(level) as f64;
 
-    xp_progress as f64 / xp_needed as f64
+    (total_xp as f64 - xp) / (get_xp_for_level(level + 1) as f64 - xp)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_get_xp_till_next_level() {
-        assert_eq!(get_xp_till_next_level(0, 0), 100);
-        assert_eq!(get_xp_till_next_level(1, 0), 155);
-        assert_eq!(get_xp_till_next_level(2, 0), 220);
-        assert_eq!(get_xp_till_next_level(10, 0), 1100);
-        assert_eq!(get_xp_till_next_level(20, 0), 3100);
-        assert_eq!(get_xp_till_next_level(80, 0), 36100);
-    }
 
     #[test]
     fn test_get_xp_for_level() {
