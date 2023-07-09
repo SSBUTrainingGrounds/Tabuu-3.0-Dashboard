@@ -3,10 +3,10 @@
         <RankedComponent />
 
         <div class="table-header">
-            <div>Match ID</div>
-            <div class="winner">Winner</div>
-            <div class="loser">Loser</div>
-            <div>Time</div>
+            <div class="clickable" @click="sortTable(matches, 'match_id', ascendingColumns)">Match ID</div>
+            <div class="winner clickable" @click="sortTable(matches, 'winner_id', ascendingColumns)">Winner</div>
+            <div class="loser clickable" @click="sortTable(matches, 'loser_id', ascendingColumns)">Loser</div>
+            <div class="clickable" @click="sortTable(matches, 'timestamp', ascendingColumns)">Time</div>
         </div>
         <div
             class="content"
@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import RankedComponent from "@/components/RankedComponent.vue";
+import { sortTable } from "@/helpers/sortTable";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { onMounted, ref } from "vue";
 
@@ -60,6 +61,13 @@ function getRatingChangeText(ratingChange: number): string {
 
 const matches = ref([]);
 
+const ascendingColumns = ref({
+    match_id: false,
+    winner_id: false,
+    loser_id: false,
+    timestamp: false
+});
+
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
     url.port = import.meta.env.VITE_API_PORT;
@@ -68,7 +76,7 @@ onMounted(async () => {
     const res = await fetch(url);
     matches.value = await res.json();
 
-    matches.value.sort((a, b) => b["timestamp"] - a["timestamp"]);
+    sortTable(matches.value, "timestamp", ascendingColumns.value);
 });
 </script>
 

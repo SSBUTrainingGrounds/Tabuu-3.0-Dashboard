@@ -170,4 +170,8 @@ function logOut() {
 .content:hover {
     background-color: var(--green);
 }
+
+.clickable {
+    cursor: pointer;
+}
 </style>

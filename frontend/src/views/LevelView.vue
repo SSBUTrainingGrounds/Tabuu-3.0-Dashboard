@@ -3,11 +3,11 @@
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
-            <div>ID</div>
-            <div>Level</div>
+            <div class="clickable" @click="sortTable(user, 'id', ascendingColumns)">ID</div>
+            <div class="clickable" @click="sortTable(user, 'level', ascendingColumns)">Level</div>
             <div>Level Progress</div>
-            <div>Total XP</div>
-            <div>Messages</div>
+            <div class="clickable" @click="sortTable(user, 'xp', ascendingColumns)">Total XP</div>
+            <div class="clickable" @click="sortTable(user, 'messages', ascendingColumns)">Messages</div>
         </div>
         <div class="content" v-for="(u, i) in user" :key="u" @click="fetchUser(users, u['id'])">
             <div>
@@ -37,10 +37,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
+import { sortTable } from "@/helpers/sortTable";
 
 const user = ref([]);
 
 const props = defineProps(["users"]);
+
+const ascendingColumns = ref({
+    id: false,
+    level: false,
+    xp: false,
+    messages: false
+});
 
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
@@ -49,7 +57,8 @@ onMounted(async () => {
 
     const res = await fetch(url);
     user.value = await res.json();
-    user.value.sort((a, b) => b["xp"] - a["xp"]);
+
+    sortTable(user.value, "xp", ascendingColumns.value);
 });
 </script>
 

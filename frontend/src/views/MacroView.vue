@@ -8,10 +8,10 @@
         </div>
 
         <div class="table-header" :style="{ gridTemplateColumns: isAdmin ? '1fr 1fr 1fr 1fr 1fr' : '1fr 1fr 1fr 1fr' }">
-            <div>Name</div>
+            <div class="clickable" @click="sortTable(allMacros, 'name', ascendingColumns)">Name</div>
             <div>Payload</div>
-            <div>Author</div>
-            <div>Uses</div>
+            <div class="clickable" @click="sortTable(allMacros, 'author', ascendingColumns)">Author</div>
+            <div class="clickable" @click="sortTable(allMacros, 'uses', ascendingColumns)">Uses</div>
         </div>
 
         <div
@@ -33,6 +33,7 @@
 import { onMounted, ref, type Ref } from "vue";
 import { getUserName } from "@/helpers/userDetails";
 import type { Macro } from "@/helpers/types";
+import { sortTable } from "@/helpers/sortTable";
 
 const props = defineProps(["userID", "isAdmin", "users"]);
 
@@ -40,6 +41,12 @@ let name = ref("");
 let payload = ref("");
 
 let allMacros: Ref<Macro[]> = ref([]);
+
+const ascendingColumns = ref({
+    uses: false,
+    name: false,
+    author: false
+});
 
 function sendMacro() {
     for (let i = 0; allMacros.value.length > i; i++) {
@@ -121,9 +128,7 @@ onMounted(async () => {
     const res = await fetch(url);
     allMacros.value = await res.json();
 
-    allMacros.value.sort((a, b) => {
-        return b.uses - a.uses;
-    });
+    sortTable(allMacros.value, "uses", ascendingColumns.value);
 });
 </script>
 

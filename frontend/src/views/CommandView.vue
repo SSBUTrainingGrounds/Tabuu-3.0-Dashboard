@@ -2,9 +2,9 @@
     <div class="grid">
         <div class="table-header">
             <div>Rank</div>
-            <div>Command Name</div>
-            <div>Uses</div>
-            <div>Last Used</div>
+            <div class="clickable" @click="sortTable(command, 'command', ascendingColumns)">Command Name</div>
+            <div class="clickable" @click="sortTable(command, 'uses', ascendingColumns)">Uses</div>
+            <div class="clickable" @click="sortTable(command, 'last_used', ascendingColumns)">Last Used</div>
         </div>
         <div class="content" v-for="(c, i) in command" :key="c">
             <div>
@@ -18,9 +18,16 @@
 </template>
 
 <script setup lang="ts">
+import { sortTable } from "@/helpers/sortTable";
 import { ref, onMounted } from "vue";
 
 const command = ref([]);
+
+const ascendingColumns = ref({
+    uses: false,
+    last_used: false,
+    command: false
+});
 
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
@@ -29,7 +36,8 @@ onMounted(async () => {
 
     const res = await fetch(url);
     command.value = await res.json();
-    command.value.sort((a, b) => b["uses"] - a["uses"]);
+
+    sortTable(command.value, "uses", ascendingColumns.value);
 });
 </script>
 

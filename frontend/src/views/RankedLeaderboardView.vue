@@ -5,11 +5,11 @@
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
-            <div>ID</div>
-            <div>TabuuSkill</div>
-            <div>Deviation</div>
-            <div>Wins</div>
-            <div>Losses</div>
+            <div class="clickable" @click="sortTable(user, 'user_id', ascendingColumns)">ID</div>
+            <div class="clickable" @click="sortTable(user, 'display_rating', ascendingColumns)">TabuuSkill</div>
+            <div class="clickable" @click="sortTable(user, 'deviation', ascendingColumns)">Deviation</div>
+            <div class="clickable" @click="sortTable(user, 'wins', ascendingColumns)">Wins</div>
+            <div class="clickable" @click="sortTable(user, 'losses', ascendingColumns)">Losses</div>
             <div>Winrate</div>
         </div>
         <div class="content" v-for="(u, i) in user" :key="u" @click="fetchUser(users, u['user_id'])">
@@ -32,12 +32,21 @@
 
 <script setup lang="ts">
 import RankedComponent from "@/components/RankedComponent.vue";
+import { sortTable } from "@/helpers/sortTable";
 import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
 import { ref, onMounted } from "vue";
 
 const props = defineProps(["users"]);
 
 const user = ref([]);
+
+const ascendingColumns = ref({
+    user_id: false,
+    display_rating: false,
+    deviation: false,
+    wins: false,
+    losses: false
+});
 
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
@@ -47,7 +56,7 @@ onMounted(async () => {
     const res = await fetch(url);
     user.value = await res.json();
 
-    user.value.sort((a, b) => b["display_rating"] - a["display_rating"]);
+    sortTable(user.value, "display_rating", ascendingColumns.value);
 });
 </script>
 
