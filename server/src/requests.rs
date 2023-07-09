@@ -217,3 +217,46 @@ pub fn get_json_string(return_type: impl Sized + Serialize) -> String {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_json_string() {
+        let test_struct = RawGuildUser {
+            avatar: Some("".to_string()),
+            communication_disabled_until: Some("".to_string()),
+            deaf: false,
+            flags: 0,
+            joined_at: "".to_string(),
+            mute: false,
+            nick: Some("".to_string()),
+            pending: false,
+            premium_since: Some("".to_string()),
+            roles: vec![],
+            user: RawUser {
+                accent_color: Some(0),
+                avatar: Some("".to_string()),
+                avatar_decoration: Some("".to_string()),
+                banner: Some("".to_string()),
+                banner_color: Some(0),
+                bot: Some(false),
+                discriminator: "".to_string(),
+                display_name: Some("".to_string()),
+                flags: 0,
+                global_name: Some("".to_string()),
+                id: "".to_string(),
+                public_flags: 0,
+                username: "".to_string(),
+            },
+        };
+
+        let json_string = get_json_string(test_struct);
+
+        assert_eq!(
+            json_string,
+            "{\"avatar\":\"\",\"communication_disabled_until\":\"\",\"deaf\":false,\"flags\":0,\"joined_at\":\"\",\"mute\":false,\"nick\":\"\",\"pending\":false,\"premium_since\":\"\",\"roles\":[],\"user\":{\"accent_color\":0,\"avatar\":\"\",\"avatar_decoration\":\"\",\"banner\":\"\",\"banner_color\":0,\"bot\":false,\"discriminator\":\"\",\"display_name\":\"\",\"flags\":0,\"global_name\":\"\",\"id\":\"\",\"public_flags\":0,\"username\":\"\"}}"
+        );
+    }
+}
