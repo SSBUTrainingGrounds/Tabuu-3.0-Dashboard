@@ -2,15 +2,17 @@
     <div class="grid">
         <RankedComponent />
 
+        <SearchbarComponent @search="searchBar" />
+
         <div class="table-header">
-            <div class="clickable" @click="sortTable(matches, 'match_id', ascendingColumns)">Match ID</div>
-            <div class="winner clickable" @click="sortTable(matches, 'winner_id', ascendingColumns)">Winner</div>
-            <div class="loser clickable" @click="sortTable(matches, 'loser_id', ascendingColumns)">Loser</div>
-            <div class="clickable" @click="sortTable(matches, 'timestamp', ascendingColumns)">Time</div>
+            <div class="clickable" @click="sortTable(displayMatches, 'match_id', ascendingColumns)">Match ID</div>
+            <div class="winner clickable" @click="sortTable(displayMatches, 'winner_id', ascendingColumns)">Winner</div>
+            <div class="loser clickable" @click="sortTable(displayMatches, 'loser_id', ascendingColumns)">Loser</div>
+            <div class="clickable" @click="sortTable(displayMatches, 'timestamp', ascendingColumns)">Time</div>
         </div>
         <div
             class="content"
-            v-for="(m, i) in matches"
+            v-for="(m, i) in displayMatches"
             :key="i"
             @click="
                 {
@@ -45,9 +47,11 @@
 
 <script setup lang="ts">
 import RankedComponent from "@/components/RankedComponent.vue";
+import SearchbarComponent from "@/components/SearchbarComponent.vue";
+import { filterTable } from "@/helpers/filterTable";
 import { sortTable } from "@/helpers/sortTable";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, type Ref } from "vue";
 
 const props = defineProps(["users"]);
 
@@ -59,7 +63,8 @@ function getRatingChangeText(ratingChange: number): string {
     }
 }
 
-const matches = ref([]);
+const matches: Ref<any[]> = ref([]);
+const displayMatches: Ref<any[]> = ref([]);
 
 const ascendingColumns = ref({
     match_id: false,
@@ -67,6 +72,10 @@ const ascendingColumns = ref({
     loser_id: false,
     timestamp: false
 });
+
+function searchBar(search: string) {
+    displayMatches.value = filterTable(matches.value, props.users, search);
+}
 
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
@@ -76,7 +85,9 @@ onMounted(async () => {
     const res = await fetch(url);
     matches.value = await res.json();
 
-    sortTable(matches.value, "timestamp", ascendingColumns.value);
+    displayMatches.value = matches.value;
+
+    sortTable(displayMatches.value, "timestamp", ascendingColumns.value);
 });
 </script>
 

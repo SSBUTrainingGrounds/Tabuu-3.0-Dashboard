@@ -1,15 +1,17 @@
 <template>
     <div class="grid">
+        <SearchbarComponent @search="searchBar" />
+
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
-            <div class="clickable" @click="sortTable(user, 'id', ascendingColumns)">ID</div>
-            <div class="clickable" @click="sortTable(user, 'level', ascendingColumns)">Level</div>
+            <div class="clickable" @click="sortTable(displayUser, 'id', ascendingColumns)">ID</div>
+            <div class="clickable" @click="sortTable(displayUser, 'level', ascendingColumns)">Level</div>
             <div>Level Progress</div>
-            <div class="clickable" @click="sortTable(user, 'xp', ascendingColumns)">Total XP</div>
-            <div class="clickable" @click="sortTable(user, 'messages', ascendingColumns)">Messages</div>
+            <div class="clickable" @click="sortTable(displayUser, 'xp', ascendingColumns)">Total XP</div>
+            <div class="clickable" @click="sortTable(displayUser, 'messages', ascendingColumns)">Messages</div>
         </div>
-        <div class="content" v-for="(u, i) in user" :key="u" @click="fetchUser(users, u['id'])">
+        <div class="content" v-for="(u, i) in displayUser" :key="u" @click="fetchUser(users, u['id'])">
             <div>
                 <i>#{{ i + 1 }}</i>
             </div>
@@ -35,11 +37,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, type Ref } from "vue";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { sortTable } from "@/helpers/sortTable";
+import { filterTable } from "@/helpers/filterTable";
+import SearchbarComponent from "@/components/SearchbarComponent.vue";
 
-const user = ref([]);
+const user: Ref<any[]> = ref([]);
+const displayUser: Ref<any[]> = ref([]);
 
 const props = defineProps(["users"]);
 
@@ -50,6 +55,10 @@ const ascendingColumns = ref({
     messages: false
 });
 
+function searchBar(search: string) {
+    displayUser.value = filterTable(user.value, props.users, search);
+}
+
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
     url.port = import.meta.env.VITE_API_PORT;
@@ -58,7 +67,9 @@ onMounted(async () => {
     const res = await fetch(url);
     user.value = await res.json();
 
-    sortTable(user.value, "xp", ascendingColumns.value);
+    displayUser.value = user.value;
+
+    sortTable(displayUser.value, "xp", ascendingColumns.value);
 });
 </script>
 

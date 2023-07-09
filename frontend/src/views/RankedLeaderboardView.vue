@@ -2,17 +2,19 @@
     <div class="grid">
         <RankedComponent />
 
+        <SearchbarComponent @search="searchBar" />
+
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
-            <div class="clickable" @click="sortTable(user, 'user_id', ascendingColumns)">ID</div>
-            <div class="clickable" @click="sortTable(user, 'display_rating', ascendingColumns)">TabuuSkill</div>
-            <div class="clickable" @click="sortTable(user, 'deviation', ascendingColumns)">Deviation</div>
-            <div class="clickable" @click="sortTable(user, 'wins', ascendingColumns)">Wins</div>
-            <div class="clickable" @click="sortTable(user, 'losses', ascendingColumns)">Losses</div>
+            <div class="clickable" @click="sortTable(displayUser, 'user_id', ascendingColumns)">ID</div>
+            <div class="clickable" @click="sortTable(displayUser, 'display_rating', ascendingColumns)">TabuuSkill</div>
+            <div class="clickable" @click="sortTable(displayUser, 'deviation', ascendingColumns)">Deviation</div>
+            <div class="clickable" @click="sortTable(displayUser, 'wins', ascendingColumns)">Wins</div>
+            <div class="clickable" @click="sortTable(displayUser, 'losses', ascendingColumns)">Losses</div>
             <div>Winrate</div>
         </div>
-        <div class="content" v-for="(u, i) in user" :key="u" @click="fetchUser(users, u['user_id'])">
+        <div class="content" v-for="(u, i) in displayUser" :key="u" @click="fetchUser(users, u['user_id'])">
             <div>
                 <i>#{{ i + 1 }}</i>
             </div>
@@ -32,13 +34,16 @@
 
 <script setup lang="ts">
 import RankedComponent from "@/components/RankedComponent.vue";
+import SearchbarComponent from "@/components/SearchbarComponent.vue";
+import { filterTable } from "@/helpers/filterTable";
 import { sortTable } from "@/helpers/sortTable";
 import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, type Ref } from "vue";
 
 const props = defineProps(["users"]);
 
-const user = ref([]);
+const user: Ref<any[]> = ref([]);
+const displayUser: Ref<any[]> = ref([]);
 
 const ascendingColumns = ref({
     user_id: false,
@@ -48,6 +53,10 @@ const ascendingColumns = ref({
     losses: false
 });
 
+function searchBar(search: string) {
+    displayUser.value = filterTable(user.value, props.users, search);
+}
+
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
     url.port = import.meta.env.VITE_API_PORT;
@@ -56,7 +65,9 @@ onMounted(async () => {
     const res = await fetch(url);
     user.value = await res.json();
 
-    sortTable(user.value, "display_rating", ascendingColumns.value);
+    displayUser.value = user.value;
+
+    sortTable(displayUser.value, "display_rating", ascendingColumns.value);
 });
 </script>
 
