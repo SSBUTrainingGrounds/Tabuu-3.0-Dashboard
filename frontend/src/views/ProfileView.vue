@@ -66,7 +66,7 @@ function searchBar(search: string) {
 onMounted(async () => {
     let url = new URL(import.meta.env.VITE_API_URL);
     url.port = import.meta.env.VITE_API_PORT;
-    url.pathname = "/profiles";
+    url.pathname = "/api/profiles";
 
     const res = await fetch(url);
     user.value = await res.json();

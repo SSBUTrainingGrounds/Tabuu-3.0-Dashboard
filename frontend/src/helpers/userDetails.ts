@@ -45,7 +45,7 @@ export async function fetchUser(users: Map<string, GuildUser>, id: string) {
 
     const url = new URL(import.meta.env.VITE_API_URL);
     url.port = import.meta.env.VITE_API_PORT;
-    url.pathname = "/user/" + id;
+    url.pathname = "/api/user/" + id;
 
     await fetch(url)
         .then((response) => response.json())

@@ -44,7 +44,7 @@ onBeforeMount(async () => {
 
         let url = new URL(import.meta.env.VITE_API_URL);
         url.port = import.meta.env.VITE_API_PORT;
-        url.pathname = "/is_admin";
+        url.pathname = "/api/is_admin";
 
         await fetch(url, {
             method: "POST",
@@ -61,7 +61,7 @@ onBeforeMount(async () => {
 
     let url = new URL(import.meta.env.VITE_API_URL);
     url.port = import.meta.env.VITE_API_PORT;
-    url.pathname = "/users";
+    url.pathname = "/api/users";
 
     await fetch(url)
         .then((res) => res.json())

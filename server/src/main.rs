@@ -501,7 +501,7 @@ async fn is_admin(
 #[launch]
 fn rocket() -> _ {
     rocket::build().attach(DbConn::fairing()).mount(
-        "/",
+        "/api/",
         routes![
             index,
             trueskill,
