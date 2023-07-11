@@ -38,3 +38,6 @@ coverage
 
 # Rocket config
 Rocket.toml
+
+# http cache
+*/http-cacache

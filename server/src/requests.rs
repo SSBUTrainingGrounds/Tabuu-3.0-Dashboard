@@ -1,6 +1,9 @@
 extern crate reqwest;
 
-use reqwest::header;
+use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache};
+use reqwest::{header, Client};
+use reqwest_middleware::ClientBuilder;
+
 use serde::Serialize;
 use serde_json::Value;
 
@@ -21,10 +24,17 @@ pub async fn admin_check(discord_token: &str, guild_id: &str) -> bool {
         },
     );
 
-    let client = match reqwest::Client::builder().default_headers(headers).build() {
+    let client = ClientBuilder::new(match Client::builder().default_headers(headers).build() {
         Ok(s) => s,
         Err(_) => return false,
-    };
+    })
+    .with(Cache(HttpCache {
+        // This is not set to ForceCache as the admin check should always be up to date.
+        mode: CacheMode::Default,
+        manager: CACacheManager::default(),
+        options: None,
+    }))
+    .build();
 
     let res = client
         .get("https://discord.com/api/users/@me/guilds")
@@ -78,10 +88,19 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
         },
     );
 
-    let client = match reqwest::Client::builder().default_headers(headers).build() {
+    let client = ClientBuilder::new(match Client::builder().default_headers(headers).build() {
         Ok(s) => s,
         Err(_) => return users,
-    };
+    })
+    .with(Cache(HttpCache {
+        // Forcing the cache to be used, as to not get rate limited by Discord.
+        // This means the users could be out of date.
+        // This could be set to Default in the future, if we lock down the API?
+        mode: CacheMode::ForceCache,
+        manager: CACacheManager::default(),
+        options: None,
+    }))
+    .build();
 
     while keep_going {
         let res = client
@@ -172,10 +191,18 @@ pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<Fet
         },
     );
 
-    let client = match reqwest::Client::builder().default_headers(headers).build() {
+    let client = ClientBuilder::new(match Client::builder().default_headers(headers).build() {
         Ok(s) => s,
         Err(_) => return None,
-    };
+    })
+    .with(Cache(HttpCache {
+        // If a user fetches a user, it's probably because they want the most up to date information.
+        // So we don't want ForceCache here.
+        mode: CacheMode::Default,
+        manager: CACacheManager::default(),
+        options: None,
+    }))
+    .build();
 
     let res = client
         .get(&("https://discord.com/api/users/".to_owned() + user_id))
