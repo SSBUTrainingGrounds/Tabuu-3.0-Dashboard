@@ -526,70 +526,70 @@ mod tests {
     use rocket::local::blocking::Client;
 
     #[test]
-    fn test_index() {
+    fn test_rocket_index() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_trueskill() {
+    fn test_rocket_trueskill() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/trueskill").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_matches() {
+    fn test_rocket_matches() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/matches").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_leaderboard() {
+    fn test_rocket_leaderboard() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/leaderboard").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_commands() {
+    fn test_rocket_commands() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/commands").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_profiles() {
+    fn test_rocket_profiles() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/profiles").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_macro_get() {
+    fn test_rocket_macro_get() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/macro_get").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_users() {
+    fn test_rocket_users() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/users").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_get_user() {
+    fn test_rocket_get_user() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/user/123456789").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 
     #[test]
-    fn test_is_admin() {
+    fn test_rocket_is_admin() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
             .post("/api/is_admin")
@@ -599,7 +599,7 @@ mod tests {
     }
 
     #[test]
-    fn test_macro_new() {
+    fn test_rocket_macro_new() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
             .post("/api/macro_new")
@@ -609,7 +609,7 @@ mod tests {
     }
 
     #[test]
-    fn test_macro_delete() {
+    fn test_rocket_macro_delete() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
             .post("/api/macro_delete")
@@ -619,7 +619,7 @@ mod tests {
     }
 
     #[test]
-    fn test_macros_bad_requests() {
+    fn test_rocket_macros_bad_requests() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
             .post("/api/macro_delete")
@@ -645,7 +645,7 @@ mod tests {
     }
 
     #[test]
-    fn test_is_admin_bad_requests() {
+    fn test_rocket_is_admin_bad_requests() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
             .post("/api/is_admin")
@@ -655,7 +655,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_user_bad_request() {
+    fn test_rocket_get_user_bad_request() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.get("/api/user/").dispatch();
         assert_eq!(response.status(), Status::NotFound);
