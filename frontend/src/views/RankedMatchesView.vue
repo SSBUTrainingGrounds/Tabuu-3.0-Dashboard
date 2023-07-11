@@ -27,8 +27,19 @@
                 {{ getUserName(props.users, m["winner_id"]) }}
             </div>
             <div class="winner-rating">
-                {{ (m["old_winner_display_rating"] as number).toFixed(2) }} →
-                {{ (m["new_winner_display_rating"] as number).toFixed(2) }}
+                {{
+                    (m["old_winner_display_rating"] as number).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}
+                →
+                {{
+                    (m["new_winner_display_rating"] as number).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}
                 {{ getRatingChangeText(m["winner_display_rating_change"]) }}
             </div>
             <div>
@@ -36,8 +47,19 @@
                 {{ getUserName(props.users, m["loser_id"]) }}
             </div>
             <div class="loser-rating">
-                {{ (m["old_loser_display_rating"] as number).toFixed(2) }} →
-                {{ (m["new_loser_display_rating"] as number).toFixed(2) }}
+                {{
+                    (m["old_loser_display_rating"] as number).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}
+                →
+                {{
+                    (m["new_loser_display_rating"] as number).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}
                 {{ getRatingChangeText(m["loser_display_rating_change"]) }}
             </div>
             <div>{{ new Date(m["timestamp"] * 1000).toLocaleString() }}</div>
@@ -57,9 +79,15 @@ const props = defineProps(["users"]);
 
 function getRatingChangeText(ratingChange: number): string {
     if (ratingChange > 0) {
-        return `(↑${ratingChange.toFixed(2)})`;
+        return `(↑${ratingChange.toLocaleString("en", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })})`;
     } else {
-        return `(↓${Math.abs(ratingChange).toFixed(2)})`;
+        return `(↓${Math.abs(ratingChange).toLocaleString("en", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })})`;
     }
 }
 

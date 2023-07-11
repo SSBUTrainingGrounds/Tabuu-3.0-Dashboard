@@ -11,7 +11,7 @@
                 <i>#{{ i + 1 }}</i>
             </div>
             <div>%{{ c["command"] }}</div>
-            <div>{{ c["uses"] }}</div>
+            <div>{{ (c["uses"] as number).toLocaleString("en") }}</div>
             <div>{{ c["last_used"] !== 0 ? new Date(c["last_used"] * 1000).toLocaleString() : "N/A" }}</div>
         </div>
     </div>

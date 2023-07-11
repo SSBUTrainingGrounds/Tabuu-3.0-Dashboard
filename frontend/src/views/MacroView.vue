@@ -23,7 +23,7 @@
             <div>%{{ macro.name }}</div>
             <div>{{ macro.payload }}</div>
             <div>{{ getUserName(props.users, macro.author) }}</div>
-            <div>{{ macro.uses }}</div>
+            <div>{{ macro.uses.toLocaleString("en") }}</div>
             <button class="delete-button" v-if="isAdmin" @click="deleteMacro(macro.name, i)">X</button>
         </div>
     </div>

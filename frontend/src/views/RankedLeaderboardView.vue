@@ -23,11 +23,33 @@
                 {{ getUserName(props.users, u["user_id"]) }}
             </div>
             <div>{{ u["user_id"] }}</div>
-            <div>{{ (u["display_rating"] as number).toFixed(2) }}</div>
-            <div>{{ (u["deviation"] * 100).toFixed(2) }}</div>
-            <div>{{ u["wins"] }}</div>
-            <div>{{ u["losses"] }}</div>
-            <div>{{ ((u["wins"] / (u["wins"] + u["losses"])) * 100).toFixed(2) }}%</div>
+            <div>
+                {{
+                    (u["display_rating"] as number).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}
+            </div>
+            <div>
+                {{
+                    (u["deviation"] * 100).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}
+            </div>
+            <div>{{ (u["wins"] as number).toLocaleString("en") }}</div>
+            <div>{{ (u["losses"] as number).toLocaleString("en") }}</div>
+            <div>
+                {{
+                    (u["wins"] / (u["wins"] + u["losses"])).toLocaleString("en", {
+                        style: "percent",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}
+            </div>
         </div>
     </div>
 </template>

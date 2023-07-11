@@ -20,7 +20,7 @@
                 {{ getUserName(props.users, u["id"]) }}
             </div>
             <div>{{ u["id"] }}</div>
-            <div>{{ u["level"] }}</div>
+            <div>{{ (u["level"] as number).toLocaleString("en") }}</div>
             <div>
                 <div
                     class="pie-progress"
@@ -28,10 +28,16 @@
                         backgroundImage: `conic-gradient(var(--light-green) ${u['xp_progress'] * 100}%, var(--gray) 0%)`
                     }"
                 ></div>
-                {{ ((u["xp_progress"] * 100) as number).toFixed(2) }}%
+                {{
+                    (u["xp_progress"] as number).toLocaleString("en", {
+                        style: "percent",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}
             </div>
-            <div>{{ u["xp"] }}</div>
-            <div>{{ u["messages"] }}</div>
+            <div>{{ (u["xp"] as number).toLocaleString("en") }}</div>
+            <div>{{ (u["messages"] as number).toLocaleString("en") }}</div>
         </div>
     </div>
 </template>
