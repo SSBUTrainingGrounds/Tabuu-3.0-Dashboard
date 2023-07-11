@@ -1,7 +1,12 @@
 <template>
     <header class="header">
-        <div class="wrapper-header">
-            <nav class="nav">
+        <button class="navigation-button" @click="headerVisible = !headerVisible">
+            <i class="fa fa-bars"></i>
+            Navigation
+        </button>
+
+        <div class="wrapper-header" v-if="headerVisible">
+            <nav class="nav" @click="changeHeaderVisibility">
                 <RouterLink class="green-link" to="/"><i class="fa fa-home"></i> Home</RouterLink>
                 <RouterLink class="green-link" to="/ranked/leaderboard"
                     ><i class="fa fa-check"></i> Ranked Matchmaking</RouterLink
@@ -10,46 +15,61 @@
                 <RouterLink class="green-link" to="/profiles"><i class="fa fa-user"></i> Profiles</RouterLink>
                 <RouterLink class="green-link" to="/commands"><i class="fa fa-signal"></i> Command Stats</RouterLink>
                 <RouterLink class="green-link" to="/macro"><i class="fa fa-cog"></i> Macros</RouterLink>
-
-                <a
-                    :href="
-                        'https://discord.com/api/oauth2/authorize?client_id=785303736582012969&redirect_uri=http%3A%2F%2F' +
-                        url +
-                        '%3A' +
-                        port +
-                        '%2F&response_type=token&scope=guilds%20guilds.members.read%20identify'
-                    "
-                    class="login-button"
-                    v-if="!discordToken"
-                    ><i class="fab fa-discord"></i> Login With Discord
-                </a>
-
-                <a href="/" class="logout-button" v-if="discordToken" @click="$emit('logOut')"
-                    ><i class="fab fa-discord"></i> Log Out</a
-                >
-
-                <div class="user-display" v-if="discordToken">
-                    <img
-                        v-if="user.id && user.avatar"
-                        :src="`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`"
-                        class="avatar"
-                        alt="Avatar"
-                    />
-                    <div class="user-login-info">Logged in as @{{ user.username }}!</div>
-                    <div class="user-login-id">({{ user.id }})</div>
-                </div>
             </nav>
+        </div>
+        <div class="login">
+            <a
+                :href="
+                    'https://discord.com/api/oauth2/authorize?client_id=785303736582012969&redirect_uri=http%3A%2F%2F' +
+                    url +
+                    '%3A' +
+                    port +
+                    '%2F&response_type=token&scope=guilds%20guilds.members.read%20identify'
+                "
+                class="login-button"
+                v-if="!discordToken"
+                ><i class="fab fa-discord"></i> Login with Discord
+            </a>
+
+            <a href="/" class="logout-button" v-if="discordToken" @click="$emit('logOut')"
+                ><i class="fab fa-discord"></i> Log Out</a
+            >
+
+            <div class="user-display" v-if="discordToken">
+                <img
+                    v-if="user.id && user.avatar"
+                    :src="`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`"
+                    class="avatar"
+                    alt="Avatar"
+                />
+                <div class="user-login-info">Logged in as @{{ user.username }}!</div>
+                <div class="user-login-id">({{ user.id }})</div>
+            </div>
         </div>
     </header>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+
 defineProps(["discordToken", "user", "guilds"]);
 
 defineEmits(["logOut"]);
 
 const url = window.location.hostname;
 const port = "5173";
+
+// We want the nav bar to be visible by default on desktop, but hidden on mobile.
+// You can still hide it, if you want to.
+const headerVisible = ref(window.innerWidth > 900 ? true : false);
+
+const changeHeaderVisibility = () => {
+    if (window.innerWidth > 900) {
+        headerVisible.value = true;
+    } else {
+        headerVisible.value = false;
+    }
+};
 </script>
 
 <style scoped>
@@ -57,17 +77,14 @@ const port = "5173";
     background-color: var(--black);
     color: var(--white);
     padding: 1rem;
-}
-
-.header {
     position: fixed;
     width: 100%;
     left: 0;
     right: 0;
-}
-
-.header {
     overflow: hidden hidden;
+    display: grid;
+    grid-template-columns: 1fr 3fr 1.5fr;
+    justify-items: space-around;
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
@@ -76,9 +93,33 @@ const port = "5173";
     display: none;
 }
 
+.login {
+    display: flex;
+    align-items: center;
+    grid-column: 3;
+}
+
 .wrapper-header {
     max-width: 1200px;
     margin: 0 auto;
+    grid-column: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navigation-button {
+    background-color: var(--black);
+    color: var(--green);
+    border: none;
+    font-size: large;
+    font-weight: bold;
+    cursor: pointer;
+    grid-column: 1;
+}
+
+.navigation-button:hover {
+    color: var(--light-green);
 }
 
 .user-display {
@@ -113,7 +154,7 @@ const port = "5173";
     text-decoration: none;
     font-weight: bold;
     font-size: large;
-    margin: 0 0.2rem 0 0.2rem;
+    margin: 0 0.5rem 0 0.5rem;
 }
 
 .login-button {
@@ -145,14 +186,11 @@ const port = "5173";
     color: var(--light-green);
 }
 
-.nav .green-link.active {
-    color: var(--light-green);
-}
-
 @media (max-width: 1300px) {
     .nav .green-link,
     .login-button,
-    .logout-button {
+    .logout-button,
+    .navigation-button {
         font-size: small;
     }
 }
@@ -160,14 +198,43 @@ const port = "5173";
 @media (max-width: 900px) {
     .nav {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+    }
+
+    .user-display {
+        display: none;
     }
 
     .nav .green-link,
     .login-button,
-    .logout-button {
-        margin: 0.2rem 0 0.2rem 0;
-        font-size: large;
+    .logout-button,
+    .navigation-button {
+        margin: 0.1rem 0 0.1rem 0;
+        font-weight: bold;
+        font-size: medium;
+    }
+
+    .header {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 0.2fr 0.5fr;
+        justify-items: center;
+        padding: 0.5rem;
+    }
+
+    .navigation-button {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .wrapper-header {
+        grid-column: 1 / 3;
+        grid-row: 2;
+        display: flex;
+    }
+
+    .login {
+        grid-column: 2;
+        grid-row: 1;
     }
 }
 </style>

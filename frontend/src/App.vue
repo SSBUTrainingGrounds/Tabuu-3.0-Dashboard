@@ -116,14 +116,8 @@ function logOut() {
 @import "./assets/styles.css";
 
 .view {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-}
-
-@media (max-width: 900px) {
-    .view {
-        padding-top: 20rem;
-    }
+    padding-top: 5rem;
+    padding-bottom: 5rem;
 }
 
 .grid {
@@ -131,7 +125,7 @@ function logOut() {
     grid-gap: 0.2rem;
     width: 95%;
     max-width: 1200px;
-    min-width: 600px;
+    min-width: 800px;
     justify-content: center;
     margin: 0 auto;
 }
