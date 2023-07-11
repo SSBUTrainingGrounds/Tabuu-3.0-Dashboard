@@ -134,7 +134,7 @@ const port = "5173";
 
 .nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 
 .nav .green-link {
@@ -149,7 +149,7 @@ const port = "5173";
     color: var(--light-green);
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1300px) {
     .nav .green-link,
     .login-button,
     .logout-button {
@@ -157,7 +157,7 @@ const port = "5173";
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
     .nav {
         flex-direction: column;
         align-items: flex-start;

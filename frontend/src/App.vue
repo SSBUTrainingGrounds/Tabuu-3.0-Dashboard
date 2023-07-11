@@ -120,7 +120,7 @@ function logOut() {
     padding-bottom: 4rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
     .view {
         padding-top: 20rem;
     }

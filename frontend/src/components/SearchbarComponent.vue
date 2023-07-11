@@ -1,5 +1,6 @@
 <template>
     <div class="searchbar">
+        <i class="fas fa-search"></i>
         <input type="text" placeholder="Search for a user..." v-model="search" @input="$emit('search', search)" />
     </div>
 </template>
@@ -25,24 +26,33 @@ defineProps(["users", "table"]);
     width: 100%;
     max-width: 800px;
     padding: 0.5rem;
+    border: 2px solid var(--green);
+    border-radius: 0.5rem;
+    outline: none;
+    font-size: large;
+    color: var(--light-gray);
+    background-color: var(--dark-gray);
 }
 
 .searchbar input {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid var(--green);
-    border-radius: 0.5rem;
     outline: none;
+    border: none;
     font-size: large;
-    color: var(--green);
+    color: var(--white);
     background-color: var(--dark-gray);
 }
 
-.searchbar input:focus {
-    border: 1px solid var(--light-green);
+.searchbar i {
+    margin-right: 0.5rem;
+    color: var(--light-gray);
 }
 
+.searchbar:focus-within {
+    border: 2px solid var(--light-green);
+}
 .searchbar input::placeholder {
-    color: var(--green);
+    color: var(--light-gray);
 }
 </style>
