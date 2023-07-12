@@ -56,8 +56,8 @@ defineProps(["discordToken", "user", "guilds"]);
 
 defineEmits(["logOut"]);
 
-const url = window.location.hostname;
-const port = "5173";
+const url = process.env.VITE_API_URL;
+const port = process.env.VITE_API_PORT;
 
 // We want the nav bar to be visible by default on desktop, but hidden on mobile.
 // You can still hide it, if you want to.
