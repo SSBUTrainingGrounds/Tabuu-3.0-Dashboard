@@ -24,7 +24,8 @@ VITE_API_PORT = "8080"
 # The Discord OAuth2 URL.
 # Visit your Application page and use the OAuth2 URL Generator.
 # Check the "identify", "guilds" and "guilds.members.read" scopes.
-VITE_DISCORD_LOGIN_URL = "https://discord.com/api/oauth2/authorize?client_id=123456789&redirect_uri=http%3A%2F%2F127.0.0.1%3A80&response_type=code&scope=identify%20guilds.members.read%20guilds"
+# Make sure the response type is "token".
+VITE_DISCORD_LOGIN_URL = "https://discord.com/api/oauth2/authorize?client_id=123456789&redirect_uri=http%3A%2F%2F127.0.0.1%3A80&response_type=token&scope=identify%20guilds.members.read%20guilds"
 ```
 
 2. Install dependencies
