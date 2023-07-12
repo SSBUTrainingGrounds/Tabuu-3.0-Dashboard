@@ -51,8 +51,6 @@ const props = defineProps(["users"]);
 // Not sure if it would make sense to implement sorting for this view.
 
 function getCharacters(characters: string): string {
-    if (characters === "") return "None";
-
     return characters
         .split(" ")
         .map((c) => c.split(":")[1])

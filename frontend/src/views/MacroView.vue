@@ -7,7 +7,10 @@
             <button class="macro-button" @click="sendMacro">+</button>
         </div>
 
-        <div class="table-header" :style="{ gridTemplateColumns: isAdmin ? '1fr 1fr 1fr 1fr 1fr' : '1fr 1fr 1fr 1fr' }">
+        <div
+            class="table-header"
+            :style="{ gridTemplateColumns: isAdmin ? '1fr 2fr 1.2fr 0.5fr 0.5fr' : '1fr 2fr 1.2fr 0.5fr' }"
+        >
             <div class="clickable" @click="sortTable(allMacros, 'name', ascendingColumns)">Name</div>
             <div>Payload</div>
             <div class="clickable" @click="sortTable(allMacros, 'author', ascendingColumns)">Author</div>
@@ -18,11 +21,14 @@
             v-for="(macro, i) in allMacros"
             :key="i"
             class="content"
-            :style="{ gridTemplateColumns: isAdmin ? '1fr 1fr 1fr 1fr 1fr' : '1fr 1fr 1fr 1fr' }"
+            :style="{ gridTemplateColumns: isAdmin ? '1fr 2fr 1.2fr 0.5fr 0.5fr' : '1fr 2fr 1.2fr 0.5fr' }"
         >
             <div>%{{ macro.name }}</div>
             <div>{{ macro.payload }}</div>
-            <div>{{ getUserName(props.users, macro.author) }}</div>
+            <div>
+                <img :src="getUserAvatar(props.users, macro.author)" alt="User Avatar" class="avatar-preview" />
+                {{ getUserName(props.users, macro.author) }}
+            </div>
             <div>{{ macro.uses.toLocaleString("en") }}</div>
             <button class="delete-button" v-if="isAdmin" @click="deleteMacro(macro.name, i)">X</button>
         </div>
@@ -31,7 +37,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from "vue";
-import { getUserName } from "@/helpers/userDetails";
+import { getUserName, getUserAvatar } from "@/helpers/userDetails";
 import type { Macro } from "@/helpers/types";
 import { sortTable } from "@/helpers/sortTable";
 
@@ -135,6 +141,10 @@ onMounted(async () => {
 <style scoped>
 @import "../assets/styles.css";
 
+.content {
+    word-break: normal;
+}
+
 .new-header {
     grid-column: 1 / 5;
 }
@@ -201,5 +211,11 @@ onMounted(async () => {
     background-color: var(--red);
     color: var(--light-red);
     border: solid 1px var(--light-red);
+}
+
+@media (max-width: 1300px) {
+    .content {
+        word-break: break-all;
+    }
 }
 </style>

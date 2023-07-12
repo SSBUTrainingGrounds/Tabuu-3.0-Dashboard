@@ -84,7 +84,7 @@ onMounted(async () => {
 
 .content,
 .table-header {
-    grid-template-columns: 1fr 1.2fr 1.5fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 0.3fr 1.2fr 1.2fr 1fr 1fr 1fr 1fr;
 }
 
 .pie-progress {

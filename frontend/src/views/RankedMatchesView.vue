@@ -122,7 +122,7 @@ onMounted(async () => {
 <style scoped>
 .content,
 .table-header {
-    grid-template-columns: 1fr 1fr 1.5fr 1fr 1.5fr 1fr;
+    grid-template-columns: 0.6fr 1fr 1.5fr 1fr 1.5fr 1fr;
 }
 
 .winner {
