@@ -18,16 +18,7 @@
             </nav>
         </div>
         <div class="login">
-            <a
-                :href="
-                    'https://discord.com/api/oauth2/authorize?client_id=785303736582012969&redirect_uri=http%3A%2F%2F' +
-                    url +
-                    '%3A' +
-                    port +
-                    '%2F&response_type=token&scope=guilds%20guilds.members.read%20identify'
-                "
-                class="login-button"
-                v-if="!discordToken"
+            <a :href="url" class="login-button" v-if="!discordToken"
                 ><i class="fab fa-discord"></i> Login with Discord
             </a>
 
@@ -56,8 +47,7 @@ defineProps(["discordToken", "user", "guilds"]);
 
 defineEmits(["logOut"]);
 
-const url = process.env.VITE_API_URL;
-const port = process.env.VITE_API_PORT;
+const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
 
 // We want the nav bar to be visible by default on desktop, but hidden on mobile.
 // You can still hide it, if you want to.
