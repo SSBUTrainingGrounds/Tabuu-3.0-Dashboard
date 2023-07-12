@@ -29,9 +29,21 @@
             <div>{{ u["user_id"] }}</div>
             <div>{{ u["tag"] }}</div>
             <div>{{ u["region"] }}</div>
-            <div>{{ getCharacters(u["mains"]) }}</div>
-            <div>{{ getCharacters(u["secondaries"]) }}</div>
-            <div>{{ getCharacters(u["pockets"]) }}</div>
+            <div>
+                <div v-for="character in getCharacters(u['mains'])" :key="character" class="emoji-grid">
+                    <img :src="character" alt="Character" class="avatar-preview" />
+                </div>
+            </div>
+            <div>
+                <div v-for="character in getCharacters(u['secondaries'])" :key="character" class="emoji-grid">
+                    <img :src="character" alt="Character" class="avatar-preview" />
+                </div>
+            </div>
+            <div>
+                <div v-for="character in getCharacters(u['pockets'])" :key="character" class="emoji-grid">
+                    <img :src="character" alt="Character" class="avatar-preview" />
+                </div>
+            </div>
             <div>{{ u["note"] }}</div>
         </div>
     </div>
@@ -40,6 +52,7 @@
 <script setup lang="ts">
 import { ref, onMounted, type Ref } from "vue";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
+import { getCharacters } from "@/helpers/characterEmojis";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
 
@@ -49,13 +62,6 @@ const displayUser: Ref<any[]> = ref([]);
 const props = defineProps(["users"]);
 
 // Not sure if it would make sense to implement sorting for this view.
-
-function getCharacters(characters: string): string {
-    return characters
-        .split(" ")
-        .map((c) => c.split(":")[1])
-        .join(", ");
-}
 
 function searchBar(search: string) {
     displayUser.value = filterTable(user.value, props.users, search);
@@ -76,12 +82,17 @@ onMounted(async () => {
 <style scoped>
 .content,
 .table-header {
-    grid-template-columns: 1.2fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.5fr 1.3fr 1fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr;
     word-break: break-all;
 }
 
 .content {
     border-left: 0.5rem solid;
     border-radius: 0.2rem;
+}
+
+.emoji-grid {
+    display: inline-block;
+    margin: 0.1rem;
 }
 </style>
