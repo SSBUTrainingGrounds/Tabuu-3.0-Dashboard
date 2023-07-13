@@ -1,9 +1,18 @@
 <template>
-    <HeaderComponent :discordToken="discordToken" :user="loggedInUser" :guilds="guilds" @logOut="logOut" />
+    <SidebarComponent v-if="sidebarVisible" @change-visibility="changeSidebarVisibility" />
 
-    <div class="view"><RouterView :isAdmin="isAdmin" :userID="loggedInUser.id" :users="allGuildUsers" /></div>
+    <HeaderComponent
+        :class="sidebarVisible ? 'shifted' : ''"
+        :discordToken="discordToken"
+        :user="loggedInUser"
+        :guilds="guilds"
+        @logOut="logOut"
+        @force-change-visibility="changeSidebarVisibility(true)"
+    />
 
-    <FooterComponent />
+    <div class="view" :class="sidebarVisible ? 'shifted' : ''">
+        <RouterView :isAdmin="isAdmin" :userID="loggedInUser.id" :users="allGuildUsers" />
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -11,9 +20,23 @@ import { onBeforeMount, ref, type Ref } from "vue";
 import { RouterView } from "vue-router";
 
 import HeaderComponent from "./components/HeaderComponent.vue";
-import FooterComponent from "./components/FooterComponent.vue";
+import SidebarComponent from "./components/SidebarComponent.vue";
 
 import type { GuildUser, LoggedInUser } from "./helpers/types";
+
+const sidebarVisible = ref(window.innerWidth > 900 ? true : false);
+
+function changeSidebarVisibility(force: boolean = false) {
+    if (force) {
+        sidebarVisible.value = !sidebarVisible.value;
+    } else {
+        if (window.innerWidth > 900) {
+            sidebarVisible.value = true;
+        } else {
+            sidebarVisible.value = !sidebarVisible.value;
+        }
+    }
+}
 
 onBeforeMount(async () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));

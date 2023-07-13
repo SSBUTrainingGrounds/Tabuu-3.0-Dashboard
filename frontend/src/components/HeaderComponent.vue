@@ -1,23 +1,10 @@
 <template>
     <header class="header">
-        <button class="navigation-button" @click="headerVisible = !headerVisible">
+        <button class="navigation-button" @click="$emit('force-change-visibility')">
             <i class="fa fa-bars"></i>
             Navigation
         </button>
 
-        <div class="wrapper-header" v-if="headerVisible">
-            <nav class="nav" @click="changeHeaderVisibility">
-                <RouterLink class="green-link" to="/"><i class="fa fa-home"></i> Home</RouterLink>
-                <RouterLink class="green-link" to="/ranked/leaderboard"
-                    ><i class="fa fa-check"></i> Ranked Matchmaking</RouterLink
-                >
-                <RouterLink class="green-link" to="/level"><i class="fa fa-envelope"></i> Level</RouterLink>
-                <RouterLink class="green-link" to="/profiles"><i class="fa fa-user"></i> Profiles</RouterLink>
-                <RouterLink class="green-link" to="/commands"><i class="fa fa-signal"></i> Command Stats</RouterLink>
-                <RouterLink class="green-link" to="/macro"><i class="fa fa-cog"></i> Macros</RouterLink>
-                <RouterLink class="green-link" to="/hardware"><i class="fa fa-microchip"></i> Hardware</RouterLink>
-            </nav>
-        </div>
         <div class="login">
             <a :href="url" class="login-button" v-if="!discordToken"
                 ><i class="fab fa-discord"></i> Login with Discord
@@ -42,25 +29,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-
 defineProps(["discordToken", "user", "guilds"]);
 
-defineEmits(["logOut"]);
+defineEmits(["logOut", "force-change-visibility"]);
 
 const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
-
-// We want the nav bar to be visible by default on desktop, but hidden on mobile.
-// You can still hide it, if you want to.
-const headerVisible = ref(window.innerWidth > 900 ? true : false);
-
-const changeHeaderVisibility = () => {
-    if (window.innerWidth > 900) {
-        headerVisible.value = true;
-    } else {
-        headerVisible.value = false;
-    }
-};
 </script>
 
 <style scoped>
@@ -70,33 +43,17 @@ const changeHeaderVisibility = () => {
     padding: 1rem;
     position: fixed;
     width: 100%;
+    height: 2rem;
     left: 0;
     right: 0;
-    overflow: hidden hidden;
     display: grid;
-    grid-template-columns: 1fr 3fr 1.5fr;
-    justify-items: space-around;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    grid-template-columns: 1fr 1fr;
 }
-
-.header::-webkit-scrollbar {
-    display: none;
-}
-
 .login {
     display: flex;
     align-items: center;
-    grid-column: 3;
-}
-
-.wrapper-header {
-    max-width: 1200px;
-    margin: 0 auto;
-    grid-column: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-self: right;
+    margin-right: 4rem;
 }
 
 .navigation-button {
@@ -106,7 +63,8 @@ const changeHeaderVisibility = () => {
     font-size: large;
     font-weight: bold;
     cursor: pointer;
-    grid-column: 1;
+    justify-self: left;
+    margin-left: 1rem;
 }
 
 .navigation-button:hover {
@@ -115,7 +73,7 @@ const changeHeaderVisibility = () => {
 
 .user-display {
     display: grid;
-    position: relative;
+    grid-template-columns: 1.5rem 1fr;
     font-weight: bold;
 }
 
@@ -139,7 +97,6 @@ const changeHeaderVisibility = () => {
     font-size: xx-small;
 }
 
-.green-link,
 .login-button,
 .logout-button {
     text-decoration: none;
@@ -164,68 +121,9 @@ const changeHeaderVisibility = () => {
     color: var(--light-red);
 }
 
-.nav {
-    display: flex;
-    justify-content: space-around;
-}
-
-.nav .green-link {
-    color: var(--green);
-}
-
-.nav .green-link:hover {
-    color: var(--light-green);
-}
-
-@media (max-width: 1300px) {
-    .nav .green-link,
-    .login-button,
-    .logout-button,
-    .navigation-button {
-        font-size: small;
-    }
-}
-
-@media (max-width: 900px) {
-    .nav {
-        flex-direction: column;
-        align-items: center;
-    }
-
+@media (max-width: 600px) {
     .user-display {
         display: none;
-    }
-
-    .nav .green-link,
-    .login-button,
-    .logout-button,
-    .navigation-button {
-        margin: 0.1rem 0 0.1rem 0;
-        font-weight: bold;
-        font-size: medium;
-    }
-
-    .header {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 0.2fr 0.5fr;
-        justify-items: center;
-        padding: 0.5rem;
-    }
-
-    .navigation-button {
-        grid-column: 1;
-        grid-row: 1;
-    }
-
-    .wrapper-header {
-        grid-column: 1 / 3;
-        grid-row: 2;
-        display: flex;
-    }
-
-    .login {
-        grid-column: 2;
-        grid-row: 1;
     }
 }
 </style>

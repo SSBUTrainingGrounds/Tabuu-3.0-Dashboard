@@ -5,7 +5,7 @@
             <h1>Tabuu 3.0 Dashboard</h1>
 
             <p>Welcome to the Tabuu 3.0 Dashboard! This is a work in progress.</p>
-            <p>Please choose a page from the navigation bar above to get started.</p>
+            <p>Please choose a page from the navigation bar to get started.</p>
         </div>
     </div>
 </template>
