@@ -42,6 +42,11 @@ const router = createRouter({
             name: "macro",
             component: () => import("../views/MacroView.vue"),
             props: true
+        },
+        {
+            path: "/hardware",
+            name: "hardware",
+            component: () => import("../views/HardwareInfoView.vue")
         }
     ]
 });

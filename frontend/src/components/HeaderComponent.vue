@@ -15,6 +15,7 @@
                 <RouterLink class="green-link" to="/profiles"><i class="fa fa-user"></i> Profiles</RouterLink>
                 <RouterLink class="green-link" to="/commands"><i class="fa fa-signal"></i> Command Stats</RouterLink>
                 <RouterLink class="green-link" to="/macro"><i class="fa fa-cog"></i> Macros</RouterLink>
+                <RouterLink class="green-link" to="/hardware"><i class="fa fa-microchip"></i> Hardware</RouterLink>
             </nav>
         </div>
         <div class="login">

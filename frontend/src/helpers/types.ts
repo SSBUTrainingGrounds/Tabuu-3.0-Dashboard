@@ -36,3 +36,22 @@ export interface LoggedInUser {
     premium_type: number;
     public_flags: number;
 }
+
+export interface HwStats {
+    uptime: number;
+    os_name: string;
+    cpu_name: string;
+    cpu_freq: number[];
+    cpu_usage: number[];
+    cpu_temp: number[];
+    cpu_cores: number[];
+    ram_total: number;
+    ram_used: number;
+    ram_free: number;
+    ram_percentage: number;
+    swap_total: number;
+    swap_used: number;
+    swap_free: number;
+    swap_percentage: number;
+    disks: number[][];
+}
