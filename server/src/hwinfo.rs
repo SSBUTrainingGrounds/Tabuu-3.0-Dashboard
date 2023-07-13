@@ -26,6 +26,8 @@ pub fn get_hw_info() -> HwInfo {
         disks: Vec::new(),
     };
 
+    sys.refresh_cpu();
+
     let cpus = sys.cpus();
 
     let components = sys.components();
