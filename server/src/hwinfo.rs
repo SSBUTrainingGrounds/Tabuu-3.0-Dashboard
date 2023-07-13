@@ -26,7 +26,14 @@ pub fn get_hw_info() -> HwInfo {
         disks: Vec::new(),
     };
 
-    sys.refresh_cpu();
+    sys.refresh_all();
+
+    // Wait for 200ms to get the CPU usage
+    let delay = std::time::Duration::from_millis(200);
+
+    std::thread::sleep(delay);
+
+    sys.refresh_all();
 
     let cpus = sys.cpus();
 
