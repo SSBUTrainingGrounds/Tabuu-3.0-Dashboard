@@ -168,4 +168,8 @@ function logOut() {
 .clickable {
     cursor: pointer;
 }
+
+.highlighted-user {
+    box-shadow: 0 0 0 0.2rem var(--green);
+}
 </style>

@@ -15,17 +15,20 @@ const router = createRouter({
             // route level code-splitting
             // this generates a separate chunk (About.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import("../views/RankedLeaderboardView.vue")
+            component: () => import("../views/RankedLeaderboardView.vue"),
+            props: true
         },
         {
             path: "/ranked/matches",
             name: "ranked_matches",
-            component: () => import("../views/RankedMatchesView.vue")
+            component: () => import("../views/RankedMatchesView.vue"),
+            props: true
         },
         {
             path: "/level",
             name: "level",
-            component: () => import("../views/LevelView.vue")
+            component: () => import("../views/LevelView.vue"),
+            props: true
         },
         {
             path: "/commands",
@@ -35,7 +38,8 @@ const router = createRouter({
         {
             path: "/profiles",
             name: "profiles",
-            component: () => import("../views/ProfileView.vue")
+            component: () => import("../views/ProfileView.vue"),
+            props: true
         },
         {
             path: "/macro",

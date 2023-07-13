@@ -11,7 +11,13 @@
             <div class="clickable" @click="sortTable(displayUser, 'xp', ascendingColumns)">Total XP</div>
             <div class="clickable" @click="sortTable(displayUser, 'messages', ascendingColumns)">Messages</div>
         </div>
-        <div class="content" v-for="u in displayUser" :key="u['id']" @click="fetchUser(users, u['id'])">
+        <div
+            class="content"
+            v-for="u in displayUser"
+            :key="u['id']"
+            @click="fetchUser(users, u['id'])"
+            :class="props.userID === u['id'] ? 'highlighted-user' : ''"
+        >
             <div>
                 <i>#{{ u["rank"] }}</i>
             </div>
@@ -52,7 +58,7 @@ import SearchbarComponent from "@/components/SearchbarComponent.vue";
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
 
-const props = defineProps(["users"]);
+const props = defineProps(["users", "userID"]);
 
 const ascendingColumns = ref({
     id: false,

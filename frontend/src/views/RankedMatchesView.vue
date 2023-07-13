@@ -20,6 +20,7 @@
                     fetchUser(users, m['loser_id']);
                 }
             "
+            :class="props.userID === m['winner_id'] || props.userID === m['loser_id'] ? 'highlighted-user' : ''"
         >
             <div>{{ m["match_id"] }}</div>
             <div>
@@ -75,7 +76,7 @@ import { sortTable } from "@/helpers/sortTable";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { onMounted, ref, type Ref } from "vue";
 
-const props = defineProps(["users"]);
+const props = defineProps(["users", "userID"]);
 
 function getRatingChangeText(ratingChange: number): string {
     if (ratingChange > 0) {

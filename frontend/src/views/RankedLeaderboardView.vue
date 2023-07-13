@@ -14,7 +14,13 @@
             <div class="clickable" @click="sortTable(displayUser, 'losses', ascendingColumns)">Losses</div>
             <div>Winrate</div>
         </div>
-        <div class="content" v-for="u in displayUser" :key="u['user_id']" @click="fetchUser(users, u['user_id'])">
+        <div
+            class="content"
+            v-for="u in displayUser"
+            :key="u['user_id']"
+            @click="fetchUser(users, u['user_id'])"
+            :class="props.userID === u['user_id'] ? 'highlighted-user' : ''"
+        >
             <div>
                 <i>#{{ u["rank"] }}</i>
             </div>
@@ -62,7 +68,7 @@ import { sortTable } from "@/helpers/sortTable";
 import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
 import { ref, onMounted, type Ref } from "vue";
 
-const props = defineProps(["users"]);
+const props = defineProps(["users", "userID"]);
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);

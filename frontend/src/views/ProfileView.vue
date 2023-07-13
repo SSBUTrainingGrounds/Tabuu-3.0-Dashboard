@@ -20,6 +20,7 @@
                 // @ts-ignore
                 borderLeftColor: '#' + u['colour'].toString(16).padStart(6, '0')
             }"
+            :class="props.userID === u['user_id'] ? 'highlighted-user' : ''"
             @click="fetchUser(users, u['user_id'])"
         >
             <div>
@@ -59,7 +60,7 @@ import { filterTable } from "@/helpers/filterTable";
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
 
-const props = defineProps(["users"]);
+const props = defineProps(["users", "userID"]);
 
 // Not sure if it would make sense to implement sorting for this view.
 
