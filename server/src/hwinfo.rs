@@ -48,9 +48,7 @@ pub fn get_hw_info() -> HwInfo {
     }
 
     for component in components {
-        if component.label().contains("Core") {
-            hw_info.cpu_temp.push(component.temperature());
-        }
+        hw_info.cpu_temp.push(component.temperature());
     }
 
     hw_info.ram_total = sys.total_memory();
