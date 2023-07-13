@@ -1,5 +1,6 @@
 #![allow(clippy::let_unit_value)] // False positive
 
+mod hwinfo;
 mod level;
 mod rating;
 mod requests;
@@ -24,7 +25,7 @@ struct DbConn(rusqlite::Connection);
 #[get("/")]
 fn index() -> &'static str {
     "Hi! Available endpoints: 
-    GET: /trueskill, /matches, /leaderboard, /commands, /profiles, /macro_get, /users, /user/<user_id>
+    GET: /trueskill, /matches, /leaderboard, /commands, /profiles, /macro_get, /users, /user/<user_id>, /hwinfo
     POST: /macro_new, /macro_delete, /is_admin"
 }
 
@@ -519,6 +520,13 @@ async fn is_admin(
     }
 }
 
+#[get("/hwinfo")]
+async fn hw_info() -> String {
+    let hw_info = hwinfo::get_hw_info();
+
+    get_json_string(hw_info)
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build().attach(DbConn::fairing()).mount(
@@ -535,7 +543,8 @@ fn rocket() -> _ {
             macro_delete,
             users,
             get_user,
-            is_admin
+            is_admin,
+            hw_info
         ],
     )
 }

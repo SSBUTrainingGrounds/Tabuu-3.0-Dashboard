@@ -161,3 +161,26 @@ pub struct IsAdmin {
 pub struct IsAdminData {
     pub discord_token: String,
 }
+
+/// A struct for the GET endpoint /hwinfo
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct HwInfo {
+    pub uptime: u64,
+    pub os_name: String,
+    pub cpu_name: String,
+    pub cpu_freq: Vec<u64>,
+    pub cpu_usage: Vec<f32>,
+    pub cpu_temp: Vec<f32>,
+    /// Physical and logical cores
+    pub cpu_cores: (usize, usize),
+    pub ram_total: u64,
+    pub ram_used: u64,
+    pub ram_free: u64,
+    pub ram_percentage: f32,
+    pub swap_total: u64,
+    pub swap_used: u64,
+    pub swap_free: u64,
+    pub swap_percentage: f32,
+    /// Type, Total, Used, Free, Percentage
+    pub disks: Vec<(String, u64, u64, u64, f32)>,
+}
