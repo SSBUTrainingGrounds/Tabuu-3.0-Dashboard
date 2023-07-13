@@ -37,6 +37,9 @@ export interface LoggedInUser {
     public_flags: number;
 }
 
+/**
+ * The data returned by our API for the hardware stats.
+ */
 export interface HwStats {
     uptime: number;
     os_name: string;

@@ -2,6 +2,7 @@ use sysinfo::{ComponentExt, CpuExt, DiskExt, System, SystemExt};
 
 use crate::types::HwInfo;
 
+/// Get the hardware information of the system.
 pub fn get_hw_info() -> HwInfo {
     let mut sys = System::new_all();
 
