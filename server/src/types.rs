@@ -20,6 +20,7 @@ pub struct MacroDelete {
 /// A struct for the GET endpoint /trueskill
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TrueSkill {
+    pub rank: usize,
     pub user_id: String,
     pub rating: f64,
     pub deviation: f64,
@@ -32,6 +33,7 @@ pub struct TrueSkill {
 /// A struct for the GET endpoint /leaderboard
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Leaderboard {
+    pub rank: usize,
     pub id: String,
     pub level: usize,
     pub xp: usize,

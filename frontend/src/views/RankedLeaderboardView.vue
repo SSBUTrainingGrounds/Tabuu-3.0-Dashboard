@@ -14,9 +14,9 @@
             <div class="clickable" @click="sortTable(displayUser, 'losses', ascendingColumns)">Losses</div>
             <div>Winrate</div>
         </div>
-        <div class="content" v-for="(u, i) in displayUser" :key="u" @click="fetchUser(users, u['user_id'])">
+        <div class="content" v-for="u in displayUser" :key="u['user_id']" @click="fetchUser(users, u['user_id'])">
             <div>
-                <i>#{{ i + 1 }}</i>
+                <i>#{{ u["rank"] }}</i>
             </div>
             <div>
                 <img :src="getUserAvatar(props.users, u['user_id'])" alt="User Avatar" class="avatar-preview" />

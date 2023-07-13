@@ -49,6 +49,7 @@ async fn trueskill(conn: DbConn) -> String {
                     let deviation = row.get(2)?;
 
                     types::TrueSkill {
+                        rank: 0,
                         user_id: row.get(0)?,
                         rating,
                         deviation,
@@ -73,6 +74,7 @@ async fn trueskill(conn: DbConn) -> String {
                     Ok(u) => u,
                     Err(_) => {
                         types::TrueSkill {
+                            rank: 0,
                             user_id: String::from(""),
                             rating: 0.0,
                             deviation: 0.0,
@@ -83,6 +85,15 @@ async fn trueskill(conn: DbConn) -> String {
                         }
                     }
                 });
+            }
+
+            trueskill.sort_by(|a, b| b.display_rating.partial_cmp(&a.display_rating).unwrap_or(std::cmp::Ordering::Equal));
+
+            let mut rank = 1;
+
+            for user in &mut trueskill {
+                user.rank = rank;
+                rank += 1;
             }
 
             get_json_string(&trueskill)
@@ -208,6 +219,7 @@ async fn leaderboard(conn: DbConn) -> String {
                 let xp = row.get(2)?;
 
                 types::Leaderboard {
+                    rank: 0,
                     id: row.get(0)?,
                     level,
                     xp,
@@ -226,6 +238,7 @@ async fn leaderboard(conn: DbConn) -> String {
             leaderboard.push(match user {
                 Ok(u) => u,
                 Err(_) => types::Leaderboard {
+                    rank: 0,
                     id: String::from(""),
                     level: 0,
                     xp: 0,
@@ -233,6 +246,14 @@ async fn leaderboard(conn: DbConn) -> String {
                     xp_progress: 0.0,
                 },
             });
+        }
+
+        leaderboard.sort_by(|a, b| b.xp.cmp(&a.xp));
+
+        let mut rank = 1;
+        for user in &mut leaderboard {
+            user.rank = rank;
+            rank += 1;
         }
 
         get_json_string(&leaderboard)
