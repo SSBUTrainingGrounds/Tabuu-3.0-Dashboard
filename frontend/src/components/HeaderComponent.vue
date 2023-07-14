@@ -84,7 +84,6 @@ const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 50%;
-    margin-right: 0.5rem;
     grid-row: 1 / 3;
 }
 
@@ -92,12 +91,14 @@ const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
     grid-column: 2;
     grid-row: 1;
     font-size: x-small;
+    margin-left: 0.5rem;
 }
 
 .user-login-id {
     grid-column: 2;
     grid-row: 2;
     font-size: xx-small;
+    margin-left: 0.5rem;
 }
 
 .short-login-button {
