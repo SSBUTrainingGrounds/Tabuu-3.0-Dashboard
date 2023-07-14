@@ -690,4 +690,11 @@ mod tests {
         let response = client.get("/api/user/").dispatch();
         assert_eq!(response.status(), Status::NotFound);
     }
+
+    #[test]
+    fn test_rocket_hw_info() {
+        let client = Client::tracked(rocket()).expect("valid rocket instance");
+        let response = client.get("/api/hwinfo").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+    }
 }
