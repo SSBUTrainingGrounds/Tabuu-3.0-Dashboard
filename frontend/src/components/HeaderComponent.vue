@@ -43,11 +43,12 @@ const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
     padding: 1rem;
     position: fixed;
     width: 100%;
+    min-width: 300px;
     height: 2rem;
     left: 0;
     right: 0;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1.5fr;
 }
 .login {
     display: flex;
@@ -124,6 +125,30 @@ const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
 @media (max-width: 600px) {
     .user-display {
         display: none;
+    }
+
+    .header {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 400px) {
+    .login-button,
+    .logout-button,
+    .navigation-button {
+        font-size: medium;
+    }
+
+    .header {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .login-button,
+    .logout-button,
+    .navigation-button {
+        font-size: small;
     }
 }
 </style>
