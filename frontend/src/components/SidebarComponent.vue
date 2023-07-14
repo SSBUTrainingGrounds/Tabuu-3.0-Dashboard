@@ -40,7 +40,7 @@
                     <li><i class="fab fa-discord"></i> Join Our Discord</li>
                 </a>
 
-                <a class="green-link" href="https://github.com/atomflunder/bot-dashboard" target="_blank">
+                <a class="green-link" href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0-Dashboard" target="_blank">
                     <li><i class="fab fa-github"></i> Dashboard GitHub</li>
                 </a>
             </ul>

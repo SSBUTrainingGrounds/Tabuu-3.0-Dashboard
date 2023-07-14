@@ -1,4 +1,4 @@
-# bot-dashboard
+# Tabuu 3.0 Dashboard
 
 Simple dashboard for the [Tabuu 3.0 Discord Bot](https://github.com/SSBUTrainingGrounds/Tabuu-3.0).  
 Written in [Vue](https://vuejs.org/) and the server is powered by [Rocket](https://rocket.rs/).
