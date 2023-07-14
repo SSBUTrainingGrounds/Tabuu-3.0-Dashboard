@@ -72,3 +72,31 @@ pub fn get_hw_info() -> HwInfo {
 
     hw_info
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hwinfo() {
+        let hw_info = get_hw_info();
+
+        assert!(hw_info.uptime > 0);
+        assert!(!hw_info.os_name.is_empty());
+        assert!(!hw_info.cpu_name.is_empty());
+        assert!(!hw_info.cpu_freq.is_empty());
+        assert!(!hw_info.cpu_usage.is_empty());
+
+        // This is zero on Windows, unless ran as administator
+        #[cfg(not(target_os = "windows"))]
+        assert!(!hw_info.cpu_temp.is_empty());
+
+        assert!(hw_info.cpu_cores.0 > 0);
+        assert!(hw_info.cpu_cores.1 > 0);
+        assert!(hw_info.ram_total > 0);
+        assert!(hw_info.ram_used > 0);
+        assert!(hw_info.ram_free > 0);
+        assert!(hw_info.ram_percentage > 0.0);
+        assert!(!hw_info.disks.is_empty());
+    }
+}
