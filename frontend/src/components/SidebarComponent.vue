@@ -2,60 +2,47 @@
     <div class="sidebar">
         <nav class="navbar" @click="$emit('change-visibility')">
             <ul>
-                <li>
-                    <RouterLink class="green-link" style="grid-row: 1" to="/"
-                        ><i class="fa fa-home"></i> Home</RouterLink
-                    >
-                </li>
+                <RouterLink class="green-link" style="grid-row: 1" to="/">
+                    <li><i class="fa fa-home"></i> Home</li>
+                </RouterLink>
 
-                <li>
-                    <RouterLink class="green-link" style="grid-row: 2" to="/ranked/leaderboard"
-                        ><i class="fa fa-check"></i> Ranked Matchmaking</RouterLink
-                    >
-                </li>
-                <li>
-                    <RouterLink class="green-link" style="grid-row: 3" to="/level"
-                        ><i class="fa fa-envelope"></i> Level</RouterLink
-                    >
-                </li>
-                <li>
-                    <RouterLink class="green-link" style="grid-row: 4" to="/profiles"
-                        ><i class="fa fa-user"></i> Profiles</RouterLink
-                    >
-                </li>
-                <li>
-                    <RouterLink class="green-link" style="grid-row: 5" to="/commands"
-                        ><i class="fa fa-signal"></i> Command Stats</RouterLink
-                    >
-                </li>
-                <li>
-                    <RouterLink class="green-link" style="grid-row: 6" to="/macro"
-                        ><i class="fa fa-cog"></i> Macros</RouterLink
-                    >
-                </li>
-                <li>
-                    <RouterLink class="green-link" style="grid-row: 7" to="/hardware"
-                        ><i class="fa fa-microchip"></i> Hardware</RouterLink
-                    >
-                </li>
+                <RouterLink class="green-link" style="grid-row: 2" to="/ranked/leaderboard">
+                    <li><i class="fa fa-check"></i> Ranked Matchmaking</li>
+                </RouterLink>
+
+                <RouterLink class="green-link" style="grid-row: 3" to="/level">
+                    <li><i class="fa fa-envelope"></i> Level</li>
+                </RouterLink>
+
+                <RouterLink class="green-link" style="grid-row: 4" to="/profiles">
+                    <li><i class="fa fa-user"></i> Profiles</li>
+                </RouterLink>
+
+                <RouterLink class="green-link" style="grid-row: 5" to="/commands">
+                    <li><i class="fa fa-signal"></i> Command Stats</li>
+                </RouterLink>
+
+                <RouterLink class="green-link" style="grid-row: 6" to="/macro">
+                    <li><i class="fa fa-cog"></i> Macros</li>
+                </RouterLink>
+
+                <RouterLink class="green-link" style="grid-row: 7" to="/hardware">
+                    <li><i class="fa fa-microchip"></i> Hardware</li>
+                </RouterLink>
             </ul>
 
             <ul>
-                <li>
-                    <a class="green-link" href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0" target="_blank"
-                        ><i class="fab fa-github"></i> Tabuu 3.0 GitHub</a
-                    >
-                </li>
-                <li>
-                    <a class="green-link" href="https://discord.gg/ssbutg" target="_blank"
-                        ><i class="fab fa-discord"></i> Join Our Discord</a
-                    >
-                </li>
-                <li>
-                    <a class="green-link" href="https://github.com/atomflunder/bot-dashboard" target="_blank"
-                        ><i class="fab fa-github"></i> Dashboard GitHub</a
-                    >
-                </li>
+                <a class="green-link" href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0" target="_blank">
+                    <li><i class="fab fa-github"></i> Tabuu 3.0 GitHub</li>
+                </a>
+
+                <a class="green-link" href="https://discord.gg/ssbutg" target="_blank">
+                    <li><i class="fab fa-discord"></i> Join Our Discord</li>
+                </a>
+
+                <a class="green-link" href="https://github.com/atomflunder/bot-dashboard" target="_blank">
+                    <li><i class="fab fa-github"></i> Dashboard GitHub</li>
+                </a>
             </ul>
         </nav>
     </div>
@@ -91,10 +78,14 @@ defineEmits(["change-visibility"]);
     text-decoration: none;
     font-weight: bold;
     font-size: large;
-    margin: 0 0.2rem 0 0.2rem;
 }
 
 .green-link:hover {
+    cursor: pointer;
+}
+
+.green-link:hover .fa,
+.green-link:hover .fab {
     color: var(--light-green);
 }
 
@@ -105,21 +96,13 @@ ul {
 
 li {
     padding: 0.5rem;
+    border-bottom: 1px solid var(--light-gray);
 }
 
 li:hover {
     background-color: var(--black);
-    color: var(--green);
-    border-radius: 0.5rem;
-}
-
-li:hover .fa,
-li:hover .fab {
     color: var(--light-green);
-}
-
-li:hover a {
-    cursor: pointer;
+    border-radius: 0.5rem;
 }
 
 .fa,

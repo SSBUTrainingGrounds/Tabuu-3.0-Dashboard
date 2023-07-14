@@ -2,17 +2,31 @@
     <div class="grid">
         <div class="general-header"><i class="fa fa-window-restore"></i> OS Stats</div>
         <div class="general-stats">
-            Uptime:
-            {{ moment.duration(hwStats["uptime"] || "0", "seconds").humanize() }}
+            <div class="name">OS</div>
+            <div class="stat">
+                {{ hwStats["os_name"] || "Unknown OS" }}
+            </div>
         </div>
-        <div class="general-stats">OS: {{ hwStats["os_name"] || "Unknown OS" }}</div>
+        <div class="general-stats">
+            <div class="name">Uptime</div>
+            <div class="stat">{{ moment.duration(hwStats["uptime"] || "0", "seconds").humanize() }}</div>
+        </div>
 
         <div class="cpu-header"><i class="fa fa-microchip"></i> CPU Stats</div>
-        <div class="cpu-stats">Name: {{ hwStats["cpu_name"] || "Unknown CPU" }}</div>
-        <div class="cpu-stats">Cores: {{ hwStats["cpu_cores"][0] || 0 }} ({{ hwStats["cpu_cores"][1] || 0 }})</div>
-        <div class="cpu-stats">Frequency: {{ getAverage(hwStats["cpu_freq"]) }} MHz</div>
         <div class="cpu-stats">
-            Usage:
+            <div class="name">Name</div>
+            <div class="stat">{{ hwStats["cpu_name"] || "Unknown CPU" }}</div>
+        </div>
+        <div class="cpu-stats">
+            <div class="name">Cores / Threads</div>
+            <div class="stat">{{ hwStats["cpu_cores"][0] || 0 }} / {{ hwStats["cpu_cores"][1] || 0 }}</div>
+        </div>
+        <div class="cpu-stats">
+            <div class="name">Frequency</div>
+            <div class="stat">{{ getAverage(hwStats["cpu_freq"]) }} MHz</div>
+        </div>
+        <div class="cpu-stats">
+            <div class="name">Usage</div>
             {{
                 getAverage(hwStats["cpu_usage"]).toLocaleString("en", {
                     maximumFractionDigits: 2,
@@ -20,35 +34,49 @@
                 })
             }}%
         </div>
-        <div class="cpu-stats">Temperature: {{ getAverage(hwStats["cpu_temp"]) }}°C</div>
+        <div class="cpu-stats">
+            <div class="name">Temperature</div>
+            <div class="stat">
+                {{ getAverage(hwStats["cpu_temp"]) }}°C ({{ celciusToFahrenheit(getAverage(hwStats["cpu_temp"])) }}°F)
+            </div>
+        </div>
 
         <div class="ram-header"><i class="fa fa-memory"> </i> Memory Stats</div>
         <div class="ram-stats">
-            RAM Usage: {{ getGBString(hwStats["ram_used"]) || 0 }} / {{ getGBString(hwStats["ram_total"]) }} ({{
-                hwStats["ram_percentage"].toLocaleString("en", {
-                    style: "percent",
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2
-                })
-            }})
+            <div class="name">RAM Usage</div>
+            <div class="stat">
+                {{ getGBString(hwStats["ram_used"]) || 0 }} / {{ getGBString(hwStats["ram_total"]) }} ({{
+                    hwStats["ram_percentage"].toLocaleString("en", {
+                        style: "percent",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2
+                    })
+                }})
+            </div>
         </div>
         <div class="ram-stats">
-            Swap Usage: {{ getGBString(hwStats["swap_used"]) || 0 }} / {{ getGBString(hwStats["swap_total"]) }} ({{
-                hwStats["swap_percentage"].toLocaleString("en", {
-                    style: "percent",
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2
-                })
-            }})
+            <div class="name">Swap Usage</div>
+            <div class="stat">
+                {{ getGBString(hwStats["swap_used"]) || 0 }} / {{ getGBString(hwStats["swap_total"]) }} ({{
+                    hwStats["swap_percentage"].toLocaleString("en", {
+                        style: "percent",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2
+                    })
+                }})
+            </div>
         </div>
         <div class="ram-stats" v-for="(disk, i) in hwStats['disks']" :key="i">
-            Disk {{ i + 1 }} Usage: {{ getGBString(disk[2]) }} / {{ getGBString(disk[1]) }} ({{
-                disk[4].toLocaleString("en", {
-                    style: "percent",
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2
-                })
-            }})
+            <div class="name">Disk {{ i + 1 }} Usage:</div>
+            <div class="stat">
+                {{ getGBString(disk[2]) }} / {{ getGBString(disk[1]) }} ({{
+                    disk[4].toLocaleString("en", {
+                        style: "percent",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2
+                    })
+                }})
+            </div>
         </div>
     </div>
 </template>
@@ -56,7 +84,7 @@
 <script setup lang="ts">
 import type { HwStats } from "@/helpers/types";
 import { onMounted, ref, type Ref } from "vue";
-import { getAverage, getGBString } from "@/helpers/hardware";
+import { getAverage, getGBString, celciusToFahrenheit } from "@/helpers/hardware";
 import moment from "moment";
 
 const hwStats: Ref<HwStats> = ref({
@@ -101,5 +129,18 @@ onMounted(async () => {
 .cpu-stats,
 .ram-stats {
     margin-bottom: 0.5rem;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 1rem;
+}
+
+.name {
+    grid-column: 1;
+    font-weight: bold;
+}
+
+.stat {
+    grid-column: 2;
 }
 </style>

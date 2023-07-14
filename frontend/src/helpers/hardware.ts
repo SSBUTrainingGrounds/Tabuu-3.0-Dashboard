@@ -22,3 +22,12 @@ export function getGBString(bytes: number): string {
         }) + " GB"
     );
 }
+
+/**
+ * Converts the given temperature in celcius to fahrenheit.
+ * @param celcius The temperature in celcius.
+ * @returns The temperature in fahrenheit.
+ */
+export function celciusToFahrenheit(celcius: number): number {
+    return (celcius * 9) / 5 + 32;
+}
