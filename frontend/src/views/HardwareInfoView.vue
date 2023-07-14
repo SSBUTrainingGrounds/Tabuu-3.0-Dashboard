@@ -37,7 +37,17 @@
         <div class="cpu-stats">
             <div class="name">Temperature</div>
             <div class="stat">
-                {{ getAverage(hwStats["cpu_temp"]) }}°C ({{ celciusToFahrenheit(getAverage(hwStats["cpu_temp"])) }}°F)
+                {{
+                    getAverage(hwStats["cpu_temp"]).toLocaleString("en", {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2
+                    })
+                }}°C ({{
+                    celciusToFahrenheit(getAverage(hwStats["cpu_temp"])).toLocaleString("en", {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2
+                    })
+                }}°F)
             </div>
         </div>
 
