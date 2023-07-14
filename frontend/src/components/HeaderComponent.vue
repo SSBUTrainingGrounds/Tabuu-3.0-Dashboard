@@ -6,9 +6,11 @@
         </button>
 
         <div class="login">
-            <a :href="url" class="login-button" v-if="!discordToken"
-                ><i class="fab fa-discord"></i> Login with Discord
+            <a :href="url" class="long-login-button" v-if="!discordToken"
+                ><i class="fab fa-discord"></i> Log In with Discord
             </a>
+
+            <a :href="url" class="short-login-button" v-if="!discordToken"><i class="fab fa-discord"></i> Log In </a>
 
             <a href="/" class="logout-button" v-if="discordToken" @click="$emit('logOut')"
                 ><i class="fab fa-discord"></i> Log Out</a
@@ -98,7 +100,12 @@ const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
     font-size: xx-small;
 }
 
-.login-button,
+.short-login-button {
+    display: none;
+}
+
+.long-login-button,
+.short-login-button,
 .logout-button {
     text-decoration: none;
     font-weight: bold;
@@ -106,11 +113,13 @@ const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
     margin: 0 0.5rem 0 0.5rem;
 }
 
-.login-button {
+.long-login-button,
+.short-login-button {
     color: var(--discord-dark);
 }
 
-.login-button:hover {
+.long-login-button:hover,
+.short-login-button:hover {
     color: var(--discord-blue);
 }
 
@@ -130,10 +139,19 @@ const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
     .header {
         grid-template-columns: 1fr 1fr;
     }
+
+    .long-login-button {
+        display: none;
+    }
+
+    .short-login-button {
+        display: block;
+    }
 }
 
 @media (max-width: 400px) {
-    .login-button,
+    .long-login-button,
+    .short-login-button,
     .logout-button,
     .navigation-button {
         font-size: medium;
@@ -145,7 +163,8 @@ const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
 }
 
 @media (max-width: 320px) {
-    .login-button,
+    .long-login-button,
+    .short-login-button,
     .logout-button,
     .navigation-button {
         font-size: small;
