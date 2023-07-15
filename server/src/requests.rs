@@ -285,5 +285,44 @@ mod tests {
             json_string,
             "{\"avatar\":\"\",\"communication_disabled_until\":\"\",\"deaf\":false,\"flags\":0,\"joined_at\":\"\",\"mute\":false,\"nick\":\"\",\"pending\":false,\"premium_since\":\"\",\"roles\":[],\"user\":{\"accent_color\":0,\"avatar\":\"\",\"avatar_decoration\":\"\",\"banner\":\"\",\"banner_color\":0,\"bot\":false,\"discriminator\":\"\",\"display_name\":\"\",\"flags\":0,\"global_name\":\"\",\"id\":\"\",\"public_flags\":0,\"username\":\"\"}}"
         );
+
+        let test_struct = RawGuildUser {
+            avatar: Some("Some Avatar".to_string()),
+            communication_disabled_until: Some("1234".to_string()),
+            deaf: true,
+            flags: 538976288,
+            joined_at: "242823".to_string(),
+            mute: true,
+            nick: Some("Nickname!".to_string()),
+            pending: true,
+            premium_since: Some("342342".to_string()),
+            roles: vec![
+                "Role 1".to_string(),
+                "Role 2".to_string(),
+                "Role 3".to_string(),
+            ],
+            user: RawUser {
+                accent_color: Some(423231),
+                avatar: Some("Another Avatar".to_string()),
+                avatar_decoration: Some("Whatever".to_string()),
+                banner: Some("Some banner".to_string()),
+                banner_color: Some(43234234),
+                bot: Some(true),
+                discriminator: "0".to_string(),
+                display_name: Some("A display name".to_string()),
+                flags: 423423243,
+                global_name: Some("Global Name".to_string()),
+                id: "42332323333".to_string(),
+                public_flags: 8,
+                username: "USERNAME".to_string(),
+            },
+        };
+
+        let json_string = get_json_string(test_struct);
+
+        assert_eq!(
+            json_string,
+            "{\"avatar\":\"Some Avatar\",\"communication_disabled_until\":\"1234\",\"deaf\":true,\"flags\":538976288,\"joined_at\":\"242823\",\"mute\":true,\"nick\":\"Nickname!\",\"pending\":true,\"premium_since\":\"342342\",\"roles\":[\"Role 1\",\"Role 2\",\"Role 3\"],\"user\":{\"accent_color\":423231,\"avatar\":\"Another Avatar\",\"avatar_decoration\":\"Whatever\",\"banner\":\"Some banner\",\"banner_color\":43234234,\"bot\":true,\"discriminator\":\"0\",\"display_name\":\"A display name\",\"flags\":423423243,\"global_name\":\"Global Name\",\"id\":\"42332323333\",\"public_flags\":8,\"username\":\"USERNAME\"}}"
+        );
     }
 }
