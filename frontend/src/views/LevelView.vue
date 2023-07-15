@@ -1,5 +1,5 @@
 <template>
-    <div class="grid">
+    <div class="grid" id="user-table">
         <SearchbarComponent @search="searchBar" />
 
         <div class="table-header">
@@ -53,10 +53,16 @@ import { ref, onMounted, type Ref } from "vue";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { sortTable } from "@/helpers/sortTable";
 import { filterTable } from "@/helpers/filterTable";
+import { infiniteScroll } from "@/helpers/infiniteScroll";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
+const usersPerPage = 200;
+
+let page = 2;
+let throttle = false;
+let currentSearch = "";
 
 const props = defineProps(["users", "userID"]);
 
@@ -68,7 +74,25 @@ const ascendingColumns = ref({
 });
 
 function searchBar(search: string) {
+    if (!search) {
+        displayUser.value = user.value.slice(0, usersPerPage);
+        currentSearch = "";
+        return;
+    }
+
+    currentSearch = search;
     displayUser.value = filterTable(user.value, props.users, search);
+}
+
+function throttleScroll(time: number) {
+    if (throttle) return;
+
+    throttle = true;
+
+    setTimeout(() => {
+        page = infiniteScroll(displayUser.value, user.value, page, usersPerPage, currentSearch);
+        throttle = false;
+    }, time);
 }
 
 onMounted(async () => {
@@ -82,6 +106,8 @@ onMounted(async () => {
     displayUser.value = user.value;
 
     sortTable(displayUser.value, "xp", ascendingColumns.value);
+    displayUser.value = displayUser.value.slice(0, usersPerPage);
+    window.addEventListener("scroll", () => throttleScroll(1000));
 });
 </script>
 
