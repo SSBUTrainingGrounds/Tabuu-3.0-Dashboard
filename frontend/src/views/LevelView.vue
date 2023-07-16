@@ -82,6 +82,7 @@ function searchBar(search: string) {
 
     currentSearch = search;
     displayUser.value = filterTable(user.value, props.users, search);
+    page = 2;
 }
 
 function throttleScroll(time: number) {
