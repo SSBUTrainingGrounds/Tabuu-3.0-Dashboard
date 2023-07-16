@@ -196,9 +196,7 @@ pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<Fet
         Err(_) => return None,
     })
     .with(Cache(HttpCache {
-        // If a user fetches a user, it's probably because they want the most up to date information.
-        // So we don't want ForceCache here.
-        mode: CacheMode::Default,
+        mode: CacheMode::ForceCache,
         manager: CACacheManager::default(),
         options: None,
     }))
