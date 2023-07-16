@@ -1,6 +1,6 @@
 <template>
     <header class="header">
-        <button class="navigation-button" @click="$emit('force-change-visibility')">
+        <button class="navigation-button" @click="$emit('forceChangeVisibility')">
             <i class="fa fa-bars"></i>
             Navigation
         </button>
@@ -31,9 +31,20 @@
 </template>
 
 <script setup lang="ts">
-defineProps(["discordToken", "user", "guilds"]);
+import type { LoggedInUser } from "../helpers/types";
 
-defineEmits(["logOut", "force-change-visibility"]);
+defineProps({
+    discordToken: String,
+    user: {
+        type: Object as () => LoggedInUser,
+        required: true
+    }
+});
+
+defineEmits<{
+    logOut: [];
+    forceChangeVisibility: [];
+}>();
 
 const url = import.meta.env.VITE_DISCORD_LOGIN_URL;
 </script>

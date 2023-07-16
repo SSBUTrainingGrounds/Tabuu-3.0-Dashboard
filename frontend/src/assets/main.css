@@ -13,3 +13,61 @@ body {
     background-color: var(--gray);
     color: var(--white);
 }
+
+.view {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.grid {
+    display: grid;
+    grid-gap: 0.2rem;
+    width: 95%;
+    max-width: 1200px;
+    min-width: 800px;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.avatar-preview {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.table-header {
+    font-weight: bold;
+}
+
+.content,
+.table-header {
+    display: grid;
+    grid-gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.content {
+    cursor: pointer;
+}
+
+.content:nth-child(odd) {
+    background-color: var(--black);
+}
+
+.content:nth-child(even) {
+    background-color: var(--dark-gray);
+}
+
+.content:hover {
+    background-color: var(--green);
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.highlighted-user {
+    box-shadow: 0 0 0 0.2rem var(--green);
+}

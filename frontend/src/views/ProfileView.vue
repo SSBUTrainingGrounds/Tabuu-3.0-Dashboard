@@ -56,11 +56,21 @@ import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { getCharacters } from "@/helpers/characterEmojis";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
+import type { GuildUser } from "@/helpers/types";
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
 
-const props = defineProps(["users", "userID"]);
+const props = defineProps({
+    users: {
+        type: Map<string, GuildUser>,
+        required: true
+    },
+    userID: {
+        type: String,
+        required: true
+    }
+});
 
 // Not sure if it would make sense to implement sorting for this view.
 

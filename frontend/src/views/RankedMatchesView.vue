@@ -73,10 +73,20 @@ import RankedComponent from "@/components/RankedComponent.vue";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
 import { sortTable } from "@/helpers/sortTable";
+import type { GuildUser } from "@/helpers/types";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { onMounted, ref, type Ref } from "vue";
 
-const props = defineProps(["users", "userID"]);
+const props = defineProps({
+    userID: {
+        type: String,
+        required: true
+    },
+    users: {
+        type: Map<string, GuildUser>,
+        required: true
+    }
+});
 
 function getRatingChangeText(ratingChange: number): string {
     if (ratingChange > 0) {

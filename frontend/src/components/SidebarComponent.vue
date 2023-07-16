@@ -1,6 +1,6 @@
 <template>
     <div class="sidebar">
-        <nav class="navbar" @click="$emit('change-visibility')">
+        <nav class="navbar" @click="$emit('changeVisibility')">
             <ul>
                 <RouterLink class="green-link" style="grid-row: 1" to="/">
                     <li><i class="fa fa-home"></i> Home</li>
@@ -49,7 +49,9 @@
 </template>
 
 <script setup lang="ts">
-defineEmits(["change-visibility"]);
+defineEmits<{
+    changeVisibility: [];
+}>();
 </script>
 
 <style scoped>

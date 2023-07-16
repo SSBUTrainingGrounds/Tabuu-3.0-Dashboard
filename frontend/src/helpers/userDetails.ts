@@ -1,4 +1,4 @@
-import { getRandomUserAvatar } from "./mockUsers";
+import { getDefaultUserAvatar } from "./mockUsers";
 import type { GuildUser } from "./types";
 
 /**
@@ -29,7 +29,7 @@ export function getUserAvatar(users: Map<string, GuildUser>, id: string): string
     if (user && user.avatar) {
         return "https://cdn.discordapp.com/avatars/" + id + "/" + user.avatar + ".png";
     } else {
-        return getRandomUserAvatar();
+        return getDefaultUserAvatar(id);
     }
 }
 

@@ -41,10 +41,11 @@ export function getRandomUserName(): string {
 }
 
 /**
- * This function returns a mock user avatar.
- * @returns {string} A random user avatar.
+ * This function returns the default user avatar. If no userID is provided, a random avatar is returned.
+ * @param {string} userID - The ID of the user to get the avatar for.
+ * @returns {string} The default user avatar.
  */
-export function getRandomUserAvatar(): string {
+export function getDefaultUserAvatar(userID: string | undefined = undefined): string {
     const avatarList = [
         "https://cdn.discordapp.com/embed/avatars/0.png",
         "https://cdn.discordapp.com/embed/avatars/1.png",
@@ -54,5 +55,9 @@ export function getRandomUserAvatar(): string {
         "https://cdn.discordapp.com/embed/avatars/5.png"
     ];
 
-    return avatarList[Math.floor(Math.random() * avatarList.length)];
+    if (userID) {
+        return avatarList[Number((BigInt(userID) >> BigInt(22)) % BigInt(avatarList.length))];
+    } else {
+        return avatarList[Math.floor(Math.random() * avatarList.length)];
+    }
 }

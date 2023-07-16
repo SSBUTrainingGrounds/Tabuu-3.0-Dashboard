@@ -38,10 +38,23 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from "vue";
 import { getUserName, getUserAvatar } from "@/helpers/userDetails";
-import type { Macro } from "@/helpers/types";
+import type { GuildUser, Macro } from "@/helpers/types";
 import { sortTable } from "@/helpers/sortTable";
 
-const props = defineProps(["userID", "isAdmin", "users"]);
+const props = defineProps({
+    isAdmin: {
+        type: Boolean,
+        required: true
+    },
+    userID: {
+        type: String,
+        required: true
+    },
+    users: {
+        type: Map<string, GuildUser>,
+        required: true
+    }
+});
 
 let name = ref("");
 let payload = ref("");

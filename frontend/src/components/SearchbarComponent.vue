@@ -10,9 +10,9 @@ import { ref } from "vue";
 
 const search = ref("");
 
-defineEmits(["search"]);
-
-defineProps(["users", "table"]);
+defineEmits<{
+    search: [search: string];
+}>();
 </script>
 
 <style scoped>

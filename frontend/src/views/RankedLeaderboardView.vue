@@ -65,10 +65,20 @@ import RankedComponent from "@/components/RankedComponent.vue";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
 import { sortTable } from "@/helpers/sortTable";
+import type { GuildUser } from "@/helpers/types";
 import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
 import { ref, onMounted, type Ref } from "vue";
 
-const props = defineProps(["users", "userID"]);
+const props = defineProps({
+    userID: {
+        type: String,
+        required: true
+    },
+    users: {
+        type: Map<string, GuildUser>,
+        required: true
+    }
+});
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);

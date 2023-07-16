@@ -55,6 +55,7 @@ import { sortTable } from "@/helpers/sortTable";
 import { filterTable } from "@/helpers/filterTable";
 import { infiniteScroll } from "@/helpers/infiniteScroll";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
+import type { GuildUser } from "@/helpers/types";
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
@@ -64,7 +65,16 @@ let page = 2;
 let throttle = false;
 let currentSearch = "";
 
-const props = defineProps(["users", "userID"]);
+const props = defineProps({
+    users: {
+        type: Map<string, GuildUser>,
+        required: true
+    },
+    userID: {
+        type: String,
+        required: true
+    }
+});
 
 const ascendingColumns = ref({
     id: false,
