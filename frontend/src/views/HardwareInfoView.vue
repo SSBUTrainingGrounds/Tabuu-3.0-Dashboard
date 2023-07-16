@@ -55,8 +55,8 @@
         <div class="ram-stats">
             <div class="name">RAM Usage</div>
             <div class="stat">
-                {{ getGBString(hwStats["ram_used"]) || 0 }} / {{ getGBString(hwStats["ram_total"]) }} ({{
-                    hwStats["ram_percentage"].toLocaleString("en", {
+                {{ getGBString(hwStats["ram_used"]) || 0 }} / {{ getGBString(hwStats["ram_total"]) || 0 }} ({{
+                    (hwStats["ram_percentage"] || 0).toLocaleString("en", {
                         style: "percent",
                         maximumFractionDigits: 2,
                         minimumFractionDigits: 2
@@ -67,8 +67,8 @@
         <div class="ram-stats">
             <div class="name">Swap Usage</div>
             <div class="stat">
-                {{ getGBString(hwStats["swap_used"]) || 0 }} / {{ getGBString(hwStats["swap_total"]) }} ({{
-                    hwStats["swap_percentage"].toLocaleString("en", {
+                {{ getGBString(hwStats["swap_used"]) || 0 }} / {{ getGBString(hwStats["swap_total"]) || 0 }} ({{
+                    (hwStats["swap_percentage"] || 0).toLocaleString("en", {
                         style: "percent",
                         maximumFractionDigits: 2,
                         minimumFractionDigits: 2
