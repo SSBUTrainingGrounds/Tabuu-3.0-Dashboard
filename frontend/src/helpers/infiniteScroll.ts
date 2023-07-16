@@ -14,15 +14,14 @@ export function infiniteScroll(
     increaseBy: number,
     currentSearch: string
 ): number {
+    // Calculates the bottom of the page with a generous offset.
+    const bottomHit =
+        window.scrollY + window.innerHeight + document.body.offsetHeight + 250 >= document.body.scrollHeight;
+
+    console.log(window.scrollY + window.innerHeight + document.body.offsetHeight + 250, document.body.scrollHeight);
+
     // If we have displayed all items, or we are searching something, or we are not at the bottom of the page, return.
-    if (
-        displayItems.length >= rawItems.length ||
-        currentSearch !== "" ||
-        document.scrollingElement!.scrollHeight -
-            document.scrollingElement!.scrollTop -
-            document.scrollingElement!.clientHeight >
-            50
-    ) {
+    if (displayItems.length >= rawItems.length || currentSearch !== "" || !bottomHit) {
         return page;
     }
 
