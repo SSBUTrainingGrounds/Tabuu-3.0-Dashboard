@@ -23,7 +23,7 @@ defineEmits<{
     justify-content: center;
     align-items: center;
     margin: 0 auto;
-    width: 100%;
+    width: 95%;
     max-width: 800px;
     padding: 0.5rem;
     border: 2px solid var(--green);

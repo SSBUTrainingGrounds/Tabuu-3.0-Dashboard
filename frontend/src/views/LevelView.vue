@@ -5,10 +5,10 @@
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
-            <div class="clickable" @click="sortTable(displayUser, 'id', ascendingColumns)">ID</div>
+            <div class="clickable id-column" @click="sortTable(displayUser, 'id', ascendingColumns)">ID</div>
+            <div class="clickable" @click="sortTable(displayUser, 'xp', ascendingColumns)">Total XP</div>
             <div class="clickable" @click="sortTable(displayUser, 'level', ascendingColumns)">Level</div>
             <div>Level Progress</div>
-            <div class="clickable" @click="sortTable(displayUser, 'xp', ascendingColumns)">Total XP</div>
             <div class="clickable" @click="sortTable(displayUser, 'messages', ascendingColumns)">Messages</div>
         </div>
         <div
@@ -21,11 +21,12 @@
             <div>
                 <i>#{{ u["rank"] }}</i>
             </div>
-            <div>
+            <div class="user-column">
                 <img :src="getUserAvatar(props.users, u['id'])" alt="User Avatar" class="avatar-preview" />
                 {{ getUserName(props.users, u["id"]) }}
             </div>
-            <div>{{ u["id"] }}</div>
+            <div class="id-column">{{ u["id"] }}</div>
+            <div>{{ (u["xp"] as number).toLocaleString("en") }}</div>
             <div>{{ (u["level"] as number).toLocaleString("en") }}</div>
             <div>
                 <div
@@ -42,7 +43,7 @@
                     })
                 }}
             </div>
-            <div>{{ (u["xp"] as number).toLocaleString("en") }}</div>
+
             <div>{{ (u["messages"] as number).toLocaleString("en") }}</div>
         </div>
     </div>
@@ -76,6 +77,7 @@ const props = defineProps({
     }
 });
 
+// TODO: Fix infinite scrolling when you sort the table
 const ascendingColumns = ref({
     id: false,
     level: false,
@@ -127,12 +129,13 @@ onMounted(async () => {
 
 .content,
 .table-header {
-    grid-template-columns: 0.3fr 1.2fr 1.2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 0.3fr 1.8fr 1.2fr 1fr 1fr 1fr 1fr;
 }
 
-.pie-progress {
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
+@media (max-width: 800px) {
+    .content,
+    .table-header {
+        grid-template-columns: 1fr 3fr 1fr;
+    }
 }
 </style>

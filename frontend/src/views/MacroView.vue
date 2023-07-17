@@ -23,8 +23,8 @@
             class="content"
             :style="{ gridTemplateColumns: isAdmin ? '1fr 2fr 1.2fr 0.5fr 0.5fr' : '1fr 2fr 1.2fr 0.5fr' }"
         >
-            <div>%{{ macro.name }}</div>
-            <div>{{ macro.payload }}</div>
+            <div class="break-text">%{{ macro.name }}</div>
+            <div class="break-text">{{ displayMacroPayload(macro.payload) }}</div>
             <div>
                 <img :src="getUserAvatar(props.users, macro.author)" alt="User Avatar" class="avatar-preview" />
                 {{ getUserName(props.users, macro.author) }}
@@ -40,6 +40,7 @@ import { onMounted, ref, type Ref } from "vue";
 import { getUserName, getUserAvatar } from "@/helpers/userDetails";
 import type { GuildUser, Macro } from "@/helpers/types";
 import { sortTable } from "@/helpers/sortTable";
+import { displayMacroPayload } from "@/helpers/macroDisplay";
 
 const props = defineProps({
     isAdmin: {
@@ -162,72 +163,8 @@ onMounted(async () => {
     grid-column: 1 / 5;
 }
 
-.macro-input {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    background-color: var(--dark-gray);
-    border-radius: 1rem;
-}
-
-.macro-input-name,
-.macro-input-value {
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    background-color: var(--light-gray);
-    color: var(--white);
-}
-
-.macro-input-name {
-    grid-column: 1 / 2;
-}
-
-.macro-input-value {
-    grid-column: 2 / 5;
-}
-
-.macro-button,
-.delete-button {
-    all: unset;
-    cursor: pointer;
-    margin: auto;
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: opacity 0.2s ease-in-out;
-    grid-column: 5;
-    align-self: start;
-    height: 2.5rem;
-    width: 2.5rem;
-    border-radius: 50%;
-    text-align: center;
-    background-color: var(--dark-gray);
-}
-
-.macro-button {
-    border: 1px solid var(--green);
-    color: var(--green);
-}
-
-.macro-button:hover {
-    background-color: var(--green);
-    color: var(--light-green);
-    border: solid 1px var(--light-green);
-}
-
-.delete-button {
-    border: solid 1px var(--red);
-    color: var(--red);
-}
-
-.delete-button:hover {
-    background-color: var(--red);
-    color: var(--light-red);
-    border: solid 1px var(--light-red);
-}
-
 @media (max-width: 1300px) {
-    .content {
+    .break-text {
         word-break: break-all;
     }
 }

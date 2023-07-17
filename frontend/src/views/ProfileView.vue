@@ -4,7 +4,7 @@
 
         <div class="table-header">
             <div>User</div>
-            <div>ID</div>
+            <div class="id-column">ID</div>
             <div>Tag</div>
             <div>Region</div>
             <div>Mains</div>
@@ -27,7 +27,7 @@
                 <img :src="getUserAvatar(props.users, u['user_id'])" alt="User Avatar" class="avatar-preview" />
                 {{ getUserName(props.users, u["user_id"]) }}
             </div>
-            <div>{{ u["user_id"] }}</div>
+            <div class="id-column">{{ u["user_id"] }}</div>
             <div>{{ u["tag"] }}</div>
             <div>{{ u["region"] }}</div>
             <div>
@@ -45,7 +45,7 @@
                     <img :src="character" alt="Character" class="avatar-preview" />
                 </div>
             </div>
-            <div>{{ u["note"] }}</div>
+            <div class="note">{{ u["note"] }}</div>
         </div>
     </div>
 </template>
@@ -94,7 +94,6 @@ onMounted(async () => {
 .content,
 .table-header {
     grid-template-columns: 1.5fr 1.3fr 1fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr;
-    word-break: break-all;
 }
 
 .content {
@@ -102,8 +101,14 @@ onMounted(async () => {
     border-radius: 0.2rem;
 }
 
-.emoji-grid {
-    display: inline-block;
-    margin: 0.1rem;
+@media (max-width: 800px) {
+    .content,
+    .table-header {
+        grid-template-columns: 2fr 1.2fr 1fr;
+    }
+
+    .note {
+        grid-column: 1 / span 3;
+    }
 }
 </style>

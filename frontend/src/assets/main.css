@@ -24,9 +24,15 @@ body {
     grid-gap: 0.2rem;
     width: 95%;
     max-width: 1200px;
-    min-width: 800px;
+    min-width: 400px;
     justify-content: center;
     margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .id-column {
+        display: none;
+    }
 }
 
 .avatar-preview {
@@ -70,4 +76,79 @@ body {
 
 .highlighted-user {
     box-shadow: 0 0 0 0.2rem var(--green);
+}
+
+.pie-progress {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+}
+
+.emoji-grid {
+    display: inline-block;
+    margin: 0.1rem;
+}
+
+.macro-input {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    background-color: var(--dark-gray);
+    border-radius: 1rem;
+}
+
+.macro-input-name,
+.macro-input-value {
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    background-color: var(--light-gray);
+    color: var(--white);
+}
+
+.macro-input-name {
+    grid-column: 1 / 2;
+}
+
+.macro-input-value {
+    grid-column: 2 / 5;
+}
+
+.macro-button,
+.delete-button {
+    all: unset;
+    cursor: pointer;
+    margin: auto;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: opacity 0.2s ease-in-out;
+    grid-column: 5;
+    align-self: start;
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 50%;
+    text-align: center;
+    background-color: var(--dark-gray);
+}
+
+.macro-button {
+    border: 1px solid var(--green);
+    color: var(--green);
+}
+
+.macro-button:hover {
+    background-color: var(--green);
+    color: var(--light-green);
+    border: solid 1px var(--light-green);
+}
+
+.delete-button {
+    border: solid 1px var(--red);
+    color: var(--red);
+}
+
+.delete-button:hover {
+    background-color: var(--red);
+    color: var(--light-red);
+    border: solid 1px var(--light-red);
 }

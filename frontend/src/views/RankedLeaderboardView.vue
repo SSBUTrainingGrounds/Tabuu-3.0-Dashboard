@@ -7,11 +7,13 @@
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
-            <div class="clickable" @click="sortTable(displayUser, 'user_id', ascendingColumns)">ID</div>
-            <div class="clickable" @click="sortTable(displayUser, 'display_rating', ascendingColumns)">TabuuSkill</div>
+            <div class="clickable id-column" @click="sortTable(displayUser, 'user_id', ascendingColumns)">ID</div>
+            <div class="clickable skill" @click="sortTable(displayUser, 'display_rating', ascendingColumns)">
+                TabuuSkill
+            </div>
             <div class="clickable" @click="sortTable(displayUser, 'deviation', ascendingColumns)">Deviation</div>
-            <div class="clickable" @click="sortTable(displayUser, 'wins', ascendingColumns)">Wins</div>
-            <div class="clickable" @click="sortTable(displayUser, 'losses', ascendingColumns)">Losses</div>
+            <div class="clickable wins" @click="sortTable(displayUser, 'wins', ascendingColumns)">Wins</div>
+            <div class="clickable losses" @click="sortTable(displayUser, 'losses', ascendingColumns)">Losses</div>
             <div>Winrate</div>
         </div>
         <div
@@ -28,8 +30,8 @@
                 <img :src="getUserAvatar(props.users, u['user_id'])" alt="User Avatar" class="avatar-preview" />
                 {{ getUserName(props.users, u["user_id"]) }}
             </div>
-            <div>{{ u["user_id"] }}</div>
-            <div>
+            <div class="id-column">{{ u["user_id"] }}</div>
+            <div class="skill">
                 {{
                     (u["display_rating"] as number).toLocaleString("en", {
                         minimumFractionDigits: 2,
@@ -45,8 +47,8 @@
                     })
                 }}
             </div>
-            <div>{{ (u["wins"] as number).toLocaleString("en") }}</div>
-            <div>{{ (u["losses"] as number).toLocaleString("en") }}</div>
+            <div class="wins">{{ (u["wins"] as number).toLocaleString("en") }}</div>
+            <div class="losses">{{ (u["losses"] as number).toLocaleString("en") }}</div>
             <div>
                 {{
                     (u["wins"] / (u["wins"] + u["losses"])).toLocaleString("en", {
@@ -80,6 +82,8 @@ const props = defineProps({
     }
 });
 
+// TODO: Implement infinite scrolling
+
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
 
@@ -112,6 +116,25 @@ onMounted(async () => {
 <style scoped>
 .content,
 .table-header {
-    grid-template-columns: 0.3fr 1.2fr 1.2fr 1fr 1fr 0.5fr 0.5fr 1fr;
+    grid-template-columns: 0.3fr 1.2fr 1.2fr 0.5fr 0.5fr 1fr 1fr 1fr;
+}
+
+@media (max-width: 800px) {
+    .content,
+    .table-header {
+        grid-template-columns: 0.5fr 3fr 0.7fr 0.7fr 1fr;
+    }
+
+    .skill {
+        grid-column: 3 / 5;
+    }
+
+    .wins {
+        grid-column: 3;
+    }
+
+    .losses {
+        grid-column: 4;
+    }
 }
 </style>
