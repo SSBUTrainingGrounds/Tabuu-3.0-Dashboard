@@ -1,5 +1,6 @@
 #![allow(clippy::let_unit_value)] // False positive
 
+mod emoji;
 mod hwinfo;
 mod level;
 mod rating;
@@ -7,6 +8,7 @@ mod requests;
 mod types;
 
 use dotenv::dotenv;
+use emoji::get_emojis_from_str;
 use rocket::response::status;
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
@@ -319,13 +321,17 @@ async fn profiles(conn: DbConn) -> String {
                 }
             };
             let user_iter = match stmt.query_map([], |row| {
+                let mains = get_emojis_from_str(row.get(3)?);
+                let secondaries = get_emojis_from_str(row.get(4)?);
+                let pockets = get_emojis_from_str(row.get(5)?);
+
                 Ok(types::Profiles {
                     user_id: row.get(0)?,
                     tag: row.get(1)?,
                     region: row.get(2)?,
-                    mains: row.get(3)?,
-                    secondaries: row.get(4)?,
-                    pockets: row.get(5)?,
+                    mains,
+                    secondaries,
+                    pockets,
                     note: row.get(6)?,
                     colour: row.get(7)?,
                 })
@@ -344,9 +350,9 @@ async fn profiles(conn: DbConn) -> String {
                             user_id: String::from(""),
                             tag: String::from(""),
                             region: String::from(""),
-                            mains: String::from(""),
-                            secondaries: String::from(""),
-                            pockets: String::from(""),
+                            mains: Vec::new(),
+                            secondaries: Vec::new(),
+                            pockets: Vec::new(),
                             note: String::from(""),
                             colour: 0,
                         }
@@ -694,7 +700,7 @@ mod tests {
     #[test]
     fn test_rocket_hw_info() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
-        let response = client.get("/api/hwinfo").dispatch();
+        let response = client.get("/api/hwinfo/").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
 }

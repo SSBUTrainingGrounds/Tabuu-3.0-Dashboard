@@ -45,16 +45,23 @@ export interface HwStats {
     os_name: string;
     cpu_name: string;
     cpu_freq: number[];
+    avg_cpu_freq: number;
     cpu_usage: number[];
-    cpu_temp: number[];
+    avg_cpu_usage: number;
+    cpu_temp_c: number[];
+    avg_cpu_temp_c: number;
+    cpu_temp_f: number[];
+    avg_cpu_temp_f: number;
     cpu_cores: number[];
     ram_total: number;
     ram_used: number;
     ram_free: number;
     ram_percentage: number;
+    ram_readable_str: string;
     swap_total: number;
     swap_used: number;
     swap_free: number;
     swap_percentage: number;
+    swap_readable_str: string;
     disks: number[][];
 }

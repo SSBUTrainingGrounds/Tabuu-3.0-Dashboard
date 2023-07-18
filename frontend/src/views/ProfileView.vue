@@ -31,17 +31,17 @@
             <div>{{ u["tag"] }}</div>
             <div>{{ u["region"] }}</div>
             <div>
-                <div v-for="character in getCharacters(u['mains'])" :key="character" class="emoji-grid">
+                <div v-for="character in u['mains']" :key="character" class="emoji-grid">
                     <img :src="character" alt="Character" class="avatar-preview" />
                 </div>
             </div>
             <div>
-                <div v-for="character in getCharacters(u['secondaries'])" :key="character" class="emoji-grid">
+                <div v-for="character in u['secondaries']" :key="character" class="emoji-grid">
                     <img :src="character" alt="Character" class="avatar-preview" />
                 </div>
             </div>
             <div>
-                <div v-for="character in getCharacters(u['pockets'])" :key="character" class="emoji-grid">
+                <div v-for="character in u['pockets']" :key="character" class="emoji-grid">
                     <img :src="character" alt="Character" class="avatar-preview" />
                 </div>
             </div>
@@ -53,7 +53,6 @@
 <script setup lang="ts">
 import { ref, onMounted, type Ref } from "vue";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
-import { getCharacters } from "@/helpers/characterEmojis";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
 import type { GuildUser } from "@/helpers/types";

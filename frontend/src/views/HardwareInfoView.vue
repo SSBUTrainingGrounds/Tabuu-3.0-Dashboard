@@ -23,69 +23,39 @@
         </div>
         <div class="cpu-stats">
             <div class="name">Frequency</div>
-            <div class="stat">{{ getAverage(hwStats["cpu_freq"]) }} MHz</div>
+            <div class="stat">{{ hwStats["avg_cpu_freq"] || 0 }} MHz</div>
         </div>
         <div class="cpu-stats">
             <div class="name">Usage</div>
             {{
-                getAverage(hwStats["cpu_usage"]).toLocaleString("en", {
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2
+                (hwStats["avg_cpu_usage"] || 0).toLocaleString("en", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
                 })
             }}%
         </div>
         <div class="cpu-stats">
             <div class="name">Temperature</div>
-            <div class="stat">
-                {{
-                    getAverage(hwStats["cpu_temp"]).toLocaleString("en", {
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2
-                    })
-                }}°C ({{
-                    celciusToFahrenheit(getAverage(hwStats["cpu_temp"])).toLocaleString("en", {
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2
-                    })
-                }}°F)
-            </div>
+            <div class="stat">{{ hwStats["avg_cpu_temp_c"] || 0 }}°C ({{ hwStats["avg_cpu_temp_f"] || 0 }}°F)</div>
         </div>
 
         <div class="ram-header"><i class="fa fa-memory"> </i> Memory Stats</div>
         <div class="ram-stats">
             <div class="name">RAM Usage</div>
             <div class="stat">
-                {{ getGBString(hwStats["ram_used"]) || 0 }} / {{ getGBString(hwStats["ram_total"]) || 0 }} ({{
-                    (hwStats["ram_percentage"] || 0).toLocaleString("en", {
-                        style: "percent",
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2
-                    })
-                }})
+                {{ hwStats["ram_readable_str"] }}
             </div>
         </div>
         <div class="ram-stats">
             <div class="name">Swap Usage</div>
             <div class="stat">
-                {{ getGBString(hwStats["swap_used"]) || 0 }} / {{ getGBString(hwStats["swap_total"]) || 0 }} ({{
-                    (hwStats["swap_percentage"] || 0).toLocaleString("en", {
-                        style: "percent",
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2
-                    })
-                }})
+                {{ hwStats["swap_readable_str"] }}
             </div>
         </div>
         <div class="ram-stats" v-for="(disk, i) in hwStats['disks']" :key="i">
             <div class="name">Disk {{ i + 1 }} Usage:</div>
             <div class="stat">
-                {{ getGBString(disk[2]) }} / {{ getGBString(disk[1]) }} ({{
-                    disk[4].toLocaleString("en", {
-                        style: "percent",
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2
-                    })
-                }})
+                {{ disk[5] }}
             </div>
         </div>
     </div>
@@ -94,7 +64,6 @@
 <script setup lang="ts">
 import type { HwStats } from "@/helpers/types";
 import { onMounted, ref, type Ref } from "vue";
-import { getAverage, getGBString, celciusToFahrenheit } from "@/helpers/hardware";
 import moment from "moment";
 
 const hwStats: Ref<HwStats> = ref({
@@ -103,16 +72,23 @@ const hwStats: Ref<HwStats> = ref({
     cpu_name: "",
     cpu_cores: [0, 0],
     cpu_freq: [],
+    avg_cpu_freq: 0,
     cpu_usage: [],
-    cpu_temp: [],
+    avg_cpu_usage: 0,
+    cpu_temp_c: [],
+    avg_cpu_temp_c: 0,
+    cpu_temp_f: [],
+    avg_cpu_temp_f: 0,
     ram_total: 0,
     ram_used: 0,
     ram_free: 0,
     ram_percentage: 0,
+    ram_readable_str: "",
     swap_total: 0,
     swap_used: 0,
     swap_free: 0,
     swap_percentage: 0,
+    swap_readable_str: "",
     disks: []
 });
 
