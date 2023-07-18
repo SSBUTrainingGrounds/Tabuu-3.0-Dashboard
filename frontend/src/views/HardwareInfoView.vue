@@ -36,7 +36,19 @@
         </div>
         <div class="cpu-stats">
             <div class="name">Temperature</div>
-            <div class="stat">{{ hwStats["avg_cpu_temp_c"] || 0 }}°C ({{ hwStats["avg_cpu_temp_f"] || 0 }}°F)</div>
+            <div class="stat">
+                {{
+                    (hwStats["avg_cpu_temp_c"] || 0).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}°C ({{
+                    (hwStats["avg_cpu_temp_f"] || 0).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                }}°F)
+            </div>
         </div>
 
         <div class="ram-header"><i class="fa fa-memory"> </i> Memory Stats</div>
