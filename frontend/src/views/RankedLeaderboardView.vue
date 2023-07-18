@@ -1,5 +1,5 @@
 <template>
-    <div class="grid">
+    <div class="grid" id="user-table">
         <RankedComponent />
 
         <SearchbarComponent @search="searchBar" />
@@ -7,13 +7,36 @@
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
-            <div class="clickable id-column" @click="sortTable(displayUser, 'user_id', ascendingColumns)">ID</div>
-            <div class="clickable skill" @click="sortTable(displayUser, 'display_rating', ascendingColumns)">
+            <div
+                class="clickable id-column"
+                @click="displayUser = sortDisplayTable(displayUser, user, 'user_id', ascendingColumns)"
+            >
+                ID
+            </div>
+            <div
+                class="clickable skill"
+                @click="displayUser = sortDisplayTable(displayUser, user, 'display_rating', ascendingColumns)"
+            >
                 TabuuSkill
             </div>
-            <div class="clickable" @click="sortTable(displayUser, 'deviation', ascendingColumns)">Deviation</div>
-            <div class="clickable wins" @click="sortTable(displayUser, 'wins', ascendingColumns)">Wins</div>
-            <div class="clickable losses" @click="sortTable(displayUser, 'losses', ascendingColumns)">Losses</div>
+            <div
+                class="clickable"
+                @click="displayUser = sortDisplayTable(displayUser, user, 'deviation', ascendingColumns)"
+            >
+                Deviation
+            </div>
+            <div
+                class="clickable wins"
+                @click="displayUser = sortDisplayTable(displayUser, user, 'wins', ascendingColumns)"
+            >
+                Wins
+            </div>
+            <div
+                class="clickable losses"
+                @click="displayUser = sortDisplayTable(displayUser, user, 'losses', ascendingColumns)"
+            >
+                Losses
+            </div>
             <div>Winrate</div>
         </div>
         <div
@@ -66,9 +89,10 @@
 import RankedComponent from "@/components/RankedComponent.vue";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
-import { sortTable } from "@/helpers/sortTable";
+import { sortDisplayTable } from "@/helpers/sortTable";
 import type { GuildUser } from "@/helpers/types";
 import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
+import { infiniteScroll } from "@/helpers/infiniteScroll";
 import { ref, onMounted, type Ref } from "vue";
 
 const props = defineProps({
@@ -82,10 +106,13 @@ const props = defineProps({
     }
 });
 
-// TODO: Implement infinite scrolling
-
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
+let usersPerPage = 200;
+
+let page = 2;
+let throttle = false;
+let currentSearch = "";
 
 const ascendingColumns = ref({
     user_id: false,
@@ -96,7 +123,24 @@ const ascendingColumns = ref({
 });
 
 function searchBar(search: string) {
+    if (!search) {
+        displayUser.value = user.value.slice(0, usersPerPage);
+        currentSearch = "";
+        return;
+    }
+
+    currentSearch = search;
     displayUser.value = filterTable(user.value, props.users, search);
+    page = 2;
+}
+
+function throttleScroll(time: number) {
+    if (throttle) return;
+    throttle = true;
+    setTimeout(() => {
+        page = infiniteScroll(displayUser.value, user.value, page, usersPerPage, currentSearch);
+        throttle = false;
+    }, time);
 }
 
 onMounted(async () => {
@@ -108,8 +152,9 @@ onMounted(async () => {
     user.value = await res.json();
 
     displayUser.value = user.value;
-
-    sortTable(displayUser.value, "display_rating", ascendingColumns.value);
+    displayUser.value = sortDisplayTable(displayUser.value, user.value, "display_rating", ascendingColumns.value);
+    displayUser.value = displayUser.value.slice(0, usersPerPage);
+    window.addEventListener("scroll", () => throttleScroll(1000));
 });
 </script>
 

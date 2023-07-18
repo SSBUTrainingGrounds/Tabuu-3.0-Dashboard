@@ -5,11 +5,28 @@
         <div class="table-header">
             <div>Rank</div>
             <div>User</div>
-            <div class="clickable id-column" @click="sortTable(displayUser, 'id', ascendingColumns)">ID</div>
-            <div class="clickable" @click="sortTable(displayUser, 'xp', ascendingColumns)">Total XP</div>
-            <div class="clickable" @click="sortTable(displayUser, 'level', ascendingColumns)">Level</div>
+            <div
+                class="clickable id-column"
+                @click="displayUser = sortDisplayTable(displayUser, user, 'id', ascendingColumns)"
+            >
+                ID
+            </div>
+            <div class="clickable" @click="displayUser = sortDisplayTable(displayUser, user, 'xp', ascendingColumns)">
+                Total XP
+            </div>
+            <div
+                class="clickable"
+                @click="displayUser = sortDisplayTable(displayUser, user, 'level', ascendingColumns)"
+            >
+                Level
+            </div>
             <div>Level Progress</div>
-            <div class="clickable" @click="sortTable(displayUser, 'messages', ascendingColumns)">Messages</div>
+            <div
+                class="clickable"
+                @click="displayUser = sortDisplayTable(displayUser, user, 'messages', ascendingColumns)"
+            >
+                Messages
+            </div>
         </div>
         <div
             class="content"
@@ -52,7 +69,7 @@
 <script setup lang="ts">
 import { ref, onMounted, type Ref } from "vue";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
-import { sortTable } from "@/helpers/sortTable";
+import { sortDisplayTable } from "@/helpers/sortTable";
 import { filterTable } from "@/helpers/filterTable";
 import { infiniteScroll } from "@/helpers/infiniteScroll";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
@@ -77,7 +94,6 @@ const props = defineProps({
     }
 });
 
-// TODO: Fix infinite scrolling when you sort the table
 const ascendingColumns = ref({
     id: false,
     level: false,
@@ -118,8 +134,9 @@ onMounted(async () => {
 
     displayUser.value = user.value;
 
-    sortTable(displayUser.value, "xp", ascendingColumns.value);
     displayUser.value = displayUser.value.slice(0, usersPerPage);
+    displayUser.value = sortDisplayTable(displayUser.value, user.value, "xp", ascendingColumns.value);
+
     window.addEventListener("scroll", () => throttleScroll(1000));
 });
 </script>

@@ -1,14 +1,34 @@
 <template>
-    <div class="grid">
+    <div class="grid" id="user-table">
         <RankedComponent />
 
         <SearchbarComponent @search="searchBar" />
 
         <div class="table-header">
-            <div class="clickable" @click="sortTable(displayMatches, 'match_id', ascendingColumns)">Match ID</div>
-            <div class="clickable" @click="sortTable(displayMatches, 'timestamp', ascendingColumns)">Time</div>
-            <div class="winner clickable" @click="sortTable(displayMatches, 'winner_id', ascendingColumns)">Winner</div>
-            <div class="loser clickable" @click="sortTable(displayMatches, 'loser_id', ascendingColumns)">Loser</div>
+            <div
+                class="clickable"
+                @click="displayMatches = sortDisplayTable(displayMatches, matches, 'match_id', ascendingColumns)"
+            >
+                Match ID
+            </div>
+            <div
+                class="clickable"
+                @click="displayMatches = sortDisplayTable(displayMatches, matches, 'timestamp', ascendingColumns)"
+            >
+                Time
+            </div>
+            <div
+                class="winner clickable"
+                @click="displayMatches = sortDisplayTable(displayMatches, matches, 'winner_id', ascendingColumns)"
+            >
+                Winner
+            </div>
+            <div
+                class="loser clickable"
+                @click="displayMatches = sortDisplayTable(displayMatches, matches, 'loser_id', ascendingColumns)"
+            >
+                Loser
+            </div>
         </div>
         <div
             class="content"
@@ -72,10 +92,11 @@
 import RankedComponent from "@/components/RankedComponent.vue";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
-import { sortTable } from "@/helpers/sortTable";
+import { sortDisplayTable } from "@/helpers/sortTable";
 import type { GuildUser } from "@/helpers/types";
 import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { getRatingChangeText } from "@/helpers/rating";
+import { infiniteScroll } from "@/helpers/infiniteScroll";
 import { onMounted, ref, type Ref } from "vue";
 
 const props = defineProps({
@@ -89,10 +110,13 @@ const props = defineProps({
     }
 });
 
-// TODO: Implement infinite scrolling
-
 const matches: Ref<any[]> = ref([]);
 const displayMatches: Ref<any[]> = ref([]);
+let matchesPerPage = 200;
+
+let page = 2;
+let throttle = false;
+let currentSearch = "";
 
 const ascendingColumns = ref({
     match_id: false,
@@ -102,7 +126,24 @@ const ascendingColumns = ref({
 });
 
 function searchBar(search: string) {
+    if (!search) {
+        displayMatches.value = matches.value.slice(0, matchesPerPage);
+        currentSearch = "";
+        return;
+    }
+
+    currentSearch = search;
     displayMatches.value = filterTable(matches.value, props.users, search);
+    page = 2;
+}
+
+function throttleScroll(time: number) {
+    if (throttle) return;
+    throttle = true;
+    setTimeout(() => {
+        page = infiniteScroll(displayMatches.value, matches.value, page, matchesPerPage, currentSearch);
+        throttle = false;
+    }, time);
 }
 
 onMounted(async () => {
@@ -114,8 +155,9 @@ onMounted(async () => {
     matches.value = await res.json();
 
     displayMatches.value = matches.value;
-
-    sortTable(displayMatches.value, "timestamp", ascendingColumns.value);
+    displayMatches.value = sortDisplayTable(displayMatches.value, matches.value, "timestamp", ascendingColumns.value);
+    displayMatches.value = displayMatches.value.slice(0, matchesPerPage);
+    window.addEventListener("scroll", () => throttleScroll(1000));
 });
 </script>
 
@@ -126,7 +168,7 @@ onMounted(async () => {
 }
 
 .winner {
-    grid-column: 2 / 4;
+    grid-column: 3 / 4;
 }
 
 .loser {

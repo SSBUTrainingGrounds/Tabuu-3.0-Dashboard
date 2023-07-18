@@ -1,5 +1,5 @@
 <template>
-    <div class="grid">
+    <div class="grid" id="user-table">
         <SearchbarComponent @search="searchBar" />
 
         <div class="table-header">
@@ -57,9 +57,16 @@ import { getCharacters } from "@/helpers/characterEmojis";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
 import type { GuildUser } from "@/helpers/types";
+import { infiniteScroll } from "@/helpers/infiniteScroll";
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
+// Setting this to 100 instead of 200 because there is a bit more to display per user.
+let usersPerPage = 100;
+
+let page = 2;
+let throttle = false;
+let currentSearch = "";
 
 const props = defineProps({
     users: {
@@ -75,7 +82,24 @@ const props = defineProps({
 // Not sure if it would make sense to implement sorting for this view.
 
 function searchBar(search: string) {
+    if (!search) {
+        displayUser.value = user.value.slice(0, usersPerPage);
+        currentSearch = "";
+        return;
+    }
+
+    currentSearch = search;
     displayUser.value = filterTable(user.value, props.users, search);
+    page = 2;
+}
+
+function throttleScroll(time: number) {
+    if (throttle) return;
+    throttle = true;
+    setTimeout(() => {
+        page = infiniteScroll(displayUser.value, user.value, page, usersPerPage, currentSearch);
+        throttle = false;
+    }, time);
 }
 
 onMounted(async () => {
@@ -87,6 +111,8 @@ onMounted(async () => {
     user.value = await res.json();
 
     displayUser.value = user.value;
+    displayUser.value = displayUser.value.slice(0, usersPerPage);
+    window.addEventListener("scroll", () => throttleScroll(1000));
 });
 </script>
 
