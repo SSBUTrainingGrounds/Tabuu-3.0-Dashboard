@@ -14,7 +14,7 @@
         <p>
             When you Log In via Discord, we will store a session token to allow you to stay logged in. 
             When you hit the Log Out button, that token will be deleted. 
-            We access your Discord user data via the Discord API only to verify your server permissions. 
+            We access your Discord user data via the Discord API only to verify that you are on the Discord Server, and your permissions on it. 
             The website does not store anything else, however the Discord Bot does store the following user data:
             <ul>
                 <li>User IDs</li>

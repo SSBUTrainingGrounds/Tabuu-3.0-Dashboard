@@ -28,7 +28,7 @@ struct DbConn(rusqlite::Connection);
 fn index() -> &'static str {
     "Hi! Available endpoints: 
     GET: /trueskill, /matches, /leaderboard, /commands, /profiles, /macro_get, /users, /user/<user_id>, /hwinfo
-    POST: /macro_new, /macro_delete, /is_admin"
+    POST: /macro_new, /macro_delete, /is_admin, /is_on_server"
 }
 
 #[get("/trueskill")]
@@ -535,6 +535,25 @@ async fn is_admin(
     }
 }
 
+#[post("/is_on_server", data = "<input>", format = "application/json")]
+async fn is_on_server(
+    input: Json<types::IsOnServerData>,
+) -> Result<status::Accepted<String>, status::Unauthorized<String>> {
+    dotenv().ok();
+
+    let result = requests::is_on_server_check(
+        &input.discord_token,
+        &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
+    )
+    .await;
+
+    if result {
+        Ok(status::Accepted(Some("True".to_string())))
+    } else {
+        Err(status::Unauthorized(Some("False".to_string())))
+    }
+}
+
 #[get("/hwinfo")]
 async fn hw_info() -> String {
     let hw_info = hwinfo::get_hw_info();
@@ -559,6 +578,7 @@ fn rocket() -> _ {
             users,
             get_user,
             is_admin,
+            is_on_server,
             hw_info
         ],
     )
@@ -694,6 +714,16 @@ mod tests {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
             .post("/api/is_admin")
+            .body(r#"{"discord_token": "123456789"}"#)
+            .dispatch();
+        assert_eq!(response.status(), Status::NotFound);
+    }
+
+    #[test]
+    fn test_rocket_is_on_server_bad_requests() {
+        let client = Client::tracked(rocket()).expect("valid rocket instance");
+        let response = client
+            .post("/api/is_on_server")
             .body(r#"{"discord_token": "123456789"}"#)
             .dispatch();
         assert_eq!(response.status(), Status::NotFound);

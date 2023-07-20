@@ -5,7 +5,11 @@
             <h1>Tabuu 3.0 Dashboard</h1>
 
             <p>Welcome to the Tabuu 3.0 Dashboard! This is a work in progress.</p>
-            <p>Please choose a page from the navigation bar to get started.</p>
+            <p>
+                Please Log In with Discord and choose a page from the navigation bar.
+                <br />
+                If you are not logged in, or have not joined our server, you will not be able to access any pages.
+            </p>
         </div>
     </div>
 </template>

@@ -163,6 +163,12 @@ pub struct IsAdminData {
     pub discord_token: String,
 }
 
+/// A struct for the data required for the POST endpoint /is_on_server
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IsOnServerData {
+    pub discord_token: String,
+}
+
 /// A struct for the GET endpoint /hwinfo
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HwInfo {

@@ -69,6 +69,62 @@ pub async fn admin_check(discord_token: &str, guild_id: &str) -> bool {
     false
 }
 
+/// Checks if the user is on the server.
+/// Returns false if the user is not on the server or if the request fails.
+pub async fn is_on_server_check(discord_token: &str, guild_id: &str) -> bool {
+    let mut headers = header::HeaderMap::new();
+    headers.insert(
+        header::AUTHORIZATION,
+        match header::HeaderValue::from_str(&("Bearer ".to_owned() + discord_token)) {
+            Ok(s) => s,
+            Err(_) => return false,
+        },
+    );
+
+    let client = ClientBuilder::new(match Client::builder().default_headers(headers).build() {
+        Ok(s) => s,
+        Err(_) => return false,
+    })
+    .with(Cache(HttpCache {
+        // This is not set to ForceCache as the server check should always be up to date.
+        mode: CacheMode::Default,
+        manager: CACacheManager::default(),
+        options: None,
+    }))
+    .build();
+
+    let res = client
+        .get("https://discord.com/api/users/@me/guilds")
+        .send()
+        .await;
+    #[allow(unused_assignments)]
+    let mut body = String::new();
+
+    match res {
+        Ok(res) => {
+            body = res.text().await.unwrap_or("".to_string());
+
+            let json: Value = match serde_json::from_str(&body) {
+                Ok(s) => s,
+                Err(_) => return false,
+            };
+
+            for guild in json.as_array().unwrap_or(&vec![]) {
+                let current_guild_id = guild["id"].as_str().unwrap_or("0");
+
+                if guild_id == current_guild_id {
+                    return true;
+                }
+            }
+        }
+        Err(_) => {
+            return false;
+        }
+    }
+
+    false
+}
+
 /// Gets all the users in a guild.
 /// Returns an empty vector if the request fails.
 /// If a user cannot be parsed, it will insert an "empty" user.
