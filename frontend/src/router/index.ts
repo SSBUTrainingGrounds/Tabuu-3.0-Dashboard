@@ -51,6 +51,11 @@ const router = createRouter({
             path: "/hardware",
             name: "hardware",
             component: () => import("../views/HardwareInfoView.vue")
+        },
+        {
+            path: "/privacy",
+            name: "privacy",
+            component: () => import("../views/PrivacyPolicyView.vue")
         }
     ]
 });

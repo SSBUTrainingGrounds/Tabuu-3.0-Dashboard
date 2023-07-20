@@ -31,15 +31,15 @@
     margin: 0 0.2rem 0 0.2rem;
 }
 
-.nav .green-link {
+.nav {
     color: var(--green);
 }
 
-.nav .green-link:hover {
+.nav {
     color: var(--light-green);
 }
 
-.nav .green-link.active {
+.nav {
     color: var(--light-green);
 }
 

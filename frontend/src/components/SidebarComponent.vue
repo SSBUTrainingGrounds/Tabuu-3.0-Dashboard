@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
         <nav class="navbar" @click="$emit('changeVisibility')">
-            <ul>
+            <ul class="list">
                 <RouterLink class="green-link" style="grid-row: 1" to="/">
                     <li><i class="fa fa-home"></i> Home</li>
                 </RouterLink>
@@ -31,7 +31,7 @@
                 </RouterLink>
             </ul>
 
-            <ul>
+            <ul class="list">
                 <a class="green-link" href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0" target="_blank">
                     <li><i class="fab fa-github"></i> Tabuu 3.0 GitHub</li>
                 </a>
@@ -43,6 +43,12 @@
                 <a class="green-link" href="https://github.com/SSBUTrainingGrounds/Tabuu-3.0-Dashboard" target="_blank">
                     <li><i class="fab fa-github"></i> Dashboard GitHub</li>
                 </a>
+            </ul>
+
+            <ul class="footer-list">
+                <RouterLink class="green-link small" to="/privacy"> Privacy Policy </RouterLink>
+                |
+                <a class="green-link small" href="mailto:ssbu.traininggrounds@gmail.com">Contact</a>
             </ul>
         </nav>
     </div>
@@ -75,40 +81,19 @@ defineEmits<{
     display: none;
 }
 
-.green-link {
-    color: var(--green);
-    text-decoration: none;
-    font-weight: bold;
-    font-size: large;
-}
-
-.green-link:hover {
-    cursor: pointer;
-}
-
-.green-link:hover .fa,
-.green-link:hover .fab {
-    color: var(--light-green);
-}
-
-ul {
-    list-style-type: none;
-    padding: 0.5rem;
-}
-
-li {
-    padding: 0.5rem;
-    border-bottom: 1px solid var(--light-gray);
-}
-
-li:hover {
-    background-color: var(--black);
-    color: var(--light-green);
-    border-radius: 0.5rem;
-}
-
 .fa,
 .fab {
     margin-right: 0.5rem;
+}
+
+.footer-list {
+    list-style-type: none;
+    margin-right: 0.5rem;
+    padding: 1rem;
+}
+
+.small {
+    font-size: small;
+    border: none;
 }
 </style>

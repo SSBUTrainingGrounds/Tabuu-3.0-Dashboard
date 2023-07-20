@@ -152,3 +152,48 @@ body {
     color: var(--light-red);
     border: solid 1px var(--light-red);
 }
+
+.green-link {
+    color: var(--green);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: large;
+}
+
+.green-link:hover {
+    cursor: pointer;
+}
+
+.green-link:hover .fa,
+.green-link:hover .fab {
+    color: var(--light-green);
+}
+
+.small-link {
+    color: var(--green);
+    text-decoration: none;
+}
+
+.small-link:hover {
+    cursor: pointer;
+}
+
+.small-link:hover {
+    color: var(--light-green);
+}
+
+.list {
+    list-style-type: none;
+    padding: 0.5rem;
+}
+
+.list li {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.list li:hover {
+    background-color: var(--black);
+    color: var(--light-green);
+    border-radius: 0.5rem;
+}
