@@ -24,7 +24,7 @@
             :style="{ gridTemplateColumns: isAdmin ? '1fr 2fr 1.2fr 0.5fr 0.5fr' : '1fr 2fr 1.2fr 0.5fr' }"
         >
             <div class="break-text">%{{ macro.name }}</div>
-            <div class="break-text">{{ displayMacroPayload(macro.payload) }}</div>
+            <div class="break-text">{{ macro.display_payload }}</div>
             <div>
                 <img :src="getUserAvatar(props.users, macro.author)" alt="User Avatar" class="avatar-preview" />
                 {{ getUserName(props.users, macro.author) }}
@@ -40,7 +40,6 @@ import { onMounted, ref, type Ref } from "vue";
 import { getUserName, getUserAvatar } from "@/helpers/userDetails";
 import type { GuildUser, Macro } from "@/helpers/types";
 import { sortTable } from "@/helpers/sortTable";
-import { displayMacroPayload } from "@/helpers/macroDisplay";
 
 const props = defineProps({
     isAdmin: {
@@ -100,6 +99,7 @@ function sendMacro() {
             allMacros.value.push({
                 name: name.value,
                 payload: payload.value,
+                display_payload: payload.value.length > 200 ? payload.value.slice(0, 200) + "..." : payload.value,
                 author: props.userID,
                 uses: 0
             });

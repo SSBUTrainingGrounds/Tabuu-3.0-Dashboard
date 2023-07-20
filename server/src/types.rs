@@ -67,6 +67,7 @@ pub struct Profiles {
 pub struct Macros {
     pub name: String,
     pub payload: String,
+    pub display_payload: String,
     pub uses: usize,
     pub author: String,
 }

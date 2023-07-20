@@ -381,9 +381,17 @@ async fn macro_get(conn: DbConn) -> String {
             }
         };
         let macro_iter = match stmt.query_map([], |row| {
+            let mut display_payload: String = row.get(1)?;
+
+            if display_payload.len() > 200 {
+                display_payload = display_payload[..200].to_string();
+                display_payload = format!("{}...", display_payload);
+            }
+
             Ok(types::Macros {
                 name: row.get(0)?,
                 payload: row.get(1)?,
+                display_payload,
                 uses: row.get(2)?,
                 author: row.get(3)?,
             })
@@ -401,6 +409,7 @@ async fn macro_get(conn: DbConn) -> String {
                 Err(_) => types::Macros {
                     name: String::from(""),
                     payload: String::from(""),
+                    display_payload: String::from(""),
                     uses: 0,
                     author: String::from(""),
                 },

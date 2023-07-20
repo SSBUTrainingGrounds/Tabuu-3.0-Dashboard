@@ -14,6 +14,7 @@ export interface GuildUser {
 export interface Macro {
     name: string;
     payload: string;
+    display_payload: string;
     author: string;
     uses: number;
 }

@@ -113,32 +113,3 @@ onMounted(async () => {
     hwStats.value = await res.json();
 });
 </script>
-
-<style scoped>
-.general-header,
-.cpu-header,
-.ram-header {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.general-stats,
-.cpu-stats,
-.ram-stats {
-    margin-bottom: 0.5rem;
-
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 1rem;
-}
-
-.name {
-    grid-column: 1;
-    font-weight: bold;
-}
-
-.stat {
-    grid-column: 2;
-}
-</style>
