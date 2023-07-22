@@ -1,5 +1,5 @@
 <template>
-    <div class="grid">
+    <div class="grid" v-if="command.length !== 0">
         <div class="table-header">
             <div>Rank</div>
             <div class="clickable" @click="sortTable(command, 'command', ascendingColumns)">Command Name</div>
@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import { sortTable } from "@/helpers/sortTable";
+import router from "@/router";
 import { ref, onMounted } from "vue";
 
 const command = ref([]);
@@ -34,10 +35,19 @@ onMounted(async () => {
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/commands";
 
-    const res = await fetch(url);
-    command.value = await res.json();
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
+    });
 
-    sortTable(command.value, "uses", ascendingColumns.value);
+    if (res.ok) {
+        command.value = await res.json();
+        sortTable(command.value, "uses", ascendingColumns.value);
+    } else {
+        router.push({ path: "/" });
+    }
 });
 </script>
 

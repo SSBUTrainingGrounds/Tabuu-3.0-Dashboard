@@ -1,5 +1,5 @@
 <template>
-    <div class="grid">
+    <div class="grid" v-if="hwStats.uptime > 0">
         <div class="general-header"><i class="fa fa-window-restore"></i> OS Stats</div>
         <div class="general-stats">
             <div class="name">OS</div>
@@ -77,6 +77,7 @@
 import type { HwStats } from "@/helpers/types";
 import { onMounted, ref, type Ref } from "vue";
 import moment from "moment";
+import router from "@/router";
 
 const hwStats: Ref<HwStats> = ref({
     uptime: 0,
@@ -109,7 +110,17 @@ onMounted(async () => {
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/hwinfo";
 
-    const res = await fetch(url);
-    hwStats.value = await res.json();
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
+    });
+
+    if (res.ok) {
+        hwStats.value = await res.json();
+    } else {
+        router.push({ path: "/" });
+    }
 });
 </script>

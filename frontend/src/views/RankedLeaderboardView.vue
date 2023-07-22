@@ -1,5 +1,5 @@
 <template>
-    <div class="grid" id="user-table">
+    <div class="grid" id="user-table" v-if="user.length !== 0">
         <RankedComponent />
 
         <SearchbarComponent @search="searchBar" />
@@ -94,6 +94,7 @@ import type { GuildUser } from "@/helpers/types";
 import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
 import { infiniteScroll } from "@/helpers/infiniteScroll";
 import { ref, onMounted, type Ref } from "vue";
+import router from "@/router";
 
 const props = defineProps({
     userID: {
@@ -148,13 +149,23 @@ onMounted(async () => {
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/trueskill";
 
-    const res = await fetch(url);
-    user.value = await res.json();
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
+    });
 
-    displayUser.value = user.value;
-    displayUser.value = sortDisplayTable(displayUser.value, user.value, "display_rating", ascendingColumns.value);
-    displayUser.value = displayUser.value.slice(0, usersPerPage);
-    window.addEventListener("scroll", () => throttleScroll(1000));
+    if (res.ok) {
+        user.value = await res.json();
+
+        displayUser.value = user.value;
+        displayUser.value = sortDisplayTable(displayUser.value, user.value, "display_rating", ascendingColumns.value);
+        displayUser.value = displayUser.value.slice(0, usersPerPage);
+        window.addEventListener("scroll", () => throttleScroll(1000));
+    } else {
+        router.push({ path: "/" });
+    }
 });
 </script>
 

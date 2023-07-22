@@ -1,5 +1,5 @@
 <template>
-    <div class="grid" id="user-table">
+    <div class="grid" id="user-table" v-if="user.length !== 0">
         <SearchbarComponent @search="searchBar" />
 
         <div class="table-header">
@@ -57,6 +57,7 @@ import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import { filterTable } from "@/helpers/filterTable";
 import type { GuildUser } from "@/helpers/types";
 import { infiniteScroll } from "@/helpers/infiniteScroll";
+import router from "@/router";
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
@@ -106,12 +107,22 @@ onMounted(async () => {
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/profiles";
 
-    const res = await fetch(url);
-    user.value = await res.json();
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
+    });
 
-    displayUser.value = user.value;
-    displayUser.value = displayUser.value.slice(0, usersPerPage);
-    window.addEventListener("scroll", () => throttleScroll(1000));
+    if (res.ok) {
+        user.value = await res.json();
+
+        displayUser.value = user.value;
+        displayUser.value = displayUser.value.slice(0, usersPerPage);
+        window.addEventListener("scroll", () => throttleScroll(1000));
+    } else {
+        router.push({ path: "/" });
+    }
 });
 </script>
 

@@ -47,7 +47,12 @@ export async function fetchUser(users: Map<string, GuildUser>, id: string) {
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/user/" + id;
 
-    await fetch(url)
+    await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
+    })
         .then((response) => response.json())
         .then((data) => {
             users.set(id, {

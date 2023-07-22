@@ -9,122 +9,6 @@ use serde_json::Value;
 
 use crate::types::{FetchedUser, RawGuildUser, RawUser};
 
-/// Checks if the user is an admin of the guild.
-/// Returns false if the user is not an admin or if the request fails.
-/// Otherwise returns true.
-pub async fn admin_check(discord_token: &str, guild_id: &str) -> bool {
-    let admin_permissions = 2147483647;
-
-    let mut headers = header::HeaderMap::new();
-    headers.insert(
-        header::AUTHORIZATION,
-        match header::HeaderValue::from_str(&("Bearer ".to_owned() + discord_token)) {
-            Ok(s) => s,
-            Err(_) => return false,
-        },
-    );
-
-    let client = ClientBuilder::new(match Client::builder().default_headers(headers).build() {
-        Ok(s) => s,
-        Err(_) => return false,
-    })
-    .with(Cache(HttpCache {
-        // This is not set to ForceCache as the admin check should always be up to date.
-        mode: CacheMode::Default,
-        manager: CACacheManager::default(),
-        options: None,
-    }))
-    .build();
-
-    let res = client
-        .get("https://discord.com/api/users/@me/guilds")
-        .send()
-        .await;
-    #[allow(unused_assignments)]
-    let mut body = String::new();
-
-    match res {
-        Ok(res) => {
-            body = res.text().await.unwrap_or("".to_string());
-
-            let json: Value = match serde_json::from_str(&body) {
-                Ok(s) => s,
-                Err(_) => return false,
-            };
-
-            for guild in json.as_array().unwrap_or(&vec![]) {
-                let current_guild_id = guild["id"].as_str().unwrap_or("0");
-                let permissions = &guild["permissions"];
-
-                if guild_id == current_guild_id && permissions == admin_permissions {
-                    return true;
-                }
-            }
-        }
-        Err(_) => {
-            return false;
-        }
-    }
-
-    false
-}
-
-/// Checks if the user is on the server.
-/// Returns false if the user is not on the server or if the request fails.
-pub async fn is_on_server_check(discord_token: &str, guild_id: &str) -> bool {
-    let mut headers = header::HeaderMap::new();
-    headers.insert(
-        header::AUTHORIZATION,
-        match header::HeaderValue::from_str(&("Bearer ".to_owned() + discord_token)) {
-            Ok(s) => s,
-            Err(_) => return false,
-        },
-    );
-
-    let client = ClientBuilder::new(match Client::builder().default_headers(headers).build() {
-        Ok(s) => s,
-        Err(_) => return false,
-    })
-    .with(Cache(HttpCache {
-        // This is not set to ForceCache as the server check should always be up to date.
-        mode: CacheMode::Default,
-        manager: CACacheManager::default(),
-        options: None,
-    }))
-    .build();
-
-    let res = client
-        .get("https://discord.com/api/users/@me/guilds")
-        .send()
-        .await;
-    #[allow(unused_assignments)]
-    let mut body = String::new();
-
-    match res {
-        Ok(res) => {
-            body = res.text().await.unwrap_or("".to_string());
-
-            let json: Value = match serde_json::from_str(&body) {
-                Ok(s) => s,
-                Err(_) => return false,
-            };
-
-            for guild in json.as_array().unwrap_or(&vec![]) {
-                let current_guild_id = guild["id"].as_str().unwrap_or("0");
-
-                if guild_id == current_guild_id {
-                    return true;
-                }
-            }
-        }
-        Err(_) => {
-            return false;
-        }
-    }
-
-    false
-}
-
 /// Gets all the users in a guild.
 /// Returns an empty vector if the request fails.
 /// If a user cannot be parsed, it will insert an "empty" user.
@@ -136,6 +20,8 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
     let mut keep_going = true;
 
     let mut headers = header::HeaderMap::new();
+    // We need to make this request as a bot, so we need to add the "Bot" prefix.
+    // The bot needs to be in the guild to make this request, and have the "Server Member Intent" turned on.
     headers.insert(
         header::AUTHORIZATION,
         match header::HeaderValue::from_str(&("Bot ".to_owned() + discord_token)) {
@@ -149,15 +35,15 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
         Err(_) => return users,
     })
     .with(Cache(HttpCache {
-        // Forcing the cache to be used, as to not get rate limited by Discord.
-        // This means the users could be out of date.
-        // This could be set to Default in the future, if we lock down the API?
-        mode: CacheMode::ForceCache,
+        mode: CacheMode::Default,
         manager: CACacheManager::default(),
         options: None,
     }))
     .build();
 
+    // We need to make multiple requests to get all the users.
+    // Each request returns 1000 users, so we need to keep making requests until we get less than 1000 users.
+    // This could be an issue for the rate limit, so we can use the cache to avoid this.
     while keep_going {
         let res = client
             .get(
@@ -180,6 +66,7 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
                     Err(_) => return users,
                 };
 
+                // We need to keep track of the last user in the array, so we can use it to get the next 1000 users in the request.
                 let last = json.as_array().unwrap_or(&vec![Value::Null]).len() - 1;
 
                 after = json.as_array().unwrap_or(&vec![])[last]["user"]["id"]
@@ -239,6 +126,7 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
 /// Otherwise returns the user.
 pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<FetchedUser> {
     let mut headers = header::HeaderMap::new();
+    // Same as the get_users function, we need to make this request as a bot.
     headers.insert(
         header::AUTHORIZATION,
         match header::HeaderValue::from_str(&("Bot ".to_owned() + discord_token)) {
@@ -252,7 +140,7 @@ pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<Fet
         Err(_) => return None,
     })
     .with(Cache(HttpCache {
-        mode: CacheMode::ForceCache,
+        mode: CacheMode::Default,
         manager: CACacheManager::default(),
         options: None,
     }))

@@ -1,5 +1,5 @@
 <template>
-    <div class="grid" id="user-table">
+    <div class="grid" id="user-table" v-if="user.length !== 0">
         <SearchbarComponent @search="searchBar" />
 
         <div class="table-header">
@@ -74,6 +74,7 @@ import { filterTable } from "@/helpers/filterTable";
 import { infiniteScroll } from "@/helpers/infiniteScroll";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import type { GuildUser } from "@/helpers/types";
+import router from "@/router";
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
@@ -129,15 +130,25 @@ onMounted(async () => {
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/leaderboard";
 
-    const res = await fetch(url);
-    user.value = await res.json();
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
+    });
 
-    displayUser.value = user.value;
+    if (res.ok) {
+        user.value = await res.json();
 
-    displayUser.value = displayUser.value.slice(0, usersPerPage);
-    displayUser.value = sortDisplayTable(displayUser.value, user.value, "xp", ascendingColumns.value);
+        displayUser.value = user.value;
 
-    window.addEventListener("scroll", () => throttleScroll(1000));
+        displayUser.value = displayUser.value.slice(0, usersPerPage);
+        displayUser.value = sortDisplayTable(displayUser.value, user.value, "xp", ascendingColumns.value);
+
+        window.addEventListener("scroll", () => throttleScroll(1000));
+    } else {
+        router.push({ path: "/" });
+    }
 });
 </script>
 

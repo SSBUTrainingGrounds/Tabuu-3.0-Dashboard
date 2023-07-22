@@ -1,5 +1,5 @@
 <template>
-    <div class="grid" id="user-table">
+    <div class="grid" id="user-table" v-if="matches.length !== 0">
         <RankedComponent />
 
         <SearchbarComponent @search="searchBar" />
@@ -98,6 +98,7 @@ import { fetchUser, getUserAvatar, getUserName } from "@/helpers/userDetails";
 import { getRatingChangeText } from "@/helpers/rating";
 import { infiniteScroll } from "@/helpers/infiniteScroll";
 import { onMounted, ref, type Ref } from "vue";
+import router from "@/router";
 
 const props = defineProps({
     userID: {
@@ -151,13 +152,28 @@ onMounted(async () => {
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/matches";
 
-    const res = await fetch(url);
-    matches.value = await res.json();
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
+    });
 
-    displayMatches.value = matches.value;
-    displayMatches.value = sortDisplayTable(displayMatches.value, matches.value, "timestamp", ascendingColumns.value);
-    displayMatches.value = displayMatches.value.slice(0, matchesPerPage);
-    window.addEventListener("scroll", () => throttleScroll(1000));
+    if (res.ok) {
+        matches.value = await res.json();
+
+        displayMatches.value = matches.value;
+        displayMatches.value = sortDisplayTable(
+            displayMatches.value,
+            matches.value,
+            "timestamp",
+            ascendingColumns.value
+        );
+        displayMatches.value = displayMatches.value.slice(0, matchesPerPage);
+        window.addEventListener("scroll", () => throttleScroll(1000));
+    } else {
+        router.push({ path: "/" });
+    }
 });
 </script>
 

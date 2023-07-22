@@ -1,20 +1,24 @@
 #![allow(clippy::let_unit_value)] // False positive
 
+mod auth;
 mod emoji;
 mod hwinfo;
 mod level;
+mod permissions;
 mod rating;
 mod requests;
 mod types;
 
+use auth::ServerUser;
 use dotenv::dotenv;
-use emoji::get_emojis_from_str;
 use rocket::response::status;
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use std::env;
 
+use emoji::get_emojis_from_str;
 use level::get_level_progress;
+use permissions::{permissions_check, Permissions};
 use rating::get_display_rating;
 use requests::{fetch_single_user, get_json_string, get_users};
 
@@ -32,7 +36,7 @@ fn index() -> &'static str {
 }
 
 #[get("/trueskill")]
-async fn trueskill(conn: DbConn) -> String {
+async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
     conn.run(move |c|
         {
             let mut trueskill = vec![];
@@ -106,7 +110,7 @@ async fn trueskill(conn: DbConn) -> String {
 }
 
 #[get("/matches")]
-async fn matches(conn: DbConn) -> String {
+async fn matches(conn: DbConn, _user: ServerUser) -> String {
     conn.run(move |c| {
         let mut matches = vec![];
 
@@ -204,7 +208,7 @@ async fn matches(conn: DbConn) -> String {
 }
 
 #[get("/leaderboard")]
-async fn leaderboard(conn: DbConn) -> String {
+async fn leaderboard(conn: DbConn, _user: ServerUser) -> String {
     conn.run(move |c| {
         let mut leaderboard = vec![];
 
@@ -265,7 +269,7 @@ async fn leaderboard(conn: DbConn) -> String {
 }
 
 #[get("/commands")]
-async fn commands(conn: DbConn) -> String {
+async fn commands(conn: DbConn, _user: ServerUser) -> String {
     conn.run(move |c| {
         let mut commands = vec![];
 
@@ -306,7 +310,7 @@ async fn commands(conn: DbConn) -> String {
 }
 
 #[get("/profiles")]
-async fn profiles(conn: DbConn) -> String {
+async fn profiles(conn: DbConn, _user: ServerUser) -> String {
     conn.run(move |c|
         {
             let mut profiles = vec![];
@@ -367,7 +371,7 @@ async fn profiles(conn: DbConn) -> String {
 }
 
 #[get("/macro_get")]
-async fn macro_get(conn: DbConn) -> String {
+async fn macro_get(conn: DbConn, _user: ServerUser) -> String {
     conn.run(move |c| {
         let mut macros = vec![];
 
@@ -423,13 +427,15 @@ async fn macro_get(conn: DbConn) -> String {
 
 #[post("/macro_new", data = "<input>", format = "application/json")]
 async fn macro_new(conn: DbConn, input: Json<types::MacroNew>) {
-    let admin = requests::admin_check(
+    let admin = permissions_check(
         &input.discord_token,
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
+        // Posting a macro requires admin permissions, and we wanna make sure they are up to date.
+        true,
     )
     .await;
 
-    if !admin {
+    if admin != Permissions::Admin {
         return;
     }
 
@@ -443,6 +449,7 @@ async fn macro_new(conn: DbConn, input: Json<types::MacroNew>) {
                 return;
             }
         };
+
         match stmt.execute([
             &input.name,
             &input.payload,
@@ -460,13 +467,15 @@ async fn macro_new(conn: DbConn, input: Json<types::MacroNew>) {
 
 #[post("/macro_delete", data = "<input>", format = "application/json")]
 async fn macro_delete(conn: DbConn, input: Json<types::MacroDelete>) {
-    let admin = requests::admin_check(
+    let admin = permissions_check(
         &input.discord_token,
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
+        // Deleting a macro requires admin permissions, and we wanna make sure they are up to date.
+        true,
     )
     .await;
 
-    if !admin {
+    if admin != Permissions::Admin {
         return;
     }
 
@@ -489,7 +498,7 @@ async fn macro_delete(conn: DbConn, input: Json<types::MacroDelete>) {
 }
 
 #[get("/users")]
-async fn users() -> String {
+async fn users(_user: ServerUser) -> String {
     dotenv().ok();
 
     let users: Vec<types::RawGuildUser> = get_users(
@@ -503,7 +512,7 @@ async fn users() -> String {
 }
 
 #[get("/user/<user_id>")]
-async fn get_user(user_id: &str) -> String {
+async fn get_user(user_id: &str, _user: ServerUser) -> String {
     dotenv().ok();
 
     let user = fetch_single_user(
@@ -522,13 +531,15 @@ async fn is_admin(
 ) -> Result<status::Accepted<String>, status::Unauthorized<String>> {
     dotenv().ok();
 
-    let result = requests::admin_check(
+    let result = permissions_check(
         &input.discord_token,
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
+        // Need to make sure the permissions are up to date.
+        true,
     )
     .await;
 
-    if result {
+    if result == Permissions::Admin {
         Ok(status::Accepted(Some("True".to_string())))
     } else {
         Err(status::Unauthorized(Some("False".to_string())))
@@ -541,13 +552,15 @@ async fn is_on_server(
 ) -> Result<status::Accepted<String>, status::Unauthorized<String>> {
     dotenv().ok();
 
-    let result = requests::is_on_server_check(
+    let result = permissions_check(
         &input.discord_token,
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
+        // This could probably be cached, but it's not a big deal.
+        true,
     )
     .await;
 
-    if result {
+    if result != Permissions::None {
         Ok(status::Accepted(Some("True".to_string())))
     } else {
         Err(status::Unauthorized(Some("False".to_string())))
@@ -555,7 +568,7 @@ async fn is_on_server(
 }
 
 #[get("/hwinfo")]
-async fn hw_info() -> String {
+async fn hw_info(_user: ServerUser) -> String {
     let hw_info = hwinfo::get_hw_info();
 
     get_json_string(hw_info)

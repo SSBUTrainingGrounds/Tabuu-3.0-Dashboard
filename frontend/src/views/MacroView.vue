@@ -1,5 +1,5 @@
 <template>
-    <div class="grid">
+    <div class="grid" v-if="allMacros.length !== 0">
         <div class="macro-input content" v-if="isAdmin">
             <h2 class="new-header">Create New Macro</h2>
             <input type="text" class="macro-input-name" placeholder="Macro Name" id="macro-name" v-model="name" />
@@ -40,12 +40,9 @@ import { onMounted, ref, type Ref } from "vue";
 import { getUserName, getUserAvatar } from "@/helpers/userDetails";
 import type { GuildUser, Macro } from "@/helpers/types";
 import { sortTable } from "@/helpers/sortTable";
+import router from "@/router";
 
 const props = defineProps({
-    isAdmin: {
-        type: Boolean,
-        required: true
-    },
     userID: {
         type: String,
         required: true
@@ -58,6 +55,7 @@ const props = defineProps({
 
 let name = ref("");
 let payload = ref("");
+let isAdmin = ref(false);
 
 let allMacros: Ref<Macro[]> = ref([]);
 
@@ -141,14 +139,39 @@ function deleteMacro(name: string, i: number) {
 }
 
 onMounted(async () => {
+    let admin_url = new URL(import.meta.env.VITE_API_URL);
+    admin_url.port = import.meta.env.VITE_API_PORT;
+    admin_url.pathname = "/api/is_admin";
+
+    await fetch(admin_url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            discord_token: localStorage.getItem("discordToken")
+        })
+    }).then((res) => {
+        isAdmin.value = res.status === 202 ? true : false;
+    });
+
     let url = new URL(import.meta.env.VITE_API_URL);
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/macro_get";
 
-    const res = await fetch(url);
-    allMacros.value = await res.json();
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
+    });
 
-    sortTable(allMacros.value, "uses", ascendingColumns.value);
+    if (res.ok) {
+        allMacros.value = await res.json();
+        sortTable(allMacros.value, "uses", ascendingColumns.value);
+    } else {
+        router.push({ path: "/" });
+    }
 });
 </script>
 

@@ -68,28 +68,10 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+    // If there is no token detected, redirect to login page to avoid making unnecessary requests.
+    // If the user is not logged in or not on the server, the API will return a 401 error.
     if (to.meta.restricted) {
-        if (localStorage.getItem("discordToken")) {
-            const server_url = new URL(import.meta.env.VITE_API_URL);
-            server_url.port = import.meta.env.VITE_API_PORT;
-            server_url.pathname = "/api/is_on_server";
-
-            await fetch(server_url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    discord_token: localStorage.getItem("discordToken")
-                })
-            }).then((res) => {
-                // If the user is not on the server, redirect them to the home page.
-                if (res.status !== 202) {
-                    return next({ path: "/" });
-                }
-            });
-        } else {
-            // If the user is not logged in, redirect them to the home page.
+        if (!localStorage.getItem("discordToken")) {
             return next({ path: "/" });
         }
     }

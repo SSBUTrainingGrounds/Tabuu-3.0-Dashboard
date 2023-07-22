@@ -11,7 +11,7 @@
     />
 
     <div class="view" :class="sidebarVisible ? 'shifted' : ''">
-        <RouterView :isAdmin="isAdmin" :userID="loggedInUser.id" :users="allGuildUsers" />
+        <RouterView :userID="loggedInUser.id" :users="allGuildUsers" />
     </div>
 </template>
 
@@ -64,29 +64,18 @@ onBeforeMount(async () => {
                     logIn(discordToken.value);
                 }
             });
-
-        let url = new URL(import.meta.env.VITE_API_URL);
-        url.port = import.meta.env.VITE_API_PORT;
-        url.pathname = "/api/is_admin";
-
-        await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                discord_token: discordToken.value
-            })
-        }).then((res) => {
-            isAdmin.value = res.status === 202 ? true : false;
-        });
     }
 
     let url = new URL(import.meta.env.VITE_API_URL);
     url.port = import.meta.env.VITE_API_PORT;
     url.pathname = "/api/users";
 
-    await fetch(url)
+    await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${discordToken.value}`
+        }
+    })
         .then((res) => res.json())
         .then((data) => {
             data.forEach((user: any) => {
@@ -99,7 +88,6 @@ onBeforeMount(async () => {
 });
 
 let discordToken = ref(localStorage.getItem("discordToken") || "");
-let isAdmin = ref(false);
 
 let loggedInUser: Ref<LoggedInUser> = ref({
     id: "",
