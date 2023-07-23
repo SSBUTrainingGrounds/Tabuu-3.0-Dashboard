@@ -9,16 +9,14 @@ mod rating;
 mod requests;
 mod types;
 
-use auth::ServerUser;
+use auth::{AdminUser, ServerUser};
 use dotenv::dotenv;
-use rocket::response::status;
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use std::env;
 
 use emoji::get_emojis_from_str;
 use level::get_level_progress;
-use permissions::{permissions_check, Permissions};
 use rating::get_display_rating;
 use requests::{fetch_single_user, get_json_string, get_users};
 
@@ -31,8 +29,8 @@ struct DbConn(rusqlite::Connection);
 #[get("/")]
 fn index() -> &'static str {
     "Hi! Available endpoints: 
-    GET: /trueskill, /matches, /leaderboard, /commands, /profiles, /macro_get, /users, /user/<user_id>, /hwinfo
-    POST: /macro_new, /macro_delete, /is_admin, /is_on_server"
+    GET: /trueskill, /matches, /leaderboard, /commands, /profiles, /macro_get, /users, /user/<user_id>, /hwinfo, /is_admin, /is_on_server
+    POST: /macro_new, /macro_delete"
 }
 
 #[get("/trueskill")]
@@ -426,19 +424,7 @@ async fn macro_get(conn: DbConn, _user: ServerUser) -> String {
 }
 
 #[post("/macro_new", data = "<input>", format = "application/json")]
-async fn macro_new(conn: DbConn, input: Json<types::MacroNew>) {
-    let admin = permissions_check(
-        &input.discord_token,
-        &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
-        // Posting a macro requires admin permissions, and we wanna make sure they are up to date.
-        true,
-    )
-    .await;
-
-    if admin != Permissions::Admin {
-        return;
-    }
-
+async fn macro_new(conn: DbConn, input: Json<types::MacroNew>, _user: AdminUser) {
     conn.run(move |c| {
         let mut stmt = match c
             .prepare("INSERT INTO macros (name, payload, uses, author) VALUES (?1, ?2, ?3, ?4)")
@@ -466,19 +452,7 @@ async fn macro_new(conn: DbConn, input: Json<types::MacroNew>) {
 }
 
 #[post("/macro_delete", data = "<input>", format = "application/json")]
-async fn macro_delete(conn: DbConn, input: Json<types::MacroDelete>) {
-    let admin = permissions_check(
-        &input.discord_token,
-        &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
-        // Deleting a macro requires admin permissions, and we wanna make sure they are up to date.
-        true,
-    )
-    .await;
-
-    if admin != Permissions::Admin {
-        return;
-    }
-
+async fn macro_delete(conn: DbConn, input: Json<types::MacroDelete>, _user: AdminUser) {
     conn.run(move |c| {
         let mut stmt = match c.prepare("DELETE FROM macros WHERE name = ?1") {
             Ok(stmt) => stmt,
@@ -525,46 +499,14 @@ async fn get_user(user_id: &str, _user: ServerUser) -> String {
     get_json_string(user)
 }
 
-#[post("/is_admin", data = "<input>", format = "application/json")]
-async fn is_admin(
-    input: Json<types::IsAdminData>,
-) -> Result<status::Accepted<String>, status::Unauthorized<String>> {
-    dotenv().ok();
-
-    let result = permissions_check(
-        &input.discord_token,
-        &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
-        // Need to make sure the permissions are up to date.
-        true,
-    )
-    .await;
-
-    if result == Permissions::Admin {
-        Ok(status::Accepted(Some("True".to_string())))
-    } else {
-        Err(status::Unauthorized(Some("False".to_string())))
-    }
+#[get("/is_admin")]
+async fn is_admin(_user: AdminUser) -> &'static str {
+    "True"
 }
 
-#[post("/is_on_server", data = "<input>", format = "application/json")]
-async fn is_on_server(
-    input: Json<types::IsOnServerData>,
-) -> Result<status::Accepted<String>, status::Unauthorized<String>> {
-    dotenv().ok();
-
-    let result = permissions_check(
-        &input.discord_token,
-        &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
-        // This could probably be cached, but it's not a big deal.
-        true,
-    )
-    .await;
-
-    if result != Permissions::None {
-        Ok(status::Accepted(Some("True".to_string())))
-    } else {
-        Err(status::Unauthorized(Some("False".to_string())))
-    }
+#[get("/is_on_server")]
+async fn is_on_server(_user: ServerUser) -> &'static str {
+    "True"
 }
 
 #[get("/hwinfo")]

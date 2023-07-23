@@ -7,13 +7,11 @@ pub struct MacroNew {
     pub payload: String,
     pub uses: usize,
     pub author: String,
-    pub discord_token: String,
 }
 
 /// A struct for the POST endpoint /macro_delete
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MacroDelete {
-    pub discord_token: String,
     pub name: String,
 }
 

@@ -80,14 +80,14 @@ function sendMacro() {
     fetch(url, {
         method: "POST",
         headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
             name: name.value,
             payload: payload.value,
             uses: 0,
-            author: props.userID,
-            discord_token: localStorage.getItem("discordToken")
+            author: props.userID
         })
     }).then((res) => {
         if (res.status !== 200) {
@@ -122,11 +122,11 @@ function deleteMacro(name: string, i: number) {
     fetch(url, {
         method: "POST",
         headers: {
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            name: name,
-            discord_token: localStorage.getItem("discordToken")
+            name: name
         })
     }).then((res) => {
         if (res.status !== 200) {
@@ -144,15 +144,12 @@ onMounted(async () => {
     admin_url.pathname = "/api/is_admin";
 
     await fetch(admin_url, {
-        method: "POST",
+        method: "GET",
         headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            discord_token: localStorage.getItem("discordToken")
-        })
+            Authorization: `Bearer ${localStorage.getItem("discordToken")}`
+        }
     }).then((res) => {
-        isAdmin.value = res.status === 202 ? true : false;
+        isAdmin.value = res.status === 200 ? true : false;
     });
 
     let url = new URL(import.meta.env.VITE_API_URL);
