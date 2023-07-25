@@ -83,15 +83,11 @@ impl<'r> FromRequest<'r> for ServerUser {
             let auth_users_hash_set = auth_users.guild_users.lock().await;
 
             if auth_users_hash_set.contains(user_id) {
-                println!("User {} found in cache.", user_id);
-
                 return Outcome::Success(ServerUser {
                     discord_token: token,
                 });
             }
         }
-
-        println!("User {} not found in cache.", token);
 
         // If the token is not in the cache, we check if the user is on the server.
         let on_server = permissions_check(
