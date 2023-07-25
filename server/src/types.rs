@@ -77,7 +77,7 @@ pub struct RawUser {
     pub avatar: Option<String>,
     pub avatar_decoration: Option<String>,
     pub banner: Option<String>,
-    pub banner_color: Option<usize>,
+    pub banner_color: Option<String>,
     pub bot: Option<bool>,
     pub discriminator: String,
     pub display_name: Option<String>,

@@ -6,11 +6,45 @@ use rocket::{
 
 use std::env;
 
-use crate::permissions::{permissions_check, Permissions};
+use crate::{
+    permissions::{permissions_check, Permissions},
+    state::AuthorizedServerUsers,
+};
+
+#[derive(Debug)]
+/// A user that is logged in to the website, but not necessarily on the server.
+pub struct User {
+    pub discord_token: String,
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for User {
+    type Error = AuthenticationError;
+
+    async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        dotenv().ok();
+
+        let token = match req.headers().get_one("Authorization") {
+            Some(token) => token.replace("Bearer ", ""),
+            None => {
+                return Outcome::Failure((
+                    rocket::http::Status::Unauthorized,
+                    AuthenticationError::MissingToken,
+                ))
+            }
+        };
+
+        Outcome::Success(User {
+            discord_token: token,
+        })
+    }
+}
 
 /// Checks if the user is on the server.
 /// This is used for the GET endpoints.
-pub struct ServerUser {}
+pub struct ServerUser {
+    pub discord_token: String,
+}
 
 #[derive(Debug)]
 pub enum AuthenticationError {
@@ -36,18 +70,51 @@ impl<'r> FromRequest<'r> for ServerUser {
             }
         };
 
+        // We try to find the token in the cache first.
+        let auth_users = req.rocket().state::<AuthorizedServerUsers>();
+
+        if let Some(auth_users) = auth_users {
+            let auth_users_hash_map = auth_users.logged_in_users.lock().await;
+
+            let invalid_token = "Invalid token.".to_string();
+
+            let user_id = auth_users_hash_map.get(&token).unwrap_or(&invalid_token);
+
+            let auth_users_hash_set = auth_users.guild_users.lock().await;
+
+            if auth_users_hash_set.contains(user_id) {
+                println!("User {} found in cache.", user_id);
+
+                return Outcome::Success(ServerUser {
+                    discord_token: token,
+                });
+            }
+        }
+
+        println!("User {} not found in cache.", token);
+
+        // If the token is not in the cache, we check if the user is on the server.
         let on_server = permissions_check(
             &token,
             &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
-            // Could also be okay to cache this result, not sure.
             true,
         )
         .await;
 
         // Admins are always allowed
         if on_server != Permissions::None {
-            Outcome::Success(ServerUser {})
+            Outcome::Success(ServerUser {
+                discord_token: token,
+            })
         } else {
+            // If the guard fails, we want to redirect the user to the User struct above, but only when they call the /api/me endpoint.
+            // This is used for the "Logged In As ..." banner.
+            // We want to display user info, even if they are not on the server.
+            if req.route().is_some_and(|route| route.uri == "/api/me") {
+                return Outcome::Forward(());
+            }
+
+            // For any other endpoint, we just return a 401.
             Outcome::Failure((
                 rocket::http::Status::Unauthorized,
                 AuthenticationError::InvalidToken,
@@ -58,7 +125,9 @@ impl<'r> FromRequest<'r> for ServerUser {
 
 /// Checks if the user is an admin.
 /// Used for verifying the macro_new and macro_delete POST endpoints.
-pub struct AdminUser {}
+pub struct AdminUser {
+    pub discord_token: String,
+}
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AdminUser {
@@ -86,7 +155,9 @@ impl<'r> FromRequest<'r> for AdminUser {
         .await;
 
         if on_server == Permissions::Admin {
-            Outcome::Success(AdminUser {})
+            Outcome::Success(AdminUser {
+                discord_token: token,
+            })
         } else {
             Outcome::Failure((
                 rocket::http::Status::Unauthorized,

@@ -1,7 +1,7 @@
 extern crate reqwest;
 
 use async_recursion::async_recursion;
-use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache};
+use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache, HttpCacheOptions};
 use reqwest::{header, Client};
 use reqwest_middleware::ClientBuilder;
 
@@ -58,7 +58,7 @@ pub async fn permissions_check(
     .with(Cache(HttpCache {
         mode: cache_mode,
         manager: CACacheManager::default(),
-        options: None,
+        options: HttpCacheOptions::default(),
     }))
     .build();
 
@@ -106,10 +106,12 @@ pub async fn permissions_check(
                 // If the user is an admin of the guild, return Admin.
                 // If the user is a member of the guild, return User.
                 // If none of the above, we return None.
-                if guild_id == current_guild_id && permissions == admin_permissions {
-                    return Permissions::Admin;
-                } else if guild_id == current_guild_id {
-                    return Permissions::User;
+                if guild_id == current_guild_id {
+                    if permissions == admin_permissions {
+                        return Permissions::Admin;
+                    } else {
+                        return Permissions::User;
+                    }
                 }
             }
         }

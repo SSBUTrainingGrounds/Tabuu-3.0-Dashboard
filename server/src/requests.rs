@@ -1,6 +1,6 @@
 extern crate reqwest;
 
-use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache};
+use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache, HttpCacheOptions};
 use reqwest::{header, Client};
 use reqwest_middleware::ClientBuilder;
 
@@ -37,7 +37,7 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
     .with(Cache(HttpCache {
         mode: CacheMode::Default,
         manager: CACacheManager::default(),
-        options: None,
+        options: HttpCacheOptions::default(),
     }))
     .build();
 
@@ -93,7 +93,7 @@ pub async fn get_users(discord_token: &str, guild_id: &str) -> Vec<RawGuildUser>
                                 avatar: Some("".to_string()),
                                 avatar_decoration: Some("".to_string()),
                                 banner: Some("".to_string()),
-                                banner_color: Some(0),
+                                banner_color: Some("".to_string()),
                                 bot: Some(false),
                                 discriminator: "".to_string(),
                                 display_name: Some("".to_string()),
@@ -142,7 +142,7 @@ pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<Fet
     .with(Cache(HttpCache {
         mode: CacheMode::Default,
         manager: CACacheManager::default(),
-        options: None,
+        options: HttpCacheOptions::default(),
     }))
     .build();
 
@@ -164,6 +164,54 @@ pub async fn fetch_single_user(discord_token: &str, user_id: &str) -> Option<Fet
             };
 
             let user: FetchedUser = match serde_json::from_value(json) {
+                Ok(s) => s,
+                Err(_) => return None,
+            };
+
+            Some(user)
+        }
+
+        Err(_) => None,
+    }
+}
+
+pub async fn fetch_me(discord_token: &str) -> Option<RawUser> {
+    // This request is made as a user, "Bearer" prefix.
+    let mut headers = header::HeaderMap::new();
+    headers.insert(
+        header::AUTHORIZATION,
+        match header::HeaderValue::from_str(&("Bearer ".to_owned() + discord_token)) {
+            Ok(s) => s,
+            Err(_) => return None,
+        },
+    );
+
+    let client = ClientBuilder::new(match Client::builder().default_headers(headers).build() {
+        Ok(s) => s,
+        Err(_) => return None,
+    })
+    .with(Cache(HttpCache {
+        mode: CacheMode::Default,
+        manager: CACacheManager::default(),
+        options: HttpCacheOptions::default(),
+    }))
+    .build();
+
+    let res = client.get("https://discord.com/api/users/@me").send().await;
+
+    #[allow(unused_assignments)]
+    let mut body = String::new();
+
+    match res {
+        Ok(res) => {
+            body = res.text().await.unwrap_or("".to_string());
+
+            let json: Value = match serde_json::from_str(&body) {
+                Ok(s) => s,
+                Err(_) => return None,
+            };
+
+            let user: RawUser = match serde_json::from_value(json) {
                 Ok(s) => s,
                 Err(_) => return None,
             };
@@ -209,7 +257,7 @@ mod tests {
                 avatar: Some("".to_string()),
                 avatar_decoration: Some("".to_string()),
                 banner: Some("".to_string()),
-                banner_color: Some(0),
+                banner_color: Some("0".to_string()),
                 bot: Some(false),
                 discriminator: "".to_string(),
                 display_name: Some("".to_string()),
@@ -225,7 +273,7 @@ mod tests {
 
         assert_eq!(
             json_string,
-            "{\"avatar\":\"\",\"communication_disabled_until\":\"\",\"deaf\":false,\"flags\":0,\"joined_at\":\"\",\"mute\":false,\"nick\":\"\",\"pending\":false,\"premium_since\":\"\",\"roles\":[],\"user\":{\"accent_color\":0,\"avatar\":\"\",\"avatar_decoration\":\"\",\"banner\":\"\",\"banner_color\":0,\"bot\":false,\"discriminator\":\"\",\"display_name\":\"\",\"flags\":0,\"global_name\":\"\",\"id\":\"\",\"public_flags\":0,\"username\":\"\"}}"
+            "{\"avatar\":\"\",\"communication_disabled_until\":\"\",\"deaf\":false,\"flags\":0,\"joined_at\":\"\",\"mute\":false,\"nick\":\"\",\"pending\":false,\"premium_since\":\"\",\"roles\":[],\"user\":{\"accent_color\":0,\"avatar\":\"\",\"avatar_decoration\":\"\",\"banner\":\"\",\"banner_color\":\"0\",\"bot\":false,\"discriminator\":\"\",\"display_name\":\"\",\"flags\":0,\"global_name\":\"\",\"id\":\"\",\"public_flags\":0,\"username\":\"\"}}"
         );
 
         let test_struct = RawGuildUser {
@@ -248,7 +296,7 @@ mod tests {
                 avatar: Some("Another Avatar".to_string()),
                 avatar_decoration: Some("Whatever".to_string()),
                 banner: Some("Some banner".to_string()),
-                banner_color: Some(43234234),
+                banner_color: Some("43234234".to_string()),
                 bot: Some(true),
                 discriminator: "0".to_string(),
                 display_name: Some("A display name".to_string()),
@@ -264,7 +312,7 @@ mod tests {
 
         assert_eq!(
             json_string,
-            "{\"avatar\":\"Some Avatar\",\"communication_disabled_until\":\"1234\",\"deaf\":true,\"flags\":538976288,\"joined_at\":\"242823\",\"mute\":true,\"nick\":\"Nickname!\",\"pending\":true,\"premium_since\":\"342342\",\"roles\":[\"Role 1\",\"Role 2\",\"Role 3\"],\"user\":{\"accent_color\":423231,\"avatar\":\"Another Avatar\",\"avatar_decoration\":\"Whatever\",\"banner\":\"Some banner\",\"banner_color\":43234234,\"bot\":true,\"discriminator\":\"0\",\"display_name\":\"A display name\",\"flags\":423423243,\"global_name\":\"Global Name\",\"id\":\"42332323333\",\"public_flags\":8,\"username\":\"USERNAME\"}}"
+            "{\"avatar\":\"Some Avatar\",\"communication_disabled_until\":\"1234\",\"deaf\":true,\"flags\":538976288,\"joined_at\":\"242823\",\"mute\":true,\"nick\":\"Nickname!\",\"pending\":true,\"premium_since\":\"342342\",\"roles\":[\"Role 1\",\"Role 2\",\"Role 3\"],\"user\":{\"accent_color\":423231,\"avatar\":\"Another Avatar\",\"avatar_decoration\":\"Whatever\",\"banner\":\"Some banner\",\"banner_color\":\"43234234\",\"bot\":true,\"discriminator\":\"0\",\"display_name\":\"A display name\",\"flags\":423423243,\"global_name\":\"Global Name\",\"id\":\"42332323333\",\"public_flags\":8,\"username\":\"USERNAME\"}}"
         );
     }
 }

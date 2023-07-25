@@ -1,4 +1,4 @@
-#![allow(clippy::let_unit_value)] // False positive
+#![allow(non_snake_case)] // False positive for unused variable names.
 
 mod auth;
 mod emoji;
@@ -7,18 +7,24 @@ mod level;
 mod permissions;
 mod rating;
 mod requests;
+mod state;
 mod types;
 
-use auth::{AdminUser, ServerUser};
+use auth::{AdminUser, ServerUser, User};
 use dotenv::dotenv;
-use rocket::serde::json::Json;
+use rocket::{futures::lock::Mutex, serde::json::Json, State};
 use rocket_sync_db_pools::database;
-use std::env;
+use state::AuthorizedServerUsers;
+use std::{
+    collections::{HashMap, HashSet},
+    env,
+    sync::Arc,
+};
 
 use emoji::get_emojis_from_str;
 use level::get_level_progress;
 use rating::get_display_rating;
-use requests::{fetch_single_user, get_json_string, get_users};
+use requests::{fetch_me, fetch_single_user, get_json_string, get_users};
 
 #[macro_use]
 extern crate rocket;
@@ -29,7 +35,7 @@ struct DbConn(rusqlite::Connection);
 #[get("/")]
 fn index() -> &'static str {
     "Hi! Available endpoints: 
-    GET: /trueskill, /matches, /leaderboard, /commands, /profiles, /macro_get, /users, /user/<user_id>, /hwinfo, /is_admin, /is_on_server
+    GET: /trueskill, /matches, /leaderboard, /commands, /profiles, /macro_get, /users, /user/<user_id>, /me, /hwinfo, /is_admin, /is_on_server
     POST: /macro_new, /macro_delete"
 }
 
@@ -471,8 +477,30 @@ async fn macro_delete(conn: DbConn, input: Json<types::MacroDelete>, _user: Admi
     .await;
 }
 
+#[get("/me", rank = 1)]
+async fn me(user: ServerUser, state: &State<AuthorizedServerUsers>) -> String {
+    // This endpoint is called when the page is loaded.
+    let logged_in_user = fetch_me(&user.discord_token).await;
+
+    // If the user is on the server, we add them to the authorized logged in users cache.
+    if let Some(u) = logged_in_user.clone() {
+        let mut authorized_server_users = state.logged_in_users.lock().await;
+
+        authorized_server_users.insert(user.discord_token, u.id);
+    }
+
+    get_json_string(logged_in_user)
+}
+
+#[get("/me", rank = 2)]
+async fn me_not_on_guild(user: User) -> String {
+    let user_not_on_guild = fetch_me(&user.discord_token).await;
+
+    get_json_string(user_not_on_guild)
+}
+
 #[get("/users")]
-async fn users(_user: ServerUser) -> String {
+async fn users(_user: ServerUser, state: &State<AuthorizedServerUsers>) -> String {
     dotenv().ok();
 
     let users: Vec<types::RawGuildUser> = get_users(
@@ -481,6 +509,33 @@ async fn users(_user: ServerUser) -> String {
         &env::var("GUILD_ID").expect("You have not set the GUILD_ID environment variable"),
     )
     .await;
+
+    // Updates the authorized users cache.
+    let mut authorized_server_users = state.guild_users.lock().await;
+
+    authorized_server_users.clear();
+
+    for user in &users {
+        authorized_server_users.insert(user.user.id.clone());
+    }
+
+    // This removes users that are no longer on the server from the authorized logged in users cache.
+    let mut authorized_logged_in_users = state.logged_in_users.lock().await;
+    let mut users_to_remove: Vec<String> = Vec::new();
+
+    for (token, user_id) in &*authorized_logged_in_users {
+        if !authorized_server_users.contains(user_id) {
+            users_to_remove.push(token.clone());
+            println!(
+                "Removing {} from the authorized logged in users cache.",
+                user_id
+            );
+        }
+    }
+
+    for token in users_to_remove {
+        authorized_logged_in_users.remove(&token);
+    }
 
     get_json_string(users)
 }
@@ -518,25 +573,33 @@ async fn hw_info(_user: ServerUser) -> String {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().attach(DbConn::fairing()).mount(
-        "/api/",
-        routes![
-            index,
-            trueskill,
-            matches,
-            leaderboard,
-            commands,
-            profiles,
-            macro_get,
-            macro_new,
-            macro_delete,
-            users,
-            get_user,
-            is_admin,
-            is_on_server,
-            hw_info
-        ],
-    )
+    rocket::build()
+        .attach(DbConn::fairing())
+        .mount(
+            "/api/",
+            routes![
+                index,
+                trueskill,
+                matches,
+                leaderboard,
+                commands,
+                profiles,
+                macro_get,
+                macro_new,
+                macro_delete,
+                users,
+                get_user,
+                me,
+                me_not_on_guild,
+                is_admin,
+                is_on_server,
+                hw_info
+            ],
+        )
+        .manage(AuthorizedServerUsers {
+            logged_in_users: Arc::new(Mutex::new(HashMap::new())),
+            guild_users: Arc::new(Mutex::new(HashSet::new())),
+        })
 }
 
 #[cfg(test)]

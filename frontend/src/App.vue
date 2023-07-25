@@ -48,7 +48,12 @@ onBeforeMount(async () => {
     }
 
     if (discordToken.value) {
-        fetch("https://discord.com/api/users/@me", {
+        let url = new URL(import.meta.env.VITE_API_URL);
+        url.port = import.meta.env.VITE_API_PORT;
+        url.pathname = "/api/me";
+
+        await fetch(url, {
+            method: "GET",
             headers: {
                 Authorization: `Bearer ${discordToken.value}`
             }
