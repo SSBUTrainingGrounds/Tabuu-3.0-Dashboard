@@ -12,13 +12,20 @@ use crate::{
 };
 
 #[derive(Debug)]
+pub enum AuthenticationError {
+    InvalidToken,
+    MissingToken,
+    // Maybe add a rate limit error?
+}
+
+#[derive(Debug)]
 /// A user that is logged in to the website, but not necessarily on the server.
-pub struct User {
+pub struct BasicUser {
     pub discord_token: String,
 }
 
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for User {
+impl<'r> FromRequest<'r> for BasicUser {
     type Error = AuthenticationError;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
@@ -34,23 +41,16 @@ impl<'r> FromRequest<'r> for User {
             }
         };
 
-        Outcome::Success(User {
+        Outcome::Success(BasicUser {
             discord_token: token,
         })
     }
 }
 
-/// Checks if the user is on the server.
-/// This is used for the GET endpoints.
+/// A user that is on the discord server.
+/// This is used for checking the GET endpoints.
 pub struct ServerUser {
     pub discord_token: String,
-}
-
-#[derive(Debug)]
-pub enum AuthenticationError {
-    InvalidToken,
-    MissingToken,
-    // Maybe add a rate limit error?
 }
 
 #[rocket::async_trait]
@@ -119,7 +119,7 @@ impl<'r> FromRequest<'r> for ServerUser {
     }
 }
 
-/// Checks if the user is an admin.
+/// A user that is on the discord server and has administator permissions.
 /// Used for verifying the macro_new and macro_delete POST endpoints.
 pub struct AdminUser {
     pub discord_token: String,

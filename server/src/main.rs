@@ -10,7 +10,7 @@ mod requests;
 mod state;
 mod types;
 
-use auth::{AdminUser, ServerUser, User};
+use auth::{AdminUser, BasicUser, ServerUser};
 use dotenv::dotenv;
 use rocket::{futures::lock::Mutex, serde::json::Json, State};
 use rocket_sync_db_pools::database;
@@ -493,7 +493,7 @@ async fn me(user: ServerUser, state: &State<AuthorizedServerUsers>) -> String {
 }
 
 #[get("/me", rank = 2)]
-async fn me_not_on_guild(user: User) -> String {
+async fn me_not_on_guild(user: BasicUser) -> String {
     let user_not_on_guild = fetch_me(&user.discord_token).await;
 
     get_json_string(user_not_on_guild)
