@@ -493,8 +493,16 @@ async fn me(user: ServerUser, state: &State<AuthorizedServerUsers>) -> String {
 }
 
 #[get("/me", rank = 2)]
-async fn me_not_on_guild(user: BasicUser) -> String {
+async fn me_not_on_guild(user: BasicUser, state: &State<AuthorizedServerUsers>) -> String {
     let user_not_on_guild = fetch_me(&user.discord_token).await;
+
+    // This route only gets fired if the user is not on the server.
+    // If the user is not on the server, we remove them from the authorized logged in users cache.
+    if user_not_on_guild.is_some() {
+        let mut authorized_server_users = state.logged_in_users.lock().await;
+
+        authorized_server_users.remove(&user.discord_token);
+    }
 
     get_json_string(user_not_on_guild)
 }
@@ -510,7 +518,7 @@ async fn users(_user: ServerUser, state: &State<AuthorizedServerUsers>) -> Strin
     )
     .await;
 
-    // Updates the authorized users cache.
+    // Updates the authorized users cache periodically.
     let mut authorized_server_users = state.guild_users.lock().await;
 
     authorized_server_users.clear();

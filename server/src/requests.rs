@@ -191,7 +191,7 @@ pub async fn fetch_me(discord_token: &str) -> Option<RawUser> {
         Err(_) => return None,
     })
     .with(Cache(HttpCache {
-        mode: CacheMode::Default,
+        mode: CacheMode::NoStore,
         manager: CACacheManager::default(),
         options: HttpCacheOptions::default(),
     }))

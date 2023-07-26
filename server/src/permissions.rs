@@ -1,5 +1,7 @@
 extern crate reqwest;
 
+use std::fmt::Display;
+
 use async_recursion::async_recursion;
 use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache, HttpCacheOptions};
 use reqwest::{header, Client};
@@ -18,6 +20,31 @@ pub enum Permissions {
     None,
 }
 
+#[derive(Debug)]
+pub enum PermissionsError {
+    MissingToken,
+    InvalidToken,
+    NotOnServer,
+    NotAdmin,
+    RateLimited(f64),
+    Other(String),
+}
+
+impl Display for PermissionsError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PermissionsError::MissingToken => write!(f, "Missing token"),
+            PermissionsError::InvalidToken => write!(f, "Invalid token"),
+            PermissionsError::NotOnServer => write!(f, "Not on server"),
+            PermissionsError::NotAdmin => write!(f, "Not admin"),
+            PermissionsError::RateLimited(time) => {
+                write!(f, "Rate limited, retry after {} seconds", time)
+            }
+            PermissionsError::Other(s) => write!(f, "Error: {}", s),
+        }
+    }
+}
+
 #[async_recursion]
 /// Returns the permission status of the user for the given guild.
 /// Can be Admin, User or None.
@@ -25,10 +52,9 @@ pub async fn permissions_check(
     discord_token: &str,
     guild_id: &str,
     force_new: bool,
-) -> Permissions {
-    // No need to make a request if the token is empty.
+) -> Result<Permissions, PermissionsError> {
     if discord_token.is_empty() || discord_token == "Bearer" || guild_id.is_empty() {
-        return Permissions::None;
+        return Err(PermissionsError::MissingToken);
     }
 
     // All permissions
@@ -39,7 +65,7 @@ pub async fn permissions_check(
         header::AUTHORIZATION,
         match header::HeaderValue::from_str(&("Bearer ".to_owned() + discord_token)) {
             Ok(s) => s,
-            Err(_) => return Permissions::None,
+            Err(e) => return Err(PermissionsError::Other(e.to_string())),
         },
     );
 
@@ -53,7 +79,7 @@ pub async fn permissions_check(
 
     let client = ClientBuilder::new(match Client::builder().default_headers(headers).build() {
         Ok(s) => s,
-        Err(_) => return Permissions::None,
+        Err(e) => return Err(PermissionsError::Other(e.to_string())),
     })
     .with(Cache(HttpCache {
         mode: cache_mode,
@@ -75,11 +101,12 @@ pub async fn permissions_check(
 
             let json: Value = match serde_json::from_str(&body) {
                 Ok(s) => s,
-                Err(_) => return Permissions::None,
+                Err(e) => return Err(PermissionsError::Other(e.to_string())),
             };
 
             // If we get rate limited, we can try again after the retry_after time.
             // This only makes sense if the retry_after time is less than ~2 seconds.
+            // Otherwise we return a rate limit error.
             if json["message"] == "You are being rate limited." {
                 let retry_after = json["retry_after"].as_f64().unwrap_or(0.0);
 
@@ -92,10 +119,12 @@ pub async fn permissions_check(
                     // Try again.
                     return permissions_check(discord_token, guild_id, force_new).await;
                 } else {
-                    println!("Rate limited, retry_after time too long: {}", retry_after);
+                    println!(
+                        "Rate limited, retry_after time too long: {} seconds",
+                        retry_after
+                    );
 
-                    // If the retry_after time is too long, we just return None.
-                    return Permissions::None;
+                    return Err(PermissionsError::RateLimited(retry_after));
                 }
             }
 
@@ -108,17 +137,15 @@ pub async fn permissions_check(
                 // If none of the above, we return None.
                 if guild_id == current_guild_id {
                     if permissions == admin_permissions {
-                        return Permissions::Admin;
+                        return Ok(Permissions::Admin);
                     } else {
-                        return Permissions::User;
+                        return Ok(Permissions::User);
                     }
                 }
             }
         }
-        Err(_) => {
-            return Permissions::None;
-        }
+        Err(_) => return Err(PermissionsError::InvalidToken),
     }
 
-    Permissions::None
+    Ok(Permissions::None)
 }

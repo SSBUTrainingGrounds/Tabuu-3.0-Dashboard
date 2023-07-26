@@ -7,16 +7,9 @@ use rocket::{
 use std::env;
 
 use crate::{
-    permissions::{permissions_check, Permissions},
+    permissions::{permissions_check, Permissions, PermissionsError},
     state::AuthorizedServerUsers,
 };
-
-#[derive(Debug)]
-pub enum AuthenticationError {
-    InvalidToken,
-    MissingToken,
-    // Maybe add a rate limit error?
-}
 
 #[derive(Debug)]
 /// A user that is logged in to the website, but not necessarily on the server.
@@ -26,7 +19,7 @@ pub struct BasicUser {
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for BasicUser {
-    type Error = AuthenticationError;
+    type Error = PermissionsError;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         dotenv().ok();
@@ -36,11 +29,13 @@ impl<'r> FromRequest<'r> for BasicUser {
             None => {
                 return Outcome::Failure((
                     rocket::http::Status::Unauthorized,
-                    AuthenticationError::MissingToken,
+                    PermissionsError::MissingToken,
                 ))
             }
         };
 
+        // This is only used for a "Logged in as..." message on the website.
+        // We do not need to check if the token is actually valid.
         Outcome::Success(BasicUser {
             discord_token: token,
         })
@@ -55,7 +50,7 @@ pub struct ServerUser {
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for ServerUser {
-    type Error = AuthenticationError;
+    type Error = PermissionsError;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         dotenv().ok();
@@ -65,7 +60,7 @@ impl<'r> FromRequest<'r> for ServerUser {
             None => {
                 return Outcome::Failure((
                     rocket::http::Status::Unauthorized,
-                    AuthenticationError::MissingToken,
+                    PermissionsError::MissingToken,
                 ))
             }
         };
@@ -97,24 +92,27 @@ impl<'r> FromRequest<'r> for ServerUser {
         )
         .await;
 
-        // Admins are always allowed
-        if on_server != Permissions::None {
-            Outcome::Success(ServerUser {
+        match on_server {
+            Ok(Permissions::Admin) | Ok(Permissions::User) => Outcome::Success(ServerUser {
                 discord_token: token,
-            })
-        } else {
-            // If the guard fails, we want to redirect the user to the User struct above, but only when they call the /api/me endpoint.
-            // This is used for the "Logged In As ..." banner.
-            // We want to display user info, even if they are not on the server.
-            if req.route().is_some_and(|route| route.uri == "/api/me") {
-                return Outcome::Forward(());
-            }
+            }),
+            Ok(Permissions::None) => {
+                if req.route().is_some_and(|route| route.uri == "/api/me") {
+                    return Outcome::Forward(());
+                }
 
-            // For any other endpoint, we just return a 401.
-            Outcome::Failure((
-                rocket::http::Status::Unauthorized,
-                AuthenticationError::InvalidToken,
-            ))
+                Outcome::Failure((
+                    rocket::http::Status::Unauthorized,
+                    PermissionsError::NotOnServer,
+                ))
+            }
+            Err(e) => {
+                if req.route().is_some_and(|route| route.uri == "/api/me") {
+                    return Outcome::Forward(());
+                }
+
+                Outcome::Failure((rocket::http::Status::Unauthorized, e))
+            }
         }
     }
 }
@@ -127,7 +125,7 @@ pub struct AdminUser {
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AdminUser {
-    type Error = AuthenticationError;
+    type Error = PermissionsError;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         dotenv().ok();
@@ -137,7 +135,7 @@ impl<'r> FromRequest<'r> for AdminUser {
             None => {
                 return Outcome::Failure((
                     rocket::http::Status::Unauthorized,
-                    AuthenticationError::MissingToken,
+                    PermissionsError::MissingToken,
                 ))
             }
         };
@@ -150,15 +148,15 @@ impl<'r> FromRequest<'r> for AdminUser {
         )
         .await;
 
-        if on_server == Permissions::Admin {
-            Outcome::Success(AdminUser {
+        match on_server {
+            Ok(Permissions::Admin) => Outcome::Success(AdminUser {
                 discord_token: token,
-            })
-        } else {
-            Outcome::Failure((
+            }),
+            Ok(Permissions::User) | Ok(Permissions::None) => Outcome::Failure((
                 rocket::http::Status::Unauthorized,
-                AuthenticationError::InvalidToken,
-            ))
+                PermissionsError::NotAdmin,
+            )),
+            Err(e) => Outcome::Failure((rocket::http::Status::Unauthorized, e)),
         }
     }
 }
