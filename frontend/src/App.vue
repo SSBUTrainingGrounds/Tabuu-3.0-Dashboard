@@ -60,13 +60,12 @@ onBeforeMount(async () => {
         })
             .then((res) => res.json())
             .then((data) => {
-                // The message property is only present if there is an error, like an invalid token.
-                if (data.message) {
-                    discordToken.value = "";
-                    console.log(data.message);
-                } else {
+                if (data) {
                     loggedInUser.value = data;
                     logIn(discordToken.value);
+                } else {
+                    // This only gets triggered if the token is completely invalid.
+                    logOut();
                 }
             });
     }
