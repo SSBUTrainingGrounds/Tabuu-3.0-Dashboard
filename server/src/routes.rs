@@ -7,7 +7,7 @@ use crate::{
     emoji::get_emojis_from_str,
     hwinfo::get_hw_info,
     level::get_level_progress,
-    rating::get_display_rating,
+    rating::{get_average_opponent, get_display_rating, get_recent_performance, get_streaks},
     requests::{fetch_me, fetch_single_user, get_json_string, get_users},
     state::AuthorizedServerUsers,
     types, DbConn,
@@ -37,18 +37,200 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
             };
             let user_iter = match stmt.query_map([], |row| {
                 Ok( {
-                    let rating = row.get(1)?;
-                    let deviation = row.get(2)?;
+                    let user_id: String = row.get(0)?;
+                    let rating: f64 = row.get(1)?;
+                    let deviation: f64 = row.get(2)?;
+                    let wins: usize = row.get(3)?;
+                    let losses: usize = row.get(4)?;
+                    let matches: String = row.get(5)?;
+                    let streaks: (usize, usize, usize, usize) = get_streaks(matches.clone());
+
+                    let mut recent_matches_stmt = match c.prepare(
+                        "SELECT CAST(match_id AS TEXT) AS match_id, CAST(winner_id AS TEXT) AS winner_id,
+                        CAST(loser_id AS TEXT) AS loser_id, timestamp, old_winner_rating, 
+                        old_winner_deviation, old_loser_rating, old_loser_deviation, new_winner_rating, 
+                        new_winner_deviation, new_loser_rating, new_loser_deviation FROM matches 
+                        WHERE winner_id = ?1 OR loser_id = ?1 ORDER BY timestamp DESC LIMIT 5"
+                    ) {
+                        Ok(stmt) => stmt,
+                        Err(e) => {
+                            println!("Error: {}", e);
+                            return Err(e);
+                        }
+                    };
+
+                    let recent_matches = match recent_matches_stmt.query_map([user_id.clone()], {
+                        |row| {
+                            Ok(types::Matches {
+                                match_id: row.get(0)?,
+                                winner_id: row.get(1)?,
+                                loser_id: row.get(2)?,
+                                timestamp: row.get(3)?,
+                                old_winner_rating: row.get(4)?,
+                                old_winner_deviation: row.get(5)?,
+                                old_loser_rating: row.get(6)?,
+                                old_loser_deviation: row.get(7)?,
+                                new_winner_rating: row.get(8)?,
+                                new_winner_deviation: row.get(9)?,
+                                new_loser_rating: row.get(10)?,
+                                new_loser_deviation: row.get(11)?,
+                                // These are just dummy values since we don't need them.
+                                old_winner_display_rating: 0.0,
+                                old_loser_display_rating: 0.0,
+                                new_winner_display_rating: 0.0,
+                                new_loser_display_rating: 0.0,
+                                winner_display_rating_change: 0.0,
+                                loser_display_rating_change: 0.0,
+                            })
+                        }
+                    }) {
+                        Ok(matches) => matches,
+                        Err(e) => {
+                            println!("Error: {}", e);
+                            return Err(e);
+                        }
+                    }.map(|m| m.unwrap_or(types::Matches {
+                        match_id: String::from(""),
+                        winner_id: String::from(""),
+                        loser_id: String::from(""),
+                        timestamp: 0,
+                        old_winner_rating: 0.0,
+                        old_winner_deviation: 0.0,
+                        old_loser_rating: 0.0,
+                        old_loser_deviation: 0.0,
+                        new_winner_rating: 0.0,
+                        new_winner_deviation: 0.0,
+                        new_loser_rating: 0.0,
+                        new_loser_deviation: 0.0,
+                        old_winner_display_rating: 0.0,
+                        old_loser_display_rating: 0.0,
+                        new_winner_display_rating: 0.0,
+                        new_loser_display_rating: 0.0,
+                        winner_display_rating_change: 0.0,
+                        loser_display_rating_change: 0.0,
+                    })).collect::<Vec<types::Matches>>();
+
+                    let mut best_win_stmt = match c.prepare(
+                        "SELECT * FROM matches WHERE winner_id = ?1 ORDER BY (old_loser_rating - 3 * old_loser_deviation) DESC LIMIT 1"
+                    ) {
+                        Ok(stmt) => stmt,
+                        Err(e) => {
+                            println!("Error: {}", e);
+                            return Err(e);
+                        }
+                    };
+
+                    // This is only a single row, so we can just query the first row and get the result directly.
+                    let best_win: f64 = best_win_stmt.query_row([user_id.clone()], |row| {
+                        let opponent_rating = row.get(6)?;
+                        let opponent_deviation = row.get(7)?;
+
+                        Ok(get_display_rating(opponent_rating, opponent_deviation))
+                    }).unwrap_or(0.0);
+
+                    let mut average_opponent_stmt = match c.prepare(
+                        "SELECT
+                            CASE WHEN winner_id = ?1 THEN
+                                old_loser_rating
+                            ELSE
+                                old_winner_rating
+                            END rating,
+                            CASE WHEN winner_id = ?1 THEN
+                                old_loser_deviation
+                            ELSE
+                                old_winner_deviation
+                            END deviation
+                        FROM matches
+                        WHERE winner_id = ?1 OR loser_id = ?1"
+                    ) {
+                        Ok(stmt) => stmt,
+                        Err(e) => {
+                            println!("Error: {}", e);
+                            return Err(e);
+                        }
+                    };
+
+                    let opponents_ratings: Vec<f64> = match average_opponent_stmt.query_map([user_id.clone()], {
+                        |row| {
+                            let rating: f64 = row.get(0)?;
+                            let deviation: f64 = row.get(1)?;
+
+                            let display_rating = get_display_rating(rating, deviation);
+
+                            Ok(display_rating)
+                        }
+                    }) {
+                        Ok(ratings) => ratings,
+                        Err(e) => {
+                            println!("Error: {}", e);
+                            return Err(e);
+                        }
+                    }.map(|r| r.unwrap_or(0.0)).collect();
+
+                    let mut highest_rating_stmt = match c.prepare(
+                        "
+                        SELECT
+                            CASE WHEN winner_id = ?1 THEN
+                                new_winner_rating
+                            ELSE
+                                CASE WHEN new_loser_rating - 3 * new_loser_deviation < old_loser_rating - 3 * old_loser_deviation THEN
+                                    old_loser_rating
+                                ELSE
+                                    new_loser_rating
+                                END
+                            END rating,
+                            CASE WHEN winner_id = ?1 THEN
+                                new_winner_deviation
+                            ELSE
+                                CASE WHEN new_loser_rating - 3 * new_loser_deviation < old_loser_rating - 3 * old_loser_deviation THEN
+                                    old_loser_deviation
+                                ELSE
+                                    new_loser_deviation
+                                END
+                            END deviation,
+                            timestamp
+                        FROM matches
+                        WHERE winner_id = ?1 OR loser_id = ?1
+                        ORDER BY rating - 3 * deviation
+                        DESC LIMIT 1
+                        "
+                    ) {
+                        Ok(stmt) => stmt,
+                        Err(e) => {
+                            println!("Error: {}", e);
+                            return Err(e);
+                        }
+                    };
+
+                    // This might be null since we did not record all matches.
+                    // In that case, we just use the current rating.
+                    let highest_rating: f64 = highest_rating_stmt.query_row([user_id.clone()], |row| {
+                        let r: f64 = row.get(0)?;
+                        let d: f64 = row.get(1)?;
+
+                        let display_rating = get_display_rating(r, d);
+
+                        Ok(display_rating)
+                    }).unwrap_or(get_display_rating(rating, deviation));
 
                     types::TrueSkill {
                         rank: 0,
-                        user_id: row.get(0)?,
+                        user_id: user_id.clone(),
                         rating,
                         deviation,
                         display_rating: get_display_rating(rating, deviation),
-                        wins: row.get(3)?,
-                        losses: row.get(4)?,
-                        matches: row.get(5)?,
+                        wins,
+                        losses,
+                        matches,
+                        win_percentage: (wins as f64 / (wins + losses) as f64) * 100.0,
+                        longest_win_streak: streaks.0,
+                        longest_loss_streak: streaks.1,
+                        current_win_streak: streaks.2,
+                        current_loss_streak: streaks.3,
+                        all_time_highest_rating: highest_rating,
+                        recent_performance: get_recent_performance(&recent_matches, &user_id, rating, deviation),
+                        avg_opponent_rating: get_average_opponent(&opponents_ratings),
+                        highest_win: best_win,
                     }
                 }
                     )
@@ -74,6 +256,15 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                             wins: 0,
                             losses: 0,
                             matches: String::from(""),
+                            win_percentage: 0.0,
+                            longest_win_streak: 0,
+                            longest_loss_streak: 0,
+                            current_win_streak: 0,
+                            current_loss_streak: 0,
+                            all_time_highest_rating: 0.0,
+                            recent_performance: 0.0,
+                            avg_opponent_rating: 0.0,
+                            highest_win: 0.0,
                         }
                     }
                 });
