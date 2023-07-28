@@ -28,12 +28,11 @@ use std::{
     sync::Arc,
 };
 
+use catcher::{bad_request, default, forbidden, not_found, unauthorized};
 use routes::{
     commands, get_user, hw_info, index, is_admin, is_on_server, leaderboard, macro_delete,
     macro_get, macro_new, matches, me, me_not_on_guild, profiles, trueskill, users,
 };
-
-use catcher::{bad_request, default, forbidden, not_found, unauthorized};
 
 #[macro_use]
 extern crate rocket;
@@ -43,9 +42,6 @@ pub struct DbConn(rusqlite::Connection);
 
 #[launch]
 fn rocket() -> _ {
-    // TODO: Switch from rusqlite to sqlx (async)
-    // https://api.rocket.rs/v0.5-rc/rocket_db_pools/index.html#sqlx-v06
-
     dotenv().ok();
 
     let db: Map<_, Value> = map! {
