@@ -12,7 +12,15 @@ mod routes;
 mod state;
 mod types;
 
-use rocket::futures::lock::Mutex;
+use dotenv::dotenv;
+use std::env;
+
+use rocket::{
+    figment::util::map,
+    figment::value::{Map, Value},
+    futures::lock::Mutex,
+    Config,
+};
 use rocket_sync_db_pools::database;
 use state::AuthorizedServerUsers;
 use std::{
@@ -35,16 +43,29 @@ pub struct DbConn(rusqlite::Connection);
 
 #[launch]
 fn rocket() -> _ {
-    // TODO: Config instead of Rocket.toml
-    // https://rocket.rs/v0.5-rc/guide/configuration/
-
-    // TODO: Shields
-    // https://api.rocket.rs/v0.5-rc/rocket/shield/index.html
-
     // TODO: Switch from rusqlite to sqlx (async)
     // https://api.rocket.rs/v0.5-rc/rocket_db_pools/index.html#sqlx-v06
 
-    rocket::build()
+    dotenv().ok();
+
+    let db: Map<_, Value> = map! {
+        "url" => env::var("ROCKET_DATABASE_URL").expect("Invalid ROCKET_DATABASE_URL environment variable").into(),
+        "pool_size" => 20.into(),
+        "timeout" => 5.into(),
+    };
+
+    let address = env::var("ROCKET_ADDRESS").expect("Invalid ROCKET_ADDRESS environment variable");
+    let port: u16 = env::var("ROCKET_PORT")
+        .expect("Invalid ROCKET_PORT environment variable")
+        .parse()
+        .expect("Invalid ROCKET_PORT environment variable");
+
+    let figment = Config::figment()
+        .merge(("databases", map!["sqlite_database" => db]))
+        .merge(("port", port))
+        .merge(("address", address));
+
+    rocket::custom(figment)
         .attach(DbConn::fairing())
         .mount(
             "/api/",

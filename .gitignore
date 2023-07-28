@@ -36,8 +36,5 @@ coverage
 # Rust target directory
 */target
 
-# Rocket config
-Rocket.toml
-
 # http cache
 */http-cacache

@@ -44,21 +44,7 @@ npm run dev -- --open
 
 _These steps take place in the `./server/` directory_
 
-1. Set up the `./server/Rocket.toml` file
-
-```toml
-[default]
-# The address the server will listen on
-address = '127.0.0.1'
-# The port the server will listen on
-port = 8080
-
-[default.databases.sqlite_database]
-# The path to the sqlite database of the bot
-url = './path/to/database.db'
-```
-
-2. Set up the `./server/.env` file
+1. Set up the `./server/.env` file
 
 ```bash
 # The ID of the discord server
@@ -66,9 +52,16 @@ url = './path/to/database.db'
 GUILD_ID = "1234567890"
 # The Token of the bot, used for requests
 DISCORD_TOKEN = "Example.Token"
+
+# The address to listen on
+ROCKET_ADDRESS = "127.0.0.1"
+# The port to listen on
+ROCKET_PORT = 8080
+# The path to the sqlite database
+ROCKET_DATABASE_URL = "/path/to/database.db"
 ```
 
-3. **Start the backend server**
+2. **Start the backend server**
 
 ```
 cargo run --release
