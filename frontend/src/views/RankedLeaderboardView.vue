@@ -194,7 +194,7 @@ const props = defineProps({
 const user: Ref<any[]> = ref([]);
 const userDetails: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
-let usersPerPage = 50;
+let usersPerPage = 200;
 
 let page = 2;
 let throttle = false;
