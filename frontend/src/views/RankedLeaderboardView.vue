@@ -74,12 +74,11 @@
             <div class="losses">{{ (u["losses"] as number).toLocaleString("en") }}</div>
             <div>
                 {{
-                    (u["wins"] / (u["wins"] + u["losses"])).toLocaleString("en", {
-                        style: "percent",
+                    (u["win_percentage"] || 0).toLocaleString("en", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
                     })
-                }}
+                }}%
             </div>
         </div>
     </div>

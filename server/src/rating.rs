@@ -40,23 +40,21 @@ pub fn get_streaks(matches: String) -> (usize, usize, usize, usize) {
 
 /// Gets the recent performance of a user in the last 5 matches.
 pub fn get_recent_performance(
-    matches: &Vec<Matches>,
+    matches: &[Matches],
     user_id: &String,
     rating: f64,
     deviation: f64,
 ) -> f64 {
-    let mut old_mu = rating;
-    let mut old_sigma = deviation;
+    let m = match matches.last() {
+        Some(m) => m,
+        None => return 0.0,
+    };
 
-    for m in matches {
-        if &m.winner_id == user_id {
-            old_mu = m.old_winner_rating;
-            old_sigma = m.old_winner_deviation;
-        } else {
-            old_mu = m.old_loser_rating;
-            old_sigma = m.old_loser_deviation;
-        }
-    }
+    let (old_mu, old_sigma) = if &m.winner_id == user_id {
+        (m.old_winner_rating, m.old_winner_deviation)
+    } else {
+        (m.old_loser_rating, m.old_loser_deviation)
+    };
 
     get_display_rating(rating, deviation) - get_display_rating(old_mu, old_sigma)
 }

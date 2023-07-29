@@ -59,7 +59,7 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                         }
                     };
 
-                    let recent_matches = match recent_matches_stmt.query_map([user_id.clone()], {
+                    let recent_matches: Vec<types::Matches> = match recent_matches_stmt.query_map([user_id.clone()], {
                         |row| {
                             Ok(types::Matches {
                                 match_id: row.get(0)?,
