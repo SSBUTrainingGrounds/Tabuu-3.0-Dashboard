@@ -1,6 +1,6 @@
 <template>
     <div class="grid" id="user-table" v-if="user.length !== 0">
-        <SearchbarComponent @search="searchBar" />
+        <SearchbarComponent @search="searchBar" :user-row="getUserRow(props.userID, user)" />
 
         <div class="table-header">
             <div>Rank</div>
@@ -75,6 +75,7 @@ import { infiniteScroll } from "@/helpers/infiniteScroll";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
 import type { GuildUser } from "@/helpers/types";
 import router from "@/router";
+import { getUserRow } from "@/helpers/userRow";
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);

@@ -2,13 +2,25 @@
     <div class="searchbar">
         <i class="fas fa-search"></i>
         <input type="text" placeholder="Search for a user..." v-model="search" @input="$emit('search', search)" />
+        <button v-if="userRow" @click="scrollToRow(userRow)">
+            <i class="fas fa-arrow-down"></i>
+            Show me
+        </button>
     </div>
 </template>
 
 <script setup lang="ts">
+import { scrollToRow } from "@/helpers/userRow";
 import { ref } from "vue";
 
 const search = ref("");
+
+defineProps({
+    userRow: {
+        type: Number,
+        required: false
+    }
+});
 
 defineEmits<{
     search: [search: string];
@@ -54,5 +66,17 @@ defineEmits<{
 }
 .searchbar input::placeholder {
     color: var(--light-gray);
+}
+
+.searchbar button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    font-size: large;
+    color: var(--light-gray);
+    background-color: var(--dark-gray);
 }
 </style>

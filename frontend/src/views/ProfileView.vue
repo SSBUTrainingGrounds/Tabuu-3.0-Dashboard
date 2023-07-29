@@ -1,6 +1,6 @@
 <template>
     <div class="grid" id="user-table" v-if="user.length !== 0">
-        <SearchbarComponent @search="searchBar" />
+        <SearchbarComponent @search="searchBar" :user-row="getUserRow(props.userID, user)" />
 
         <div class="table-header">
             <div>User</div>
@@ -58,6 +58,7 @@ import { filterTable } from "@/helpers/filterTable";
 import type { GuildUser } from "@/helpers/types";
 import { infiniteScroll } from "@/helpers/infiniteScroll";
 import router from "@/router";
+import { getUserRow } from "@/helpers/userRow";
 
 const user: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);

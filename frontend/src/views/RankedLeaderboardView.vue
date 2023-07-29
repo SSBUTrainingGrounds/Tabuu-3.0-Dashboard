@@ -2,7 +2,7 @@
     <div class="grid" id="user-table" v-if="user.length !== 0">
         <RankedComponent />
 
-        <SearchbarComponent @search="searchBar" />
+        <SearchbarComponent @search="searchBar" :user-row="getUserRow(props.userID, user)" />
 
         <div class="table-header" @click="userDetails = Array(user.length).fill(false)">
             <div>Rank</div>
@@ -179,6 +179,7 @@ import { infiniteScroll } from "@/helpers/infiniteScroll";
 import { ref, onMounted, type Ref } from "vue";
 import router from "@/router";
 import { getRatingChangeText } from "@/helpers/rating";
+import { getUserRow } from "@/helpers/userRow";
 
 const props = defineProps({
     userID: {
