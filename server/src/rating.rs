@@ -38,6 +38,11 @@ pub fn get_streaks(matches: String) -> (usize, usize, usize, usize) {
     )
 }
 
+/// Gets the last 5 matches from a String of match results, in reversed order.
+pub fn get_recent_matches(matches: String) -> String {
+    matches.chars().rev().take(5).collect()
+}
+
 /// Gets the recent performance of a user in the last 5 matches.
 pub fn get_recent_performance(
     matches: &[Matches],
@@ -107,6 +112,25 @@ mod tests {
         assert!(longest_lose_streak == 0);
         assert!(current_win_streak == str.len());
         assert!(current_lose_streak == 0);
+    }
+
+    #[test]
+    fn test_recent_matches() {
+        let str = "WWWWLWLLLLWWWLLLWWLLLLW".to_string();
+
+        assert!(get_recent_matches(str) == "WLLLL");
+
+        let str = "LWW".to_string();
+
+        assert!(get_recent_matches(str) == "WWL");
+
+        let str = "L".to_string();
+
+        assert!(get_recent_matches(str) == "L");
+
+        let str = "".to_string();
+
+        assert!(get_recent_matches(str).is_empty());
     }
 
     #[test]

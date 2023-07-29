@@ -62,7 +62,7 @@
                         maximumFractionDigits: 2
                     })
                 }}
-                {{ getRatingChangeText(m["winner_display_rating_change"]) }}
+                ({{ getRatingChangeText(m["winner_display_rating_change"]) }})
             </div>
             <div>
                 <img :src="getUserAvatar(props.users, m['loser_id'])" alt="User Avatar" class="avatar-preview" />
@@ -82,7 +82,7 @@
                         maximumFractionDigits: 2
                     })
                 }}
-                {{ getRatingChangeText(m["loser_display_rating_change"]) }}
+                ({{ getRatingChangeText(m["loser_display_rating_change"]) }})
             </div>
         </div>
     </div>

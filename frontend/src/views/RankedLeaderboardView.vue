@@ -4,7 +4,7 @@
 
         <SearchbarComponent @search="searchBar" />
 
-        <div class="table-header">
+        <div class="table-header" @click="userDetails = Array(user.length).fill(false)">
             <div>Rank</div>
             <div>User</div>
             <div
@@ -41,9 +41,14 @@
         </div>
         <div
             class="content"
-            v-for="u in displayUser"
+            v-for="(u, i) in displayUser"
             :key="u['user_id']"
-            @click="fetchUser(users, u['user_id'])"
+            @click="
+                {
+                    fetchUser(users, u['user_id']);
+                    userDetails[i] = !userDetails[i];
+                }
+            "
             :class="props.userID === u['user_id'] ? 'highlighted-user' : ''"
         >
             <div>
@@ -54,7 +59,7 @@
                 {{ getUserName(props.users, u["user_id"]) }}
             </div>
             <div class="id-column">{{ u["user_id"] }}</div>
-            <div class="skill">
+            <div class="skill" v-if="!userDetails[i]">
                 {{
                     (u["display_rating"] as number).toLocaleString("en", {
                         minimumFractionDigits: 2,
@@ -62,7 +67,7 @@
                     })
                 }}
             </div>
-            <div>
+            <div v-if="!userDetails[i]">
                 {{
                     (u["deviation"] * 100).toLocaleString("en", {
                         minimumFractionDigits: 2,
@@ -70,15 +75,94 @@
                     })
                 }}
             </div>
-            <div class="wins">{{ (u["wins"] as number).toLocaleString("en") }}</div>
-            <div class="losses">{{ (u["losses"] as number).toLocaleString("en") }}</div>
-            <div>
+            <div class="wins" v-if="!userDetails[i]">{{ (u["wins"] as number).toLocaleString("en") }}</div>
+            <div class="losses" v-if="!userDetails[i]">{{ (u["losses"] as number).toLocaleString("en") }}</div>
+            <div v-if="!userDetails[i]">
                 {{
                     (u["win_percentage"] || 0).toLocaleString("en", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
                     })
                 }}%
+            </div>
+            <div class="user-details" v-if="userDetails[i]">
+                <div class="description">TabuuSkill:</div>
+                <div class="value">
+                    {{
+                        (u["display_rating"] as number).toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    }}
+                </div>
+
+                <div class="description">Deviation:</div>
+                <div class="value">
+                    {{
+                        (u["deviation"] * 100).toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    }}
+                </div>
+
+                <div class="description">Wins:</div>
+                <div class="value">{{ (u["wins"] as number).toLocaleString("en") }}</div>
+
+                <div class="description">Losses:</div>
+                <div class="value">{{ (u["losses"] as number).toLocaleString("en") }}</div>
+
+                <div class="description">Winrate:</div>
+                <div class="value">
+                    {{
+                        (u["win_percentage"] || 0).toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    }}%
+                </div>
+
+                <div class="description">Total Matches:</div>
+                <div class="value">{{ u["wins"] + u["losses"] || 0 }}</div>
+
+                <div class="description">Recent Performance:</div>
+                <div class="value">{{ getRatingChangeText(u["recent_performance"]) }} ({{ u["recent_matches"] }})</div>
+
+                <div class="description">Longest Winning Streak:</div>
+                <div class="value">{{ u["longest_win_streak"] }} (Current: {{ u["current_win_streak"] }})</div>
+
+                <div class="description">Longest Losing Streak:</div>
+                <div class="value">{{ u["longest_loss_streak"] }} (Current: {{ u["current_loss_streak"] }})</div>
+
+                <div class="description">All-Time Highest Rating:</div>
+                <div class="value">{{ u["all_time_highest_rating"] }}</div>
+
+                <div class="description">Highest Win:</div>
+                <div class="value">
+                    {{
+                        (u["highest_win"]["old_loser_display_rating"] || 0).toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    }}
+                    <br />
+                    (vs. {{ getUserName(props.users, u["highest_win"]["loser_id"]) || "Unknown User" }},
+                    {{
+                        u["highest_win"]["timestamp"]
+                            ? new Date(u["highest_win"]["timestamp"] * 1000).toLocaleString()
+                            : "Unknown Date"
+                    }})
+                </div>
+
+                <div class="description">Average Opponent:</div>
+                <div class="value">
+                    ~{{
+                        (u["avg_opponent_rating"] || 0).toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    }}
+                </div>
             </div>
         </div>
     </div>
@@ -94,6 +178,7 @@ import { getUserName, getUserAvatar, fetchUser } from "@/helpers/userDetails";
 import { infiniteScroll } from "@/helpers/infiniteScroll";
 import { ref, onMounted, type Ref } from "vue";
 import router from "@/router";
+import { getRatingChangeText } from "@/helpers/rating";
 
 const props = defineProps({
     userID: {
@@ -107,8 +192,9 @@ const props = defineProps({
 });
 
 const user: Ref<any[]> = ref([]);
+const userDetails: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
-let usersPerPage = 200;
+let usersPerPage = 50;
 
 let page = 2;
 let throttle = false;
@@ -157,6 +243,7 @@ onMounted(async () => {
 
     if (res.ok) {
         user.value = await res.json();
+        userDetails.value = Array(user.value.length).fill(false);
 
         displayUser.value = user.value;
         displayUser.value = sortDisplayTable(displayUser.value, user.value, "display_rating", ascendingColumns.value);

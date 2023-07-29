@@ -224,3 +224,23 @@ body {
 .stat {
     grid-column: 2;
 }
+
+.user-details {
+    grid-column: 1 / 9;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.user-details .description {
+    font-weight: bold;
+    grid-column: 1;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.user-details .value {
+    font-style: italic;
+    grid-column: 2;
+    border-bottom: 1px solid var(--light-gray);
+}

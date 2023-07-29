@@ -7,7 +7,10 @@ use crate::{
     emoji::get_emojis_from_str,
     hwinfo::get_hw_info,
     level::get_level_progress,
-    rating::{get_average_opponent, get_display_rating, get_recent_performance, get_streaks},
+    rating::{
+        get_average_opponent, get_display_rating, get_recent_matches, get_recent_performance,
+        get_streaks,
+    },
     requests::{fetch_me, fetch_single_user, get_json_string, get_users},
     state::AuthorizedServerUsers,
     types, DbConn,
@@ -74,7 +77,6 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                                 new_winner_deviation: row.get(9)?,
                                 new_loser_rating: row.get(10)?,
                                 new_loser_deviation: row.get(11)?,
-                                // These are just dummy values since we don't need them.
                                 old_winner_display_rating: 0.0,
                                 old_loser_display_rating: 0.0,
                                 new_winner_display_rating: 0.0,
@@ -111,7 +113,10 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                     })).collect::<Vec<types::Matches>>();
 
                     let mut best_win_stmt = match c.prepare(
-                        "SELECT * FROM matches WHERE winner_id = ?1 ORDER BY (old_loser_rating - 3 * old_loser_deviation) DESC LIMIT 1"
+                        "SELECT CAST(match_id AS TEXT) AS match_id, CAST(winner_id AS TEXT) AS winner_id,
+                        CAST(loser_id AS TEXT) AS loser_id, timestamp, old_winner_rating, 
+                        old_winner_deviation, old_loser_rating, old_loser_deviation, new_winner_rating, 
+                        new_winner_deviation, new_loser_rating, new_loser_deviation FROM matches WHERE winner_id = ?1 ORDER BY (old_loser_rating - 3 * old_loser_deviation) DESC LIMIT 1"
                     ) {
                         Ok(stmt) => stmt,
                         Err(e) => {
@@ -121,12 +126,67 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                     };
 
                     // This is only a single row, so we can just query the first row and get the result directly.
-                    let best_win: f64 = best_win_stmt.query_row([user_id.clone()], |row| {
-                        let opponent_rating = row.get(6)?;
-                        let opponent_deviation = row.get(7)?;
+                    let best_win: types::Matches = best_win_stmt.query_row([user_id.clone()], |row| {
+                        let old_winner_rating = row.get(4)?;
+                        let old_winner_deviation = row.get(5)?;
+                        let old_loser_rating = row.get(6)?;
+                        let old_loser_deviation = row.get(7)?;
+                        let new_winner_rating = row.get(8)?;
+                        let new_winner_deviation = row.get(9)?;
+                        let new_loser_rating = row.get(10)?;
+                        let new_loser_deviation = row.get(11)?;
+        
+                        let old_winner_display_rating =
+                            get_display_rating(old_winner_rating, old_winner_deviation);
+                        let old_loser_display_rating =
+                            get_display_rating(old_loser_rating, old_loser_deviation);
+                        let new_winner_display_rating =
+                            get_display_rating(new_winner_rating, new_winner_deviation);
+                        let new_loser_display_rating =
+                            get_display_rating(new_loser_rating, new_loser_deviation);
 
-                        Ok(get_display_rating(opponent_rating, opponent_deviation))
-                    }).unwrap_or(0.0);
+                        Ok(types::Matches {
+                            match_id: row.get(0)?,
+                            winner_id: row.get(1)?,
+                            loser_id: row.get(2)?,
+                            timestamp: row.get(3)?,
+                            old_winner_rating,
+                            old_winner_deviation,
+                            old_loser_rating,
+                            old_loser_deviation,
+                            new_winner_rating,
+                            new_winner_deviation,
+                            new_loser_rating,
+                            new_loser_deviation,
+                            old_winner_display_rating,
+                            old_loser_display_rating,
+                            new_winner_display_rating,
+                            new_loser_display_rating,
+                            winner_display_rating_change: new_winner_display_rating
+                                - old_winner_display_rating,
+                            loser_display_rating_change: new_loser_display_rating
+                                - old_loser_display_rating,
+                        })
+                    }).unwrap_or(types::Matches {
+                        match_id: String::from(""),
+                        winner_id: String::from(""),
+                        loser_id: String::from(""),
+                        timestamp: 0,
+                        old_winner_rating: 0.0,
+                        old_winner_deviation: 0.0,
+                        old_loser_rating: 0.0,
+                        old_loser_deviation: 0.0,
+                        new_winner_rating: 0.0,
+                        new_winner_deviation: 0.0,
+                        new_loser_rating: 0.0,
+                        new_loser_deviation: 0.0,
+                        old_winner_display_rating: 0.0,
+                        old_loser_display_rating: 0.0,
+                        new_winner_display_rating: 0.0,
+                        new_loser_display_rating: 0.0,
+                        winner_display_rating_change: 0.0,
+                        loser_display_rating_change: 0.0,
+                    });
 
                     let mut average_opponent_stmt = match c.prepare(
                         "SELECT
@@ -221,7 +281,8 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                         display_rating: get_display_rating(rating, deviation),
                         wins,
                         losses,
-                        matches,
+                        matches: matches.clone(),
+                        recent_matches: get_recent_matches(matches),
                         win_percentage: (wins as f64 / (wins + losses) as f64) * 100.0,
                         longest_win_streak: streaks.0,
                         longest_loss_streak: streaks.1,
@@ -256,6 +317,7 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                             wins: 0,
                             losses: 0,
                             matches: String::from(""),
+                            recent_matches: String::from(""),
                             win_percentage: 0.0,
                             longest_win_streak: 0,
                             longest_loss_streak: 0,
@@ -264,7 +326,26 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                             all_time_highest_rating: 0.0,
                             recent_performance: 0.0,
                             avg_opponent_rating: 0.0,
-                            highest_win: 0.0,
+                            highest_win: types::Matches {
+                                match_id: String::from(""),
+                                winner_id: String::from(""),
+                                loser_id: String::from(""),
+                                timestamp: 0,
+                                old_winner_rating: 0.0,
+                                old_winner_deviation: 0.0,
+                                old_loser_rating: 0.0,
+                                old_loser_deviation: 0.0,
+                                new_winner_rating: 0.0,
+                                new_winner_deviation: 0.0,
+                                new_loser_rating: 0.0,
+                                new_loser_deviation: 0.0,
+                                old_winner_display_rating: 0.0,
+                                old_loser_display_rating: 0.0,
+                                new_winner_display_rating: 0.0,
+                                new_loser_display_rating: 0.0,
+                                winner_display_rating_change: 0.0,
+                                loser_display_rating_change: 0.0,
+                            },
                         }
                     }
                 });
