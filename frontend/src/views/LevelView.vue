@@ -2,7 +2,7 @@
     <div class="grid" id="user-table" v-if="user.length !== 0">
         <SearchbarComponent @search="searchBar" :user-row="getUserRow(props.userID, user)" />
 
-        <div class="table-header">
+        <div class="table-header" @click="userDetails = Array(user.length).fill(false)">
             <div>Rank</div>
             <div>User</div>
             <div
@@ -30,9 +30,14 @@
         </div>
         <div
             class="content"
-            v-for="u in displayUser"
+            v-for="(u, i) in displayUser"
             :key="u['id']"
-            @click="fetchUser(users, u['id'])"
+            @click="
+                {
+                    fetchUser(users, u['id']);
+                    userDetails[i] = !userDetails[i];
+                }
+            "
             :class="props.userID === u['id'] ? 'highlighted-user' : ''"
         >
             <div>
@@ -43,9 +48,9 @@
                 {{ getUserName(props.users, u["id"]) }}
             </div>
             <div class="id-column">{{ u["id"] }}</div>
-            <div>{{ (u["xp"] as number).toLocaleString("en") }}</div>
-            <div>{{ (u["level"] as number).toLocaleString("en") }}</div>
-            <div>
+            <div v-if="!userDetails[i]">{{ (u["xp"] as number).toLocaleString("en") }}</div>
+            <div v-if="!userDetails[i]">{{ (u["level"] as number).toLocaleString("en") }}</div>
+            <div v-if="!userDetails[i]">
                 <div
                     class="pie-progress"
                     :style="{
@@ -61,7 +66,61 @@
                 }}
             </div>
 
-            <div>{{ (u["messages"] as number).toLocaleString("en") }}</div>
+            <div v-if="!userDetails[i]">{{ (u["messages"] as number).toLocaleString("en") }}</div>
+            <div class="user-details" v-if="userDetails[i]">
+                <div class="description">Total XP:</div>
+                <div class="value">{{ (u["xp"] as number).toLocaleString("en") }}</div>
+
+                <div class="description">Level:</div>
+                <div class="value">{{ (u["level"] as number).toLocaleString("en") }}</div>
+
+                <div class="description">Messages sent:</div>
+                <div class="value">{{ (u["messages"] as number).toLocaleString("en") }}</div>
+
+                <div class="description">XP to next Level:</div>
+                <div class="value">
+                    {{
+                        (u["xp_progress"] || 0).toLocaleString("en", {
+                            style: "percent",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    }}
+                    - {{ (u["xp_to_next_level"] || 0).toLocaleString("en") }}XP needed
+                </div>
+
+                <div class="description">Progress to next Role:</div>
+                <div class="value">
+                    {{
+                        (u["next_role_progress"] || 0).toLocaleString("en", {
+                            style: "percent",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    }}
+                    - {{ (u["xp_to_next_role"] || 0).toLocaleString("en") }}XP needed ({{ u["next_role"] || "N/A" }})
+                </div>
+
+                <div class="description">User Badges:</div>
+                <div class="value">
+                    <span v-if="u['badges'].length === 0">None</span>
+                    <span v-for="character in u['badges']" :key="character" class="emoji-grid">
+                        <img :src="character" alt="Character" class="avatar-preview" />
+                    </span>
+                </div>
+
+                <div class="description">Last 5 Nicknames:</div>
+                <div class="value">
+                    <span v-if="u['last_five_nicknames'].length === 0">None</span>
+                    <span v-else>{{ u["last_five_nicknames"].join(", ") }}</span>
+                </div>
+
+                <div class="description">Last 5 Usernames:</div>
+                <div class="value">
+                    <span v-if="u['last_five_usernames'].length === 0">None</span>
+                    <span v-else>{{ u["last_five_usernames"].join(", ") }}</span>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -78,6 +137,7 @@ import router from "@/router";
 import { getUserRow } from "@/helpers/userRow";
 
 const user: Ref<any[]> = ref([]);
+const userDetails: Ref<any[]> = ref([]);
 const displayUser: Ref<any[]> = ref([]);
 const usersPerPage = 200;
 
@@ -140,9 +200,9 @@ onMounted(async () => {
 
     if (res.ok) {
         user.value = await res.json();
+        userDetails.value = Array(user.value.length).fill(false);
 
         displayUser.value = user.value;
-
         displayUser.value = displayUser.value.slice(0, usersPerPage);
         displayUser.value = sortDisplayTable(displayUser.value, user.value, "xp", ascendingColumns.value);
 

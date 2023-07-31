@@ -3,8 +3,8 @@ pub fn get_emojis_from_str(input_str: String) -> Vec<String> {
     let mut emoji_vec: Vec<String> = Vec::new();
 
     input_str.split(' ').for_each(|x| {
-        if x.starts_with("<:") {
-            let id = x.split(':').collect::<Vec<&str>>()[2].replace('>', "");
+        if x.starts_with("<:") || x.starts_with("<a:") {
+            let id = x.split(':').collect::<Vec<&str>>()[2].replace(['>', '<'], "");
 
             emoji_vec.push("https://cdn.discordapp.com/emojis/".to_string() + &id + ".png");
         }

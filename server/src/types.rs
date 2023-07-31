@@ -47,6 +47,13 @@ pub struct Leaderboard {
     pub xp: usize,
     pub messages: usize,
     pub xp_progress: f64,
+    pub xp_to_next_level: usize,
+    pub next_role: Option<String>,
+    pub next_role_progress: Option<f64>,
+    pub xp_to_next_role: Option<usize>,
+    pub badges: Vec<String>,
+    pub last_five_usernames: Vec<String>,
+    pub last_five_nicknames: Vec<String>,
 }
 
 /// A struct for the GET endpoint /commands

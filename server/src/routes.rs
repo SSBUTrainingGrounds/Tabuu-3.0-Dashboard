@@ -6,7 +6,7 @@ use crate::{
     auth::{AdminUser, BasicUser, ServerUser},
     emoji::get_emojis_from_str,
     hwinfo::get_hw_info,
-    level::get_level_progress,
+    level::{get_level_progress, get_next_role_progress, get_xp_for_level},
     rating::{
         get_average_opponent, get_display_rating, get_recent_matches, get_recent_performance,
         get_streaks,
@@ -479,8 +479,70 @@ pub async fn leaderboard(conn: DbConn, _user: ServerUser) -> String {
             };
         let user_iter = match stmt.query_map([], |row| {
             Ok({
+                let id: String = row.get(0)?;
                 let level = row.get(1)?;
                 let xp = row.get(2)?;
+
+                let (next_role, next_role_progress, xp_to_next_role) = get_next_role_progress(level, xp);
+
+                let mut badge_stmt = match c.prepare(
+                    "SELECT badges FROM userbadges WHERE user_id = ?1",
+                ) {
+                    Ok(stmt) => stmt,
+                    Err(e) => {
+                        println!("Error: {}", e);
+                        return Err(e);
+                    }
+                };
+
+                let badges: Vec<String> = match badge_stmt.query_row([id.clone()], |row| {
+                    let badges: String = row.get(0)?;
+
+                    Ok(get_emojis_from_str(badges))
+                }) {
+                    Ok(badges) => badges,
+                    Err(_) => Vec::new(),
+                };
+
+                let mut username_stmt = match c.prepare(
+                    "SELECT old_name FROM usernames WHERE user_id = ?1 ORDER BY timestamp DESC LIMIT 5",
+                ) {
+                    Ok(stmt) => stmt,
+                    Err(e) => {
+                        println!("Error: {}", e);
+                        return Err(e);
+                    }
+                };
+
+                let last_five_usernames = match username_stmt.query_map([id.clone()], |row| {
+                    row.get(0)
+                }) {
+                    Ok(usernames) => usernames,
+                    Err(e) => {
+                        println!("Error: {}", e);
+                        return Err(e);
+                    }
+                }.map(|u| u.unwrap_or(String::from(""))).collect();
+
+                let mut nickname_stmt = match c.prepare(
+                    "SELECT old_name FROM nicknames WHERE user_id = ?1 ORDER BY timestamp DESC LIMIT 5",
+                ) {
+                    Ok(stmt) => stmt,
+                    Err(e) => {
+                        println!("Error: {}", e);
+                        return Err(e);
+                    }
+                };
+
+                let last_five_nicknames = match nickname_stmt.query_map([id], |row| {
+                    row.get(0)
+                }) {
+                    Ok(nicknames) => nicknames,
+                    Err(e) => {
+                        println!("Error: {}", e);
+                        return Err(e);
+                    }
+                }.map(|n| n.unwrap_or(String::from(""))).collect();
 
                 types::Leaderboard {
                     rank: 0,
@@ -489,6 +551,13 @@ pub async fn leaderboard(conn: DbConn, _user: ServerUser) -> String {
                     xp,
                     messages: row.get(3)?,
                     xp_progress: get_level_progress(level, xp),
+                    xp_to_next_level: get_xp_for_level(level + 1) - xp,
+                    next_role,
+                    next_role_progress,
+                    xp_to_next_role,
+                    badges,
+                    last_five_usernames,
+                    last_five_nicknames,
                 }
             })
         }) {
@@ -508,6 +577,13 @@ pub async fn leaderboard(conn: DbConn, _user: ServerUser) -> String {
                     xp: 0,
                     messages: 0,
                     xp_progress: 0.0,
+                    xp_to_next_level: 0,
+                    next_role: None,
+                    next_role_progress: None,
+                    xp_to_next_role: None,
+                    badges: Vec::new(),
+                    last_five_usernames: Vec::new(),
+                    last_five_nicknames: Vec::new(),
                 },
             });
         }
