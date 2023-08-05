@@ -129,13 +129,26 @@
                 <div class="value">{{ getRatingChangeText(u["recent_performance"]) }} ({{ u["recent_matches"] }})</div>
 
                 <div class="description">Longest Winning Streak:</div>
-                <div class="value">{{ u["longest_win_streak"] }} (Current: {{ u["current_win_streak"] }})</div>
+                <div class="value">
+                    {{ (u["longest_win_streak"] as number).toLocaleString("en") }} (Current:
+                    {{ u["current_win_streak"] }})
+                </div>
 
                 <div class="description">Longest Losing Streak:</div>
-                <div class="value">{{ u["longest_loss_streak"] }} (Current: {{ u["current_loss_streak"] }})</div>
+                <div class="value">
+                    {{ (u["longest_loss_streak"] as number).toLocaleString("en") }} (Current:
+                    {{ u["current_loss_streak"] }})
+                </div>
 
                 <div class="description">All-Time Highest Rating:</div>
-                <div class="value">{{ u["all_time_highest_rating"] }}</div>
+                <div class="value">
+                    {{
+                        (u["all_time_highest_rating"] as number).toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    }}
+                </div>
 
                 <div class="description">Highest Win:</div>
                 <div class="value">
