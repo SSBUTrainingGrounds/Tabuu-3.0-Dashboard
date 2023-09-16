@@ -43,7 +43,7 @@ pub fn get_recent_matches(matches: String, amount: usize) -> String {
     matches.chars().rev().take(amount).collect()
 }
 
-/// Gets the recent performance of a user in the last 5 matches.
+/// Gets the recent performance of a user in the last X matches.
 pub fn get_recent_performance(
     matches: &[Matches],
     user_id: &String,
@@ -56,9 +56,9 @@ pub fn get_recent_performance(
     };
 
     let (old_mu, old_sigma) = if &m.winner_id == user_id {
-        (m.old_winner_rating, m.old_winner_deviation)
+        (m.new_winner_rating, m.new_winner_deviation)
     } else {
-        (m.old_loser_rating, m.old_loser_deviation)
+        (m.new_loser_rating, m.new_loser_deviation)
     };
 
     get_display_rating(rating, deviation) - get_display_rating(old_mu, old_sigma)

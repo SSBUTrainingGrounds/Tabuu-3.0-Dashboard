@@ -125,7 +125,10 @@
                 <div class="description">Total Matches:</div>
                 <div class="value">{{ u["wins"] + u["losses"] || 0 }}</div>
 
-                <div class="description">Recent Performance (Last 10 Matches):</div>
+                <div class="description">
+                    Recent Performance:<br />
+                    (Last 10 Matches)
+                </div>
                 <div class="value">
                     {{ getRatingChangeText(u["recent_performance"]) }} ({{ u["recent_matches"] }})
                     <RatingChartComponent :ratings="u['last_ratings']" />

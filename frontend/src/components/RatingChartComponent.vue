@@ -1,5 +1,5 @@
 <template>
-    <Line :data="chartData" />
+    <Line :data="chartData" :options="chartOptions" class="chart" />
 </template>
 
 <script setup lang="ts">
@@ -33,4 +33,18 @@ const chartData = ref({
         }
     ]
 });
+
+const chartOptions = ref({
+    plugins: {
+        legend: {
+            display: false
+        }
+    }
+});
 </script>
+
+<style scoped>
+.chart {
+    margin-top: 1rem;
+}
+</style>
