@@ -138,7 +138,7 @@ mod tests {
     fn test_recent_matches() {
         let str = "WWWWLWLLLLWWWLLLWWLLLLW".to_string();
 
-        assert!(get_recent_matches(str, 10) == "WLLLL");
+        assert!(get_recent_matches(str, 10) == "WLLLLWWLLL");
 
         let str = "LWW".to_string();
 
@@ -180,12 +180,12 @@ mod tests {
                 match_id: "0".to_string(),
                 winner_id: "0".to_string(),
                 loser_id: "1".to_string(),
-                old_winner_rating: 25.0,
+                old_winner_rating: 22.0,
                 old_winner_deviation: 4.0,
                 old_loser_rating: 25.0,
                 old_loser_deviation: 4.0,
-                new_winner_rating: 30.0,
-                new_winner_deviation: 3.0,
+                new_winner_rating: 25.0,
+                new_winner_deviation: 4.0,
                 new_loser_rating: 20.0,
                 new_loser_deviation: 3.0,
                 timestamp: 0,
