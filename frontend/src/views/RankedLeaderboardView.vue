@@ -125,8 +125,11 @@
                 <div class="description">Total Matches:</div>
                 <div class="value">{{ u["wins"] + u["losses"] || 0 }}</div>
 
-                <div class="description">Recent Performance:</div>
-                <div class="value">{{ getRatingChangeText(u["recent_performance"]) }} ({{ u["recent_matches"] }})</div>
+                <div class="description">Recent Performance (Last 10 Matches):</div>
+                <div class="value">
+                    {{ getRatingChangeText(u["recent_performance"]) }} ({{ u["recent_matches"] }})
+                    <RatingChartComponent :ratings="u['last_ratings']" />
+                </div>
 
                 <div class="description">Longest Winning Streak:</div>
                 <div class="value">
@@ -167,6 +170,21 @@
                     }})
                 </div>
 
+                <div class="description">Last Match:</div>
+                <div class="value">
+                    {{ u["last_match"]["winner_id"] === u["user_id"] ? "Win" : "Loss" }} vs.
+                    {{
+                        (u["last_match"]["winner_id"] === u["user_id"]
+                            ? getUserName(props.users, u["last_match"]["loser_id"])
+                            : getUserName(props.users, u["last_match"]["winner_id"])) || "Unknown User"
+                    }},
+                    {{
+                        u["last_match"]["timestamp"]
+                            ? new Date(u["last_match"]["timestamp"] * 1000).toLocaleString()
+                            : "Unknown Date"
+                    }}
+                </div>
+
                 <div class="description">Average Opponent:</div>
                 <div class="value">
                     ~{{
@@ -184,6 +202,8 @@
 <script setup lang="ts">
 import RankedComponent from "@/components/RankedComponent.vue";
 import SearchbarComponent from "@/components/SearchbarComponent.vue";
+import RatingChartComponent from "@/components/RatingChartComponent.vue";
+
 import { filterTable } from "@/helpers/filterTable";
 import { sortDisplayTable } from "@/helpers/sortTable";
 import type { GuildUser } from "@/helpers/types";

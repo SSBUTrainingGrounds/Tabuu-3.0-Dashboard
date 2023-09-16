@@ -34,8 +34,10 @@ pub struct TrueSkill {
     pub current_loss_streak: usize,
     pub all_time_highest_rating: f64,
     pub recent_performance: f64,
+    pub last_ratings: Vec<f64>,
     pub avg_opponent_rating: f64,
     pub highest_win: Matches,
+    pub last_match: Matches,
 }
 
 /// A struct for the GET endpoint /leaderboard

@@ -38,9 +38,9 @@ pub fn get_streaks(matches: String) -> (usize, usize, usize, usize) {
     )
 }
 
-/// Gets the last 5 matches from a String of match results, in reversed order.
-pub fn get_recent_matches(matches: String) -> String {
-    matches.chars().rev().take(5).collect()
+/// Gets the last X matches from a String of match results, in reversed order.
+pub fn get_recent_matches(matches: String, amount: usize) -> String {
+    matches.chars().rev().take(amount).collect()
 }
 
 /// Gets the recent performance of a user in the last 5 matches.
@@ -62,6 +62,26 @@ pub fn get_recent_performance(
     };
 
     get_display_rating(rating, deviation) - get_display_rating(old_mu, old_sigma)
+}
+
+pub fn get_last_ratings(matches: &[Matches], user_id: &String) -> Vec<f64> {
+    let mut ratings = Vec::new();
+
+    for m in matches {
+        if &m.winner_id == user_id {
+            ratings.push(get_display_rating(
+                m.new_winner_rating,
+                m.new_winner_deviation,
+            ));
+        } else {
+            ratings.push(get_display_rating(
+                m.new_loser_rating,
+                m.new_loser_deviation,
+            ));
+        }
+    }
+
+    ratings
 }
 
 /// Calculates the average rating of a vector of ratings.
@@ -118,19 +138,19 @@ mod tests {
     fn test_recent_matches() {
         let str = "WWWWLWLLLLWWWLLLWWLLLLW".to_string();
 
-        assert!(get_recent_matches(str) == "WLLLL");
+        assert!(get_recent_matches(str, 10) == "WLLLL");
 
         let str = "LWW".to_string();
 
-        assert!(get_recent_matches(str) == "WWL");
+        assert!(get_recent_matches(str, 10) == "WWL");
 
         let str = "L".to_string();
 
-        assert!(get_recent_matches(str) == "L");
+        assert!(get_recent_matches(str, 10) == "L");
 
         let str = "".to_string();
 
-        assert!(get_recent_matches(str).is_empty());
+        assert!(get_recent_matches(str, 10).is_empty());
     }
 
     #[test]

@@ -67,7 +67,7 @@ body {
 }
 
 .content:hover {
-    background-color: var(--green);
+    background-color: var(--hover-gray);
 }
 
 .clickable {

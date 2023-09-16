@@ -14,9 +14,11 @@
         "start": "nodemon ./server/server.ts"
     },
     "dependencies": {
+        "chart.js": "^4.4.0",
         "dotenv": "^16.3.1",
         "moment": "^2.29.4",
         "vue": "^3.3.4",
+        "vue-chartjs": "^5.2.0",
         "vue-router": "^4.2.2"
     },
     "devDependencies": {

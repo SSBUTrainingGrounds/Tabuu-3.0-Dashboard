@@ -9,7 +9,7 @@ use crate::{
     level::{get_level_progress, get_next_role_progress, get_xp_for_level},
     rating::{
         get_average_opponent, get_display_rating, get_recent_matches, get_recent_performance,
-        get_streaks,
+        get_streaks, get_last_ratings,
     },
     requests::{fetch_me, fetch_single_user, get_json_string, get_users},
     state::AuthorizedServerUsers,
@@ -53,7 +53,7 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                         CAST(loser_id AS TEXT) AS loser_id, timestamp, old_winner_rating, 
                         old_winner_deviation, old_loser_rating, old_loser_deviation, new_winner_rating, 
                         new_winner_deviation, new_loser_rating, new_loser_deviation FROM matches 
-                        WHERE winner_id = ?1 OR loser_id = ?1 ORDER BY timestamp DESC LIMIT 5"
+                        WHERE winner_id = ?1 OR loser_id = ?1 ORDER BY timestamp DESC LIMIT 10"
                     ) {
                         Ok(stmt) => stmt,
                         Err(e) => {
@@ -273,6 +273,30 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                         Ok(display_rating)
                     }).unwrap_or(get_display_rating(rating, deviation));
 
+                    let last_match = match recent_matches.first() {
+                        Some(m) => m.clone(),
+                        None => types::Matches {
+                            match_id: String::from(""),
+                            winner_id: String::from(""),
+                            loser_id: String::from(""),
+                            timestamp: 0,
+                            old_winner_rating: 0.0,
+                            old_winner_deviation: 0.0,
+                            old_loser_rating: 0.0,
+                            old_loser_deviation: 0.0,
+                            new_winner_rating: 0.0,
+                            new_winner_deviation: 0.0,
+                            new_loser_rating: 0.0,
+                            new_loser_deviation: 0.0,
+                            old_winner_display_rating: 0.0,
+                            old_loser_display_rating: 0.0,
+                            new_winner_display_rating: 0.0,
+                            new_loser_display_rating: 0.0,
+                            winner_display_rating_change: 0.0,
+                            loser_display_rating_change: 0.0,
+                        },
+                    };
+
                     types::TrueSkill {
                         rank: 0,
                         user_id: user_id.clone(),
@@ -282,7 +306,7 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                         wins,
                         losses,
                         matches: matches.clone(),
-                        recent_matches: get_recent_matches(matches),
+                        recent_matches: get_recent_matches(matches, 10),
                         win_percentage: (wins as f64 / (wins + losses) as f64) * 100.0,
                         longest_win_streak: streaks.0,
                         longest_loss_streak: streaks.1,
@@ -290,8 +314,10 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                         current_loss_streak: streaks.3,
                         all_time_highest_rating: highest_rating,
                         recent_performance: get_recent_performance(&recent_matches, &user_id, rating, deviation),
+                        last_ratings: get_last_ratings(&recent_matches, &user_id),
                         avg_opponent_rating: get_average_opponent(&opponents_ratings),
                         highest_win: best_win,
+                        last_match,
                     }
                 }
                     )
@@ -325,8 +351,29 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                             current_loss_streak: 0,
                             all_time_highest_rating: 0.0,
                             recent_performance: 0.0,
+                            last_ratings: vec![],
                             avg_opponent_rating: 0.0,
                             highest_win: types::Matches {
+                                match_id: String::from(""),
+                                winner_id: String::from(""),
+                                loser_id: String::from(""),
+                                timestamp: 0,
+                                old_winner_rating: 0.0,
+                                old_winner_deviation: 0.0,
+                                old_loser_rating: 0.0,
+                                old_loser_deviation: 0.0,
+                                new_winner_rating: 0.0,
+                                new_winner_deviation: 0.0,
+                                new_loser_rating: 0.0,
+                                new_loser_deviation: 0.0,
+                                old_winner_display_rating: 0.0,
+                                old_loser_display_rating: 0.0,
+                                new_winner_display_rating: 0.0,
+                                new_loser_display_rating: 0.0,
+                                winner_display_rating_change: 0.0,
+                                loser_display_rating_change: 0.0,
+                            },
+                            last_match: types::Matches {
                                 match_id: String::from(""),
                                 winner_id: String::from(""),
                                 loser_id: String::from(""),
