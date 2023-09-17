@@ -32,7 +32,8 @@ pub struct TrueSkill {
     pub longest_loss_streak: usize,
     pub current_win_streak: usize,
     pub current_loss_streak: usize,
-    pub all_time_highest_rating: f64,
+    // Rating + Timestamp
+    pub all_time_highest_rating: (f64, usize),
     pub recent_performance: f64,
     pub last_ratings: Vec<f64>,
     pub avg_opponent_rating: f64,

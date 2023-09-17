@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 use rocket::{serde::json::Json, State};
 use std::env;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::{
     auth::{AdminUser, BasicUser, ServerUser},
@@ -264,14 +265,15 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
 
                     // This might be null since we did not record all matches.
                     // In that case, we just use the current rating.
-                    let highest_rating: f64 = highest_rating_stmt.query_row([user_id.clone()], |row| {
+                    let highest_rating: (f64, usize) = highest_rating_stmt.query_row([user_id.clone()], |row| {
                         let r: f64 = row.get(0)?;
                         let d: f64 = row.get(1)?;
+                        let timestamp: usize = row.get(2)?;
 
                         let display_rating = get_display_rating(r, d);
 
-                        Ok(display_rating)
-                    }).unwrap_or(get_display_rating(rating, deviation));
+                        Ok((display_rating, timestamp))
+                    }).unwrap_or((get_display_rating(rating, deviation), SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() as usize));
 
                     let last_match = match recent_matches.first() {
                         Some(m) => m.clone(),
@@ -349,7 +351,7 @@ pub async fn trueskill(conn: DbConn, _user: ServerUser) -> String {
                             longest_loss_streak: 0,
                             current_win_streak: 0,
                             current_loss_streak: 0,
-                            all_time_highest_rating: 0.0,
+                            all_time_highest_rating: (0.0, 0),
                             recent_performance: 0.0,
                             last_ratings: vec![],
                             avg_opponent_rating: 0.0,

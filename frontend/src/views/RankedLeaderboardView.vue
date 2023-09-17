@@ -149,11 +149,16 @@
                 <div class="description">All-Time Highest Rating:</div>
                 <div class="value">
                     {{
-                        (u["all_time_highest_rating"] as number).toLocaleString("en", {
+                        (u["all_time_highest_rating"][0] as number).toLocaleString("en", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
                         })
                     }}
+                    ({{
+                        u["all_time_highest_rating"][1]
+                            ? new Date(u["all_time_highest_rating"][1] * 1000).toLocaleString()
+                            : "Unknown Date"
+                    }})
                 </div>
 
                 <div class="description">Highest Win:</div>
