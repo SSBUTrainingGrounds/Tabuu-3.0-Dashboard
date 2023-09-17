@@ -169,9 +169,7 @@
                             maximumFractionDigits: 2
                         })
                     }}
-                    <br />
-                    (vs. {{ getUserName(props.users, u["highest_win"]["loser_id"]) || "Unknown User" }},
-                    {{
+                    vs. {{ getUserName(props.users, u["highest_win"]["loser_id"]) || "Unknown User" }} ({{
                         u["highest_win"]["timestamp"]
                             ? new Date(u["highest_win"]["timestamp"] * 1000).toLocaleString()
                             : "Unknown Date"
@@ -180,17 +178,17 @@
 
                 <div class="description">Last Match:</div>
                 <div class="value">
-                    {{ u["last_match"]["winner_id"] === u["user_id"] ? "Win" : "Loss" }} vs.
+                    {{ u["recent_matches"].slice(0, 1) === "W" ? "Win" : "Loss" }} vs.
                     {{
                         (u["last_match"]["winner_id"] === u["user_id"]
                             ? getUserName(props.users, u["last_match"]["loser_id"])
                             : getUserName(props.users, u["last_match"]["winner_id"])) || "Unknown User"
-                    }},
-                    {{
+                    }}
+                    ({{
                         u["last_match"]["timestamp"]
                             ? new Date(u["last_match"]["timestamp"] * 1000).toLocaleString()
                             : "Unknown Date"
-                    }}
+                    }})
                 </div>
 
                 <div class="description">Average Opponent:</div>
