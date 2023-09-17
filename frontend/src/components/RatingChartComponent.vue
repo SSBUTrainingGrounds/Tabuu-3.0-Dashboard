@@ -39,12 +39,14 @@ const chartOptions = ref({
         legend: {
             display: false
         }
-    }
+    },
+    responsive: true
 });
 </script>
 
 <style scoped>
 .chart {
     margin-top: 1rem;
+    max-width: 100%;
 }
 </style>
